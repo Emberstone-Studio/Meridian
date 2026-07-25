@@ -78,13 +78,23 @@ html {
 
 #search-zone {
   padding: 32px 16px 24px;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 600px) 1fr;
+  align-items: end;
+  gap: 16px;
+}
+
+#top-actions {
+  grid-column: 3;
+  justify-self: end;
   display: flex;
-  justify-content: center;
+  gap: 8px;
+  z-index: 50;
 }
 
 #search-bar {
+  grid-column: 2;
   width: 100%;
-  max-width: 600px;
 }
 
 .search-container {
@@ -292,7 +302,7 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 62px 0;
+  height: 150px;
 }
 
 .new-tab-idle-btn {
@@ -389,6 +399,9 @@ html {
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
   transition:
     transform var(--transition),
     box-shadow var(--transition);
@@ -408,7 +421,8 @@ html {
 
 .card-thumbnail {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  flex: 1;
+  min-height: 0;
   object-fit: cover;
   display: block;
   background: var(--surface-hover);
@@ -416,7 +430,8 @@ html {
 
 .card-thumbnail-placeholder {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  flex: 1;
+  min-height: 0;
   background: var(--surface-hover);
   display: flex;
   align-items: center;
@@ -429,16 +444,17 @@ html {
 
 .card-info {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 0 10px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
 .card-favicon {
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  margin-top: 2px;
 }
 
 .card-title {
@@ -486,9 +502,6 @@ html {
 /* ---- Settings ---- */
 
 #bookmarks-btn {
-  position: fixed;
-  top: 16px;
-  right: 104px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -508,12 +521,17 @@ html {
   color: var(--text-primary);
 }
 
+.bookmarks-anchor {
+  position: relative;
+  display: flex;
+}
+
 #bookmarks-panel {
-  position: fixed;
-  top: 60px;
-  right: 104px;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
   width: min(360px, calc(100vw - 32px));
-  max-height: min(520px, calc(100vh - 76px));
+  max-height: min(520px, calc(100vh - 100px));
   overflow: hidden;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -638,9 +656,6 @@ html {
 }
 
 #new-group-btn {
-  position: fixed;
-  top: 16px;
-  right: 60px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -664,9 +679,6 @@ html {
 }
 
 #settings-btn {
-  position: fixed;
-  top: 16px;
-  right: 16px;
   width: 36px;
   height: 36px;
   border-radius: 50%;
