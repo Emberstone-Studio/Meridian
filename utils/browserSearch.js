@@ -179,18 +179,24 @@ async function injectMetaExtractor(tabId) {
 export function initTabIndex() {
   // New tab created
   chrome.tabs.onCreated.addListener(async (tab) => {
-    await mutateStorageValue(INDEX_KEY, {}, async (index) => {
-      index[tab.id] = await buildEntry(tab, index[tab.id]);
-    });
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+        index[tab.id] = await buildEntry(tab, index[tab.id]);
+      });
+    } catch (_) {}
   });
 
   // Tab updated (title change or navigation complete)
   chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status !== "complete" && !changeInfo.title) return;
 
-    await mutateStorageValue(INDEX_KEY, {}, async (index) => {
-      index[tabId] = await buildEntry(tab, index[tabId]);
-    });
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+        index[tabId] = await buildEntry(tab, index[tabId]);
+      });
+    } catch (_) {
+      return;
+    }
 
     // Inject content script on full load to capture meta/headings
     if (changeInfo.status === "complete") {
@@ -200,18 +206,22 @@ export function initTabIndex() {
 
   // Tab activated — update lastActive timestamp
   chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    await mutateStorageValue(INDEX_KEY, {}, (index) => {
-      if (index[activeInfo.tabId]) {
-        index[activeInfo.tabId].lastActive = Date.now();
-      }
-    });
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, (index) => {
+        if (index[activeInfo.tabId]) {
+          index[activeInfo.tabId].lastActive = Date.now();
+        }
+      });
+    } catch (_) {}
   });
 
   // Tab removed — delete from index
   chrome.tabs.onRemoved.addListener(async (tabId) => {
-    await mutateStorageValue(INDEX_KEY, {}, (index) => {
-      delete index[tabId];
-    });
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, (index) => {
+        delete index[tabId];
+      });
+    } catch (_) {}
   });
 }
 

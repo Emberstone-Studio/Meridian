@@ -37,11 +37,6 @@ export async function getWorkspaceData() {
   return normalizeWorkspaceData(result[STORAGE_KEY]);
 }
 
-export async function saveWorkspaceData(data) {
-  data.version = SCHEMA_VERSION;
-  await mutateStorageValue(STORAGE_KEY, DEFAULT_DATA, () => data);
-}
-
 export async function assignTab(tabId, workspaceId) {
   await mutateWorkspaceData((data) => {
     data.assignments[String(tabId)] = workspaceId;

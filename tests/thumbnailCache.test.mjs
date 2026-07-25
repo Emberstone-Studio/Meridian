@@ -40,7 +40,10 @@ test("keeps the 200 most recently saved thumbnails", async () => {
   const access = {};
   for (let i = 0; i < 200; i += 1) {
     initial[`thumb_${i}`] = `data:image/webp;base64,${i}`;
-    access[`thumb_${i}`] = i;
+    access[`thumb_${i}`] = {
+      t: i,
+      b: initial[`thumb_${i}`].length,
+    };
   }
   initial.thumbnailCacheAccess = access;
   const values = installStorage(initial);
@@ -49,17 +52,39 @@ test("keeps the 200 most recently saved thumbnails", async () => {
 
   assert.equal(values.thumb_0, undefined);
   assert.equal(values.thumb_200, "data:image/webp;base64,new");
+  assert.equal(
+    values.thumbnailCacheAccess.thumb_200.b,
+    "data:image/webp;base64,new".length,
+  );
   assert.equal(Object.keys(await getAllThumbnails()).length, 200);
 });
 
 test("eviction removes thumbnail data and recency metadata", async () => {
   const values = installStorage({
     thumb_7: "data:image/webp;base64,test",
-    thumbnailCacheAccess: { thumb_7: 1 },
+    thumbnailCacheAccess: {
+      thumb_7: { t: 1, b: "data:image/webp;base64,test".length },
+    },
   });
 
   await evictThumbnail(7);
 
   assert.equal(values.thumb_7, undefined);
   assert.deepEqual(values.thumbnailCacheAccess, {});
+});
+
+test("prunes by byte counts stored in access metadata", async () => {
+  const values = installStorage({
+    thumb_1: "old",
+    thumbnailCacheAccess: {
+      thumb_1: { t: 1, b: 50 * 1024 * 1024 },
+    },
+  });
+
+  await saveThumbnail(2, "new");
+
+  assert.equal(values.thumb_1, undefined);
+  assert.equal(values.thumb_2, "new");
+  assert.deepEqual(Object.keys(values.thumbnailCacheAccess), ["thumb_2"]);
+  assert.equal(values.thumbnailCacheAccess.thumb_2.b, 3);
 });
