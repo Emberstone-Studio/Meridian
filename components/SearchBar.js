@@ -25,50 +25,54 @@ const PROVIDERS = [
   },
 ];
 
-const SEARCH_ICON = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
+const MAGNIFIER_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
+const BOOKMARK_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`;
+const HISTORY_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>`;
+const SCOPE_GLYPHS = {
+  all: MAGNIFIER_ICON,
+  bookmarks: BOOKMARK_ICON,
+  history: HISTORY_ICON,
+};
+
+const SCOPE_PLACEHOLDERS = {
+  all: "Search everything…",
+  bookmarks: "Search bookmarks…",
+  history: "Search history…",
+};
+
+const SCOPE_LABELS = {
+  all: "Search everything",
+  bookmarks: "Search bookmarks",
+  history: "Search history",
+};
 
 export function createSearchBar(container) {
   let currentProvider = PROVIDERS[0];
-  let dropdownOpen = false;
+  let scope = "all";
 
   const wrapper = document.createElement("div");
   wrapper.className = "search-container";
+  wrapper.dataset.scope = scope;
 
-  // Left: engine logo button (opens provider dropdown)
+  // Left: scope glyph — a signifier of the active mode, NOT an engine picker.
+  // Engine selection lives on the web-search row (see meridian.js).
   const logoBtn = document.createElement("button");
-  logoBtn.className = "search-logo-btn";
-  logoBtn.setAttribute("aria-haspopup", "listbox");
-  logoBtn.setAttribute("aria-label", "Choose search engine");
+  logoBtn.className = "search-logo-btn search-logo-btn--glyph";
+  logoBtn.type = "button";
+  logoBtn.tabIndex = -1;
+  logoBtn.setAttribute("aria-label", SCOPE_LABELS.all);
 
-  const logoImg = document.createElement("img");
-  logoImg.className = "search-logo";
-  logoImg.width = 18;
-  logoImg.height = 18;
-  logoImg.alt = "";
-  logoImg.onerror = () => {
-    logoImg.style.display = "none";
-    logoFallback.style.display = "flex";
-  };
-
-  const logoFallback = document.createElement("span");
-  logoFallback.className = "search-logo-fallback";
-  logoFallback.style.display = "none";
-
-  logoBtn.appendChild(logoImg);
-  logoBtn.appendChild(logoFallback);
-
-  // Dropdown
-  const dropdown = document.createElement("div");
-  dropdown.className = "provider-dropdown hidden";
-  dropdown.setAttribute("role", "listbox");
-  logoBtn.appendChild(dropdown);
+  const glyph = document.createElement("span");
+  glyph.className = "search-logo-glyph";
+  glyph.innerHTML = SCOPE_GLYPHS.all;
+  logoBtn.appendChild(glyph);
 
   // Center: search input
   const input = document.createElement("input");
   input.className = "search-input";
   input.type = "text";
-  input.placeholder = "Search…";
-  input.setAttribute("aria-label", "Search");
+  input.placeholder = SCOPE_PLACEHOLDERS.all;
+  input.setAttribute("aria-label", SCOPE_LABELS.all);
   input.autofocus = true;
 
   // Clear button (shown when input has text)
@@ -76,12 +80,6 @@ export function createSearchBar(container) {
   clearBtn.className = "search-clear-btn hidden";
   clearBtn.setAttribute("aria-label", "Clear search");
   clearBtn.textContent = "\xd7";
-
-  // Right: submit button
-  const submitBtn = document.createElement("button");
-  submitBtn.className = "search-submit-btn";
-  submitBtn.setAttribute("aria-label", "Search");
-  submitBtn.innerHTML = SEARCH_ICON;
 
   function updateClearBtn() {
     if (input.value.length > 0) {
@@ -93,75 +91,58 @@ export function createSearchBar(container) {
 
   function updateProvider(provider) {
     currentProvider = provider;
-    logoImg.src = provider.favicon;
-    logoImg.style.display = "";
-    logoFallback.style.display = "none";
-    logoFallback.textContent = provider.name.charAt(0);
-    logoBtn.setAttribute("aria-label", `Search engine: ${provider.name}`);
-    renderDropdown();
     chrome.storage.sync.set({ searchProvider: provider.id });
+    api.onProviderChange?.(provider);
   }
 
-  function renderDropdown() {
-    dropdown.innerHTML = "";
-    for (const p of PROVIDERS) {
-      const opt = document.createElement("div");
-      opt.className =
-        "provider-option" + (p.id === currentProvider.id ? " active" : "");
-      opt.setAttribute("role", "option");
-
-      const favicon = document.createElement("img");
-      favicon.width = 16;
-      favicon.height = 16;
-      favicon.alt = "";
-      favicon.src = p.favicon;
-      favicon.onerror = () => {
-        favicon.style.display = "none";
-      };
-      opt.appendChild(favicon);
-
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = p.name;
-      opt.appendChild(nameSpan);
-
-      opt.addEventListener("click", (e) => {
-        e.stopPropagation();
-        updateProvider(p);
-        closeDropdown();
-      });
-      dropdown.appendChild(opt);
-    }
+  function notifyQuery() {
+    api.onBrowserQuery?.(input.value.trim() || null, scope);
   }
 
-  function openDropdown() {
-    dropdownOpen = true;
-    dropdown.classList.remove("hidden");
-    logoBtn.setAttribute("aria-expanded", "true");
+  function applyScope(next) {
+    scope = next;
+    wrapper.dataset.scope = scope;
+    // Left glyph stays the search magnifier across all scopes; only the
+    // placeholder signals the active mode.
+    input.placeholder = SCOPE_PLACEHOLDERS[scope] ?? SCOPE_PLACEHOLDERS.all;
+    const label = SCOPE_LABELS[scope] ?? SCOPE_LABELS.all;
+    input.setAttribute("aria-label", label);
+    logoBtn.setAttribute("aria-label", label);
+
+    // Query text clears on scope switch (carrying a query across scopes misleads).
+    input.value = "";
+    updateClearBtn();
+
+    api.onScopeChange?.(scope);
+    notifyQuery();
   }
 
-  function closeDropdown() {
-    dropdownOpen = false;
-    dropdown.classList.add("hidden");
-    logoBtn.setAttribute("aria-expanded", "false");
+  function setScope(requested) {
+    applyScope(scope === requested ? "all" : requested);
+    input.focus();
   }
 
   function doSearch() {
     const q = input.value.trim();
     if (!q) return;
+    if (scope !== "all") {
+      api.onScopedSubmit?.();
+      return;
+    }
     chrome.tabs.create({ url: currentProvider.url + encodeURIComponent(q) });
     input.value = "";
+    updateClearBtn();
   }
 
+  // Left glyph is a signifier; clicking it just returns focus to the field.
   logoBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    dropdownOpen ? closeDropdown() : openDropdown();
+    input.focus();
   });
-
-  document.addEventListener("click", closeDropdown);
 
   input.addEventListener("input", () => {
     updateClearBtn();
-    api.onBrowserQuery?.(input.value.trim() || null);
+    notifyQuery();
   });
 
   input.addEventListener("keydown", (e) => {
@@ -173,26 +154,40 @@ export function createSearchBar(container) {
       api.onArrowDown?.();
     }
     if (e.key === "Escape") {
-      input.value = "";
-      updateClearBtn();
-      api.onBrowserQuery?.(null);
-      input.blur();
+      if (scope !== "all") {
+        applyScope("all");
+      } else {
+        input.value = "";
+        updateClearBtn();
+        notifyQuery();
+        input.blur();
+      }
     }
   });
 
   clearBtn.addEventListener("click", () => {
     input.value = "";
     updateClearBtn();
-    api.onBrowserQuery?.(null);
+    notifyQuery();
     input.focus();
   });
 
-  submitBtn.addEventListener("click", doSearch);
+  // In a scoped mode (bookmarks/history), a click anywhere outside the pill or
+  // its popup exits the scope: deselect back to "all" (which closes the popup
+  // via onScopeChange) and drop focus. pointerdown so it beats focus changes.
+  document.addEventListener("pointerdown", (e) => {
+    if (scope === "all") return;
+    const insidePill = wrapper.contains(e.target);
+    const insidePopup = !!e.target.closest?.("#bookmarks-panel");
+    if (insidePill || insidePopup) return;
+    applyScope("all");
+    input.blur();
+  });
 
   wrapper.appendChild(logoBtn);
   wrapper.appendChild(input);
   wrapper.appendChild(clearBtn);
-  wrapper.appendChild(submitBtn);
+
   container.appendChild(wrapper);
 
   chrome.storage.sync.get("searchProvider").then(({ searchProvider }) => {
@@ -201,16 +196,25 @@ export function createSearchBar(container) {
     updateProvider(saved);
   });
 
-  renderDropdown();
-
   const api = {
     focus: () => input.focus(),
     onBrowserQuery: null,
     onArrowDown: null,
+    onScopedSubmit: null,
+    onScopeChange: null,
+    onProviderChange: null,
+    setScope,
+    getScope: () => scope,
+    getProvider: () => currentProvider,
+    getProviders: () => PROVIDERS.slice(),
+    setProvider: (id) => {
+      const p = PROVIDERS.find((x) => x.id === id);
+      if (p) updateProvider(p);
+    },
     clearSearch: () => {
       input.value = "";
       updateClearBtn();
-      api.onBrowserQuery?.(null);
+      notifyQuery();
     },
   };
 

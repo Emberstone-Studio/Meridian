@@ -293,17 +293,16 @@ function formatDate(ts) {
  * @param {string} query
  * @returns {Promise<{ tabs: ResultItem[], bookmarks: ResultItem[], history: ResultItem[] }>}
  */
-export async function search(query) {
-  if (!query || !query.trim()) {
+export async function search(query, scope = "all") {
+  const trimmed = query?.trim() ?? "";
+  if (!trimmed && scope === "all") {
     return { tabs: [], bookmarks: [], history: [] };
   }
 
-  const trimmed = query.trim();
-
   const [tabs, bookmarks, history] = await Promise.all([
-    searchTabs(trimmed),
-    searchBookmarks(trimmed),
-    searchHistory(trimmed),
+    scope === "all" ? searchTabs(trimmed) : [],
+    scope === "all" || scope === "bookmarks" ? searchBookmarks(trimmed) : [],
+    scope === "all" || scope === "history" ? searchHistory(trimmed) : [],
   ]);
 
   return { tabs, bookmarks, history };
@@ -345,7 +344,17 @@ async function searchTabs(query) {
 async function searchBookmarks(query) {
   let nodes;
   try {
-    nodes = await chrome.bookmarks.search({ query });
+    if (query) {
+      nodes = await chrome.bookmarks.search({ query });
+    } else {
+      const roots = await chrome.bookmarks.getTree();
+      nodes = [];
+      const visit = (node) => {
+        if (node.url) nodes.push(node);
+        node.children?.forEach(visit);
+      };
+      roots.forEach(visit);
+    }
   } catch (_) {
     return [];
   }
@@ -367,8 +376,8 @@ async function searchBookmarks(query) {
       }
 
       const domain = extractDomain(node.url);
-      const titleScore = fuzzyScore(query, node.title ?? "");
-      const urlScore = fuzzyScore(query, node.url ?? "");
+      const titleScore = query ? fuzzyScore(query, node.title ?? "") : 1;
+      const urlScore = query ? fuzzyScore(query, node.url ?? "") : 1;
       const score = Math.max(titleScore, urlScore);
 
       return {
@@ -404,8 +413,8 @@ async function searchHistory(query) {
     .sort((a, b) => (b.lastVisitTime ?? 0) - (a.lastVisitTime ?? 0))
     .map((item) => {
       const domain = extractDomain(item.url);
-      const titleScore = fuzzyScore(query, item.title ?? "");
-      const urlScore = fuzzyScore(query, item.url ?? "");
+      const titleScore = query ? fuzzyScore(query, item.title ?? "") : 1;
+      const urlScore = query ? fuzzyScore(query, item.url ?? "") : 1;
       const score = Math.max(titleScore, urlScore);
 
       return {

@@ -4,6 +4,7 @@ import { search } from "./utils/browserSearch.js";
 import {
   createSettingsPanel,
   applyTheme,
+  applyAccentFromBackground,
   applyBackground,
   DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
@@ -16,7 +17,7 @@ import {
   assignTab,
 } from "./utils/workspaceManager.js";
 import { show as showContextMenu } from "./components/ContextMenu.js";
-import { createBookmarksButton } from "./components/BookmarksButton.js";
+import { createScopePopup } from "./components/BookmarksButton.js";
 
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
@@ -38,6 +39,7 @@ async function applyStoredAppearance() {
   const bg = background ?? DEFAULT_BACKGROUND;
   const customUrl = bg.type === "custom" ? await getCustomBackgroundUrl() : null;
   applyBackground(bg, customUrl);
+  applyAccentFromBackground(bg, customUrl);
 }
 
 function setupLightbox() {
@@ -469,6 +471,7 @@ function filterGrid(query) {
 function clearBrowserSearch() {
   browserSearchActive = false;
   browserSearchResults = null;
+  document.getElementById("new-group-btn")?.classList.remove("hidden");
 
   document.querySelectorAll(".workspace-lane").forEach((lane) => {
     lane.style.display = "";
@@ -538,7 +541,7 @@ function buildResultRow(item) {
   return row;
 }
 
-function renderSearchResults(results, query) {
+function renderSearchResults(results, query, scope = "all") {
   let container = document.getElementById("browser-search-results");
   if (!container) {
     container = document.createElement("div");
@@ -571,51 +574,161 @@ function renderSearchResults(results, query) {
     container.appendChild(section);
   }
 
-  if (
-    !results.tabs.length &&
-    !results.bookmarks.length &&
-    !results.history.length
-  ) {
-    const empty = document.createElement("div");
-    empty.className = "search-results-empty";
-    const msg = document.createElement("span");
-    msg.textContent = `No results for "${query}" — `;
-    const webBtn = document.createElement("button");
-    webBtn.className = "search-web-fallback";
-    webBtn.textContent = "search the web";
-    webBtn.addEventListener("click", async () => {
-      const PROVIDER_URLS = {
-        google: "https://www.google.com/search?q=",
-        duckduckgo: "https://duckduckgo.com/?q=",
-        bing: "https://www.bing.com/search?q=",
-        brave: "https://search.brave.com/search?q=",
-      };
-      const { searchProvider } = await chrome.storage.sync.get("searchProvider");
-      const base = PROVIDER_URLS[searchProvider] ?? PROVIDER_URLS.google;
-      chrome.tabs.create({ url: base + encodeURIComponent(query) });
-    });
-    empty.appendChild(msg);
-    empty.appendChild(webBtn);
-    container.appendChild(empty);
+  if (scope !== "all") {
+    if (
+      !results.tabs.length &&
+      !results.bookmarks.length &&
+      !results.history.length
+    ) {
+      const empty = document.createElement("div");
+      empty.className = "search-results-empty";
+      empty.textContent =
+        scope === "bookmarks" ? "No bookmarks found" : "No history found";
+      container.appendChild(empty);
+    }
+    return;
+  }
+
+  // All scope: once text is entered, offer the web search with the engine picker.
+  if (query) {
+    const anyLocal =
+      results.tabs.length || results.bookmarks.length || results.history.length;
+    container.appendChild(buildWebSearchRow(query, !anyLocal));
   }
 }
 
-async function handleBrowserQuery(query) {
+const CHEVRON_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+
+function buildWebSearchRow(query, noLocal) {
+  const providers = searchBarApi?.getProviders?.() ?? [];
+  let provider = searchBarApi?.getProvider?.() ?? providers[0];
+
+  const row = document.createElement("div");
+  row.className = "search-web-row";
+
+  if (noLocal) {
+    const note = document.createElement("div");
+    note.className = "search-web-note";
+    note.textContent = "No matches in your tabs, bookmarks, or history.";
+    row.appendChild(note);
+  }
+
+  const bar = document.createElement("div");
+  bar.className = "search-web-bar";
+
+  const go = document.createElement("button");
+  go.className = "search-web-go result-row";
+  go.type = "button";
+
+  const fav = document.createElement("img");
+  fav.className = "result-favicon";
+  fav.alt = "";
+  fav.src = provider?.favicon ?? "";
+  fav.onerror = () => {
+    fav.style.visibility = "hidden";
+  };
+
+  const label = document.createElement("span");
+  label.className = "result-title";
+  const setLabel = () => {
+    label.textContent = `Search ${provider?.name ?? "the web"} for "${query}"`;
+  };
+  setLabel();
+
+  go.appendChild(fav);
+  go.appendChild(label);
+  go.addEventListener("click", () => {
+    if (!provider) return;
+    chrome.tabs.create({ url: provider.url + encodeURIComponent(query) });
+  });
+
+  const picker = document.createElement("button");
+  picker.className = "search-web-provider";
+  picker.type = "button";
+  picker.setAttribute("aria-haspopup", "listbox");
+  picker.setAttribute("aria-label", "Choose search engine");
+  picker.setAttribute("aria-expanded", "false");
+  picker.innerHTML = CHEVRON_ICON;
+
+  const dropdown = document.createElement("div");
+  dropdown.className = "provider-dropdown hidden";
+  dropdown.setAttribute("role", "listbox");
+
+  const closeDropdown = () => {
+    dropdown.classList.add("hidden");
+    picker.setAttribute("aria-expanded", "false");
+  };
+
+  for (const p of providers) {
+    const opt = document.createElement("div");
+    opt.className = "provider-option" + (p.id === provider?.id ? " active" : "");
+    opt.setAttribute("role", "option");
+
+    const f = document.createElement("img");
+    f.width = 16;
+    f.height = 16;
+    f.alt = "";
+    f.src = p.favicon;
+    f.onerror = () => {
+      f.style.visibility = "hidden";
+    };
+
+    const n = document.createElement("span");
+    n.textContent = p.name;
+
+    opt.appendChild(f);
+    opt.appendChild(n);
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      provider = p;
+      searchBarApi?.setProvider?.(p.id);
+      fav.src = p.favicon;
+      fav.style.visibility = "";
+      setLabel();
+      dropdown
+        .querySelectorAll(".provider-option")
+        .forEach((o) => o.classList.remove("active"));
+      opt.classList.add("active");
+      closeDropdown();
+    });
+    dropdown.appendChild(opt);
+  }
+
+  picker.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const nowOpen = dropdown.classList.contains("hidden");
+    dropdown.classList.toggle("hidden");
+    picker.setAttribute("aria-expanded", String(nowOpen));
+  });
+  document.addEventListener("click", closeDropdown);
+
+  bar.appendChild(go);
+  bar.appendChild(picker);
+  bar.appendChild(dropdown);
+  row.appendChild(bar);
+  return row;
+}
+
+async function handleBrowserQuery(query, scope = "all") {
   browserSearchActive = true;
   const searchSequence = ++browserSearchSequence;
+  document.getElementById("new-group-btn")?.classList.add("hidden");
 
-  filterGrid(query);
+  if (scope === "all") filterGrid(query);
+  else filterGrid("");
 
-  const r = await search(query);
+  const r = await search(query, scope);
   const { localSearch } = await chrome.storage.sync.get("localSearch");
   const ls = localSearch ?? { tabs: true, bookmarks: true, history: true };
-  if (!ls.tabs) r.tabs = [];
-  if (!ls.bookmarks) r.bookmarks = [];
-  if (!ls.history) r.history = [];
+  if (scope === "all") {
+    if (!ls.tabs) r.tabs = [];
+    if (!ls.bookmarks) r.bookmarks = [];
+    if (!ls.history) r.history = [];
+  }
   if (!browserSearchActive || searchSequence !== browserSearchSequence) return;
   browserSearchResults = r;
 
-  renderSearchResults(r, query);
+  renderSearchResults(r, query ?? "", scope);
 }
 
 async function init() {
@@ -682,6 +795,18 @@ async function init() {
       color: var(--accent); font-size: 14px; font-family: inherit; text-decoration: underline;
     }
     .search-web-fallback:hover { opacity: 0.8; }
+    .search-web-row { margin-top: 8px; }
+    .search-web-note { font-size: 13px; color: var(--text-secondary); padding: 4px 0 8px; }
+    .search-web-bar { display: flex; align-items: center; gap: 4px; position: relative; }
+    .search-web-go { flex: 1; }
+    .search-web-provider {
+      background: none; border: none; cursor: pointer; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: var(--radius-sm); flex-shrink: 0;
+      transition: background var(--transition), color var(--transition);
+    }
+    .search-web-provider:hover { background: var(--surface-hover); color: var(--text-primary); }
+    .provider-dropdown.hidden { display: none; }
   `;
   document.head.appendChild(style);
 
@@ -692,34 +817,85 @@ async function init() {
 
   searchBarApi = createSearchBar(document.getElementById("search-bar"));
 
-  searchBarApi.onBrowserQuery = (query) => {
-    if (!query) {
+  // Move the scope/settings icon cluster into the search pill itself.
+  const searchContainer = document.querySelector("#search-bar .search-container");
+  const topActions = document.getElementById("top-actions");
+  if (searchContainer && topActions) searchContainer.appendChild(topActions);
+
+  // Scope popup (Bookmarks / History): attached directly below the search field,
+  // shown while a scope is active.
+  const scopePanel = document.createElement("div");
+  scopePanel.id = "bookmarks-panel";
+  scopePanel.className = "hidden";
+  scopePanel.setAttribute("role", "dialog");
+  scopePanel.setAttribute("aria-label", "Bookmarks");
+  document.getElementById("search-bar").appendChild(scopePanel);
+  const scopePopup = createScopePopup(scopePanel, {
+    openItem: openBookmark,
+    historyProvider: (q) => search(q, "history").then((r) => r.history),
+  });
+
+  const isPopupScope = (scope) => scope === "bookmarks" || scope === "history";
+
+  searchBarApi.onBrowserQuery = (query, scope) => {
+    if (isPopupScope(scope)) {
+      scopePopup.setQuery(query || "");
+      return;
+    }
+    if (!query && scope === "all") {
       clearBrowserSearch();
     } else {
-      handleBrowserQuery(query);
+      handleBrowserQuery(query, scope);
     }
   };
 
   searchBarApi.onArrowDown = () => {
+    if (isPopupScope(searchBarApi.getScope())) {
+      document.querySelector("#bookmarks-panel .bookmark-row")?.focus();
+      return;
+    }
     document.querySelector("#browser-search-results .result-row")?.focus();
+  };
+  searchBarApi.onScopedSubmit = () => {
+    if (isPopupScope(searchBarApi.getScope())) {
+      document
+        .querySelector("#bookmarks-panel .bookmark-row:not(.bookmark-folder)")
+        ?.click();
+      return;
+    }
+    document.querySelector("#browser-search-results .result-row")?.click();
   };
 
   const settingsOverlay = document.getElementById("settings-overlay");
   const settingsContainer = document.getElementById("settings-panel");
   const settingsBtn = document.getElementById("settings-btn");
   const newGroupBtn = document.getElementById("new-group-btn");
-  const bookmarksBtn = document.getElementById("bookmarks-btn");
-  const bookmarksPanel = document.getElementById("bookmarks-panel");
 
   createSettingsPanel(settingsContainer, closeSettings);
 
   settingsBtn.addEventListener("click", openSettings);
   newGroupBtn.addEventListener("click", handleNewGroup);
-  bookmarksApi = createBookmarksButton(
-    bookmarksBtn,
-    bookmarksPanel,
-    openBookmark,
-  );
+
+  const scopeButtons = {
+    bookmarks: document.getElementById("scope-bookmarks"),
+    history: document.getElementById("scope-history"),
+  };
+  for (const [scopeName, btn] of Object.entries(scopeButtons)) {
+    btn?.addEventListener("click", () => searchBarApi.setScope(scopeName));
+  }
+  searchBarApi.onScopeChange = (activeScope) => {
+    for (const [scopeName, btn] of Object.entries(scopeButtons)) {
+      const active = scopeName === activeScope;
+      btn?.classList.toggle("active", active);
+      btn?.setAttribute("aria-pressed", String(active));
+    }
+    if (isPopupScope(activeScope)) {
+      clearBrowserSearch();
+      scopePopup.openScope(activeScope);
+    } else {
+      scopePopup.close();
+    }
+  };
   settingsOverlay.addEventListener("click", (e) => {
     if (e.target === settingsOverlay) closeSettings();
   });

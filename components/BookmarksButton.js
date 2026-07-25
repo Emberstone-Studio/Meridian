@@ -49,44 +49,58 @@ function folderIcon() {
   return svg;
 }
 
-export function createBookmarksButton(button, panel, openBookmark) {
-  let view = "bar"; // "bar" | "all"
+// Scope popup driven by the search bar's Bookmarks / History scopes. It attaches
+// directly below the search field. Bookmarks: browsable tabbed / folder view
+// when empty, flat filtered results when typing. History: recent list when
+// empty, filtered when typing (via the injected historyProvider).
+export function createScopePopup(panel, { openItem, historyProvider }) {
+  let scope = null; // "bookmarks" | "history"
+  let query = "";
+
+  // Bookmarks state
+  let bmLoaded = false;
   let bookmarksBar = [];
   let allRoot = [];
-  let path = []; // stack of folder nodes drilled into within the "all" view
+  let allFlat = [];
+  let view = "bar"; // "bar" | "all"
+  let path = []; // folders drilled into within the "all" view
+
+  // History state
+  let historyItems = [];
+  let histSeq = 0;
+
+  function isOpen() {
+    return !panel.classList.contains("hidden");
+  }
 
   function close() {
     panel.classList.add("hidden");
-    button.setAttribute("aria-expanded", "false");
   }
 
-  function renderMessage(text) {
-    panel.replaceChildren();
+  function renderEmpty(text) {
     const message = document.createElement("p");
     message.className = "bookmarks-empty";
     message.textContent = text;
     panel.appendChild(message);
   }
 
-  function makeBookmarkRow(bookmark) {
+  // Generic result row (favicon + label). Works for bookmark leaves and history.
+  function makeItemRow(item) {
     const row = document.createElement("button");
     row.type = "button";
     row.className = "bookmark-row";
-    row.title = bookmark.url;
+    row.title = item.url;
 
     const favicon = document.createElement("img");
     favicon.className = "bookmark-favicon";
     favicon.alt = "";
-    favicon.src = faviconUrl(bookmark.url);
+    favicon.src = item.favicon || faviconUrl(item.url);
     favicon.addEventListener("error", () => favicon.classList.add("hidden"));
 
     const label = document.createElement("span");
-    label.textContent = bookmark.title || bookmark.url;
+    label.textContent = item.title || item.url;
     row.append(favicon, label);
-    row.addEventListener("click", () => {
-      close();
-      openBookmark(bookmark.url);
-    });
+    row.addEventListener("click", () => openItem(item.url));
     return row;
   }
 
@@ -167,16 +181,32 @@ export function createBookmarksButton(button, panel, openBookmark) {
     return allRoot;
   }
 
-  function render() {
-    panel.replaceChildren();
-    panel.appendChild(renderHeader());
+  function renderBookmarks() {
+    const q = query.trim().toLowerCase();
 
+    // Typed → flat, filtered search across every bookmark.
+    if (q) {
+      const matches = allFlat.filter(
+        (b) =>
+          (b.title || "").toLowerCase().includes(q) ||
+          (b.url || "").toLowerCase().includes(q),
+      );
+      if (!matches.length) {
+        renderEmpty("No bookmarks match");
+        return;
+      }
+      const list = document.createElement("div");
+      list.className = "bookmarks-list";
+      for (const b of matches.slice(0, 200)) list.appendChild(makeItemRow(b));
+      panel.appendChild(list);
+      return;
+    }
+
+    // Empty → browsable tabbed / folder view.
+    panel.appendChild(renderHeader());
     const nodes = currentNodes();
     if (!nodes.length) {
-      const empty = document.createElement("p");
-      empty.className = "bookmarks-empty";
-      empty.textContent = "No bookmarks";
-      panel.appendChild(empty);
+      renderEmpty("No bookmarks");
       return;
     }
 
@@ -187,40 +217,84 @@ export function createBookmarksButton(button, panel, openBookmark) {
       if (!node.url) list.appendChild(makeFolderRow(node));
     }
     for (const node of nodes) {
-      if (node.url) list.appendChild(makeBookmarkRow(node));
+      if (node.url) list.appendChild(makeItemRow(node));
     }
     panel.appendChild(list);
   }
 
-  async function open() {
-    try {
-      const [root] = await chrome.bookmarks.getTree();
-      const bar = findBookmarksBar(root);
-      bookmarksBar = flattenBookmarks(bar?.children || []);
-      allRoot = allBookmarksRoot(root, bar);
-      view = "bar";
-      path = [];
-      render();
-    } catch {
-      renderMessage("Could not load bookmarks");
-    }
-    panel.classList.remove("hidden");
-    button.setAttribute("aria-expanded", "true");
-  }
-
-  button.addEventListener("click", async (event) => {
-    event.stopPropagation();
-    if (!panel.classList.contains("hidden")) {
-      close();
+  function renderHistory() {
+    if (!historyItems.length) {
+      renderEmpty(query.trim() ? "No history match" : "No history");
       return;
     }
-    await open();
-  });
-  panel.addEventListener("click", (event) => event.stopPropagation());
-  document.addEventListener("click", close);
+    const list = document.createElement("div");
+    list.className = "bookmarks-list";
+    for (const item of historyItems.slice(0, 200)) {
+      list.appendChild(makeItemRow(item));
+    }
+    panel.appendChild(list);
+  }
 
-  return {
-    close,
-    isOpen: () => !panel.classList.contains("hidden"),
-  };
+  function render() {
+    panel.replaceChildren();
+    if (scope === "history") renderHistory();
+    else renderBookmarks();
+  }
+
+  async function loadBookmarks() {
+    const [root] = await chrome.bookmarks.getTree();
+    const bar = findBookmarksBar(root);
+    bookmarksBar = flattenBookmarks(bar?.children || []);
+    allRoot = allBookmarksRoot(root, bar);
+    allFlat = flattenBookmarks(root.children || []);
+    bmLoaded = true;
+  }
+
+  async function fetchHistory(q) {
+    const seq = ++histSeq;
+    const items = await historyProvider(q);
+    if (seq !== histSeq) return false; // a newer request superseded this one
+    historyItems = items || [];
+    return true;
+  }
+
+  async function openScope(next) {
+    scope = next;
+    query = "";
+    panel.setAttribute(
+      "aria-label",
+      next === "history" ? "History" : "Bookmarks",
+    );
+
+    try {
+      if (next === "bookmarks") {
+        if (!bmLoaded) await loadBookmarks();
+      } else if (next === "history") {
+        await fetchHistory("");
+      }
+    } catch {
+      panel.replaceChildren();
+      renderEmpty("Could not load");
+      panel.classList.remove("hidden");
+      return;
+    }
+
+    panel.classList.remove("hidden");
+    render();
+  }
+
+  async function setQuery(next) {
+    query = next || "";
+    if (!isOpen()) return;
+    if (scope === "history") {
+      const fresh = await fetchHistory(query);
+      if (fresh) render();
+    } else {
+      render();
+    }
+  }
+
+  panel.addEventListener("click", (event) => event.stopPropagation());
+
+  return { openScope, close, isOpen, setQuery };
 }

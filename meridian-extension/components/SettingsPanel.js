@@ -277,6 +277,7 @@ export function createSettingsPanel(container, onClose) {
     currentBg = { type, value };
     chrome.storage.sync.set({ background: currentBg });
     applyBackground(currentBg, customBgUrl);
+    applyAccentFromBackground(currentBg, customBgUrl);
     renderBgSection();
   }
 
@@ -485,6 +486,7 @@ export function createSettingsPanel(container, onClose) {
         getCustomBackgroundUrl().then((url) => {
           customBgUrl = url;
           applyBackground(currentBg, customBgUrl);
+          applyAccentFromBackground(currentBg, customBgUrl);
           renderBgSection();
         });
       }
@@ -504,6 +506,290 @@ export function createSettingsPanel(container, onClose) {
   renderBgSection();
 }
 
+// ── Auto accent: derive the accent hue from the active background ──
+// The accent tracks the background's dominant hue; the theme keeps saturation
+// and lightness (see meridian.css), and a contrast guard nudges lightness so
+// the accent can never collapse into a same-toned solid background.
+
+function hexToRgb(hex) {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex).trim());
+  if (!m) return null;
+  let h = m[1];
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const int = parseInt(h, 16);
+  return [(int >> 16) & 255, (int >> 8) & 255, int & 255];
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  const d = max - min;
+  let h = 0;
+  let s = 0;
+  if (d !== 0) {
+    s = d / (1 - Math.abs(2 * l - 1));
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+  }
+  return { h, s: Math.round(s * 100), l: Math.round(l * 100) };
+}
+
+// Pick the most saturated stop of a gradient/solid — the color that gives
+// the background its identity, not the muddy average of all stops.
+function dominantHex(str) {
+  const hexes = String(str).match(/#[0-9a-f]{6}|#[0-9a-f]{3}/gi);
+  if (!hexes || !hexes.length) return null;
+  let best = null;
+  for (const hx of hexes) {
+    const rgb = hexToRgb(hx);
+    if (!rgb) continue;
+    const hsl = rgbToHsl(...rgb);
+    if (!best || hsl.s > best.s) best = hsl;
+  }
+  return best;
+}
+
+// Find an image's dominant *vivid* hue via a saturation-weighted histogram.
+// A plain pixel average collapses to gray and throws the real color away.
+// Also returns the image's overall luminance (all opaque pixels) so callers
+// can decide whether content sitting on it needs light or dark text.
+function analyzeImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const size = 48;
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, size, size);
+        const { data } = ctx.getImageData(0, 0, size, size);
+        const BINS = 24;
+        const weight = new Array(BINS).fill(0);
+        const sSum = new Array(BINS).fill(0);
+        const lSum = new Array(BINS).fill(0);
+        const count = new Array(BINS).fill(0);
+        let lumSum = 0;
+        let lumN = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] < 125) continue;
+          lumSum += relLum(data[i], data[i + 1], data[i + 2]);
+          lumN += 1;
+          const hsl = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+          // Skip grays and near black/white — they carry no hue identity.
+          if (hsl.s < 18 || hsl.l < 10 || hsl.l > 92) continue;
+          const bin = Math.floor((hsl.h / 360) * BINS) % BINS;
+          weight[bin] += hsl.s / 100; // vivid pixels weigh more
+          sSum[bin] += hsl.s;
+          lSum[bin] += hsl.l;
+          count[bin] += 1;
+        }
+        const lum = lumN ? lumSum / lumN : null;
+        let top = -1;
+        let topW = 0;
+        for (let b = 0; b < BINS; b += 1) {
+          if (weight[b] > topW) {
+            topW = weight[b];
+            top = b;
+          }
+        }
+        if (top < 0) return resolve({ dominant: null, lum }); // no vivid pixels
+        resolve({
+          dominant: {
+            h: Math.round(((top + 0.5) / BINS) * 360),
+            s: Math.round(sSum[top] / count[top]),
+            l: Math.round(lSum[top] / count[top]),
+          },
+          lum,
+        });
+      } catch {
+        resolve({ dominant: null, lum: null }); // cross-origin taint, etc.
+      }
+    };
+    img.onerror = () => resolve({ dominant: null, lum: null });
+    img.src = url;
+  });
+}
+
+// Average relative luminance across every hex stop in a string.
+function averageLumOfHexes(str) {
+  const hexes = String(str).match(/#[0-9a-f]{6}|#[0-9a-f]{3}/gi);
+  if (!hexes || !hexes.length) return null;
+  let sum = 0;
+  let n = 0;
+  for (const hx of hexes) {
+    const rgb = hexToRgb(hx);
+    if (!rgb) continue;
+    sum += relLum(...rgb);
+    n += 1;
+  }
+  return n ? sum / n : null;
+}
+
+// Returns { dominant, lum } for the active background. `lum` is null for the
+// "none" background, which follows the theme's --bg (read live at apply time).
+async function analyzeBackground(bg, customDataUrl) {
+  if (!bg || bg.type === "none") return { dominant: null, lum: null };
+  if (bg.type === "solid") {
+    const rgb = hexToRgb(bg.value);
+    return {
+      dominant: rgb ? rgbToHsl(...rgb) : null,
+      lum: rgb ? relLum(...rgb) : null,
+    };
+  }
+  if (bg.type === "gradient") {
+    return { dominant: dominantHex(bg.value), lum: averageLumOfHexes(bg.value) };
+  }
+  if (bg.type === "photo") return analyzeImage(bg.value);
+  if (bg.type === "custom") {
+    return customDataUrl
+      ? analyzeImage(customDataUrl)
+      : { dominant: null, lum: null };
+  }
+  return { dominant: null, lum: null };
+}
+
+// ── Color math for the surface-contrast solver ──
+function hslToRgb(h, s, l) {
+  s /= 100;
+  l /= 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  return [(r + m) * 255, (g + m) * 255, (b + m) * 255];
+}
+
+function relLum(r, g, b) {
+  const a = [r, g, b].map((v) => {
+    const n = v / 255;
+    return n <= 0.03928 ? n / 12.92 : ((n + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+}
+
+function contrastRatio(l1, l2) {
+  const hi = Math.max(l1, l2);
+  const lo = Math.min(l1, l2);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+// Luminance of the actual --surface the accent renders on (cards, panels).
+function surfaceLum() {
+  const v = getComputedStyle(document.documentElement)
+    .getPropertyValue("--surface")
+    .trim();
+  const rgb = hexToRgb(v);
+  if (rgb) return relLum(...rgb);
+  return docIsDark() ? 0.035 : 1;
+}
+
+// Derived accents run a touch under full saturation — neon reads cheap.
+const ACCENT_SAT = 80;
+
+// Last resolved dominant + background luminance, cached so a theme switch can
+// re-run the solver and re-pick on-background text without re-sampling.
+let lastDominant = null;
+let lastBgLum = null;
+
+function docIsDark() {
+  const t = document.documentElement.dataset.theme;
+  if (t === "dark") return true;
+  if (t === "light") return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+function applyDerivedAccent(dominant) {
+  const root = document.documentElement;
+  // Grayscale / very desaturated → no meaningful hue; use the default.
+  if (!dominant || dominant.s < 12) {
+    root.style.removeProperty("--accent-hue");
+    root.style.removeProperty("--accent-sat");
+    root.style.removeProperty("--accent-light");
+    return;
+  }
+
+  // Solve for a lightness that clears a legible contrast against the SURFACE
+  // (where the accent actually lives), searching in the safe direction and
+  // staying inside a tasteful band so filled-accent glyphs stay readable too.
+  const hue = dominant.h;
+  const dark = docIsDark();
+  const surf = surfaceLum();
+  const target = 3.5;
+  const floor = dark ? 48 : 30;
+  const ceil = dark ? 70 : 50;
+  let l = dark ? 58 : 44;
+  const step = dark ? 2 : -2;
+  for (let i = 0; i < 40; i += 1) {
+    const [r, g, b] = hslToRgb(hue, ACCENT_SAT, l);
+    if (contrastRatio(relLum(r, g, b), surf) >= target) break;
+    l += step;
+    if (l <= floor) {
+      l = floor;
+      break;
+    }
+    if (l >= ceil) {
+      l = ceil;
+      break;
+    }
+  }
+
+  root.style.setProperty("--accent-hue", String(hue));
+  root.style.setProperty("--accent-sat", `${ACCENT_SAT}%`);
+  root.style.setProperty("--accent-light", `${l}%`);
+}
+
+// Content that sits directly on the background (lane headers) can't rely on the
+// theme's text color — the wallpaper may be light or dark regardless of theme.
+// Pick light or dark on-background text from the background's own luminance,
+// plus a contrasting text-shadow scrim so it survives busy photos.
+function applyOnBackground(lum) {
+  const root = document.documentElement;
+  let L = lum;
+  if (L == null) {
+    // "none" background follows the theme's --bg — read it live.
+    const v = getComputedStyle(root).getPropertyValue("--bg").trim();
+    const rgb = hexToRgb(v);
+    L = rgb ? relLum(...rgb) : docIsDark() ? 0.02 : 0.9;
+  }
+  if (L < 0.4) {
+    // Dark background → light text.
+    root.style.setProperty("--on-bg", "rgba(255, 255, 255, 0.95)");
+    root.style.setProperty("--on-bg-muted", "rgba(255, 255, 255, 0.72)");
+    root.style.setProperty("--on-bg-shadow", "0 1px 3px rgba(0, 0, 0, 0.55)");
+  } else {
+    // Light background → dark text.
+    root.style.setProperty("--on-bg", "rgba(0, 0, 0, 0.9)");
+    root.style.setProperty("--on-bg-muted", "rgba(0, 0, 0, 0.6)");
+    root.style.setProperty("--on-bg-shadow", "0 1px 2px rgba(255, 255, 255, 0.4)");
+  }
+}
+
+export async function applyAccentFromBackground(bg, customDataUrl = null) {
+  const { dominant, lum } = await analyzeBackground(bg, customDataUrl);
+  lastDominant = dominant;
+  lastBgLum = lum;
+  applyDerivedAccent(dominant);
+  applyOnBackground(lum);
+}
+
 export function applyTheme(theme) {
   const html = document.documentElement;
   if (theme === "light") {
@@ -513,6 +799,10 @@ export function applyTheme(theme) {
   } else {
     delete html.dataset.theme;
   }
+  // Both the accent solver and the on-background text depend on the theme
+  // (surface + the "none" background follow it) — re-run them on switch.
+  applyDerivedAccent(lastDominant);
+  applyOnBackground(lastBgLum);
 }
 
 export function applyBackground(bg, customDataUrl = null) {
