@@ -26,11 +26,17 @@ function extractDomain(url) {
 }
 
 /**
- * Build a Google favicon URL for a given domain or full URL.
+ * Build a favicon URL for a page using Chrome's local _favicon provider.
+ * This resolves against the browser's own favicon cache — no network request
+ * and no third-party leak of the user's browsing domains. Requires the
+ * "favicon" permission in the manifest.
  */
-function faviconUrl(domain) {
-  if (!domain) return "";
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=16`;
+function faviconUrl(pageUrl) {
+  if (!pageUrl) return "";
+  const u = new URL(chrome.runtime.getURL("/_favicon/"));
+  u.searchParams.set("pageUrl", pageUrl);
+  u.searchParams.set("size", "16");
+  return u.toString();
 }
 
 /**
@@ -223,11 +229,15 @@ export function initTabIndex() {
  */
 export async function rebuildIndex() {
   const tabs = await chrome.tabs.query({});
+  // Seed from the existing index so entries written by the event listeners
+  // (registered synchronously before this runs) — plus already-extracted
+  // meta/headings and lastActive — are preserved rather than overwritten.
+  const existing = await readIndex();
   const index = {};
 
   await Promise.all(
     tabs.map(async (tab) => {
-      index[tab.id] = await buildEntry(tab, null);
+      index[tab.id] = await buildEntry(tab, existing[tab.id]);
     }),
   );
 
@@ -322,7 +332,7 @@ async function searchTabs(query) {
     tabId: entry.tabId,
     title: entry.title,
     url: entry.url,
-    favicon: faviconUrl(entry.domain),
+    favicon: faviconUrl(entry.url),
     domain: entry.domain,
     context: entry.workspaceName,
     score,
@@ -365,7 +375,7 @@ async function searchBookmarks(query) {
         tabId: null,
         title: node.title ?? "",
         url: node.url ?? "",
-        favicon: faviconUrl(domain),
+        favicon: faviconUrl(node.url),
         domain,
         context,
         score,
@@ -402,7 +412,7 @@ async function searchHistory(query) {
         tabId: null,
         title: item.title ?? "",
         url: item.url ?? "",
-        favicon: faviconUrl(domain),
+        favicon: faviconUrl(item.url),
         domain,
         context: formatDate(item.lastVisitTime),
         score,

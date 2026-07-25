@@ -460,9 +460,7 @@ function buildResultRow(item) {
   favicon.className = "result-favicon";
   favicon.width = 16;
   favicon.height = 16;
-  favicon.src =
-    item.favicon ||
-    `https://www.google.com/s2/favicons?domain=${item.domain}&sz=16`;
+  favicon.src = item.favicon || "";
   favicon.onerror = () => {
     let letter = "?";
     try { letter = new URL(item.url).hostname.replace(/^www\./, "").charAt(0).toUpperCase() || "?"; } catch (_) {}
