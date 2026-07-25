@@ -7,6 +7,7 @@ import {
   applyBackground,
   DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
+import { getCustomBackgroundUrl } from "./utils/customBackground.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
 import {
@@ -26,7 +27,9 @@ async function applyStoredAppearance() {
     "background",
   ]);
   applyTheme(theme ?? "system");
-  applyBackground(background ?? DEFAULT_BACKGROUND);
+  const bg = background ?? DEFAULT_BACKGROUND;
+  const customUrl = bg.type === "custom" ? await getCustomBackgroundUrl() : null;
+  applyBackground(bg, customUrl);
 }
 
 function setupLightbox() {
