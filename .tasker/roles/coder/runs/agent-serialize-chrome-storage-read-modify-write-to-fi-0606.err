@@ -1,0 +1,68 @@
+Reading additional input from stdin...
+2026-07-25T04:43:15.741784Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in C:\Users\russp\AppData\Local\Temp\tasker-task-worktrees\2b13ff41ffe7\serialize-chrome-storage-read-modify-write-to-fi-6e978c24a5c4cc80\utils\browserSearch.js:
+  // Tab activated â€” update lastActive timestamp
+  chrome.tabs.onActivated.addListener(async (activeInfo) => {
+    const index = await readIndex();
+    if (index[activeInfo.tabId]) {
+      index[activeInfo.tabId].lastActive = Date.now();
+      await writeIndex(index);
+    }
+  });
+2026-07-25T04:43:24.228412Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5
+2026-07-25T04:43:58.004175Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in C:\Users\russp\AppData\Local\Temp\tasker-task-worktrees\2b13ff41ffe7\serialize-chrome-storage-read-modify-write-to-fi-6e978c24a5c4cc80\utils\browserSearch.js:
+export async function rebuildIndex() {
+  const tabs = await chrome.tabs.query({});
+  // Seed from the existing index so entries written by the event listeners
+  // (registered synchronously before this runs) â€” plus already-extracted
+  // meta/headings and lastActive â€” are preserved rather than overwritten.
+  const existing = await readIndex();
+  const index = {};
+
+  await Promise.all(
+    tabs.map(async (tab) => {
+      index[tab.id] = await buildEntry(tab, existing[tab.id]);
+    }),
+  );
+
+  await writeIndex(index);
+2026-07-25T04:44:38.401833Z ERROR codex_core::tools::router: error=apply_patch verification failed: Failed to find expected lines in C:\Users\russp\AppData\Local\Temp\tasker-task-worktrees\2b13ff41ffe7\serialize-chrome-storage-read-modify-write-to-fi-6e978c24a5c4cc80\utils\browserSearch.js:
+export async function rebuildIndex() {
+  const tabs = await chrome.tabs.query({});
+  // Seed from the existing index so entries written by the event listeners
+  // (registered synchronously before this runs) â€” plus already-extracted
+  // meta/headings and lastActive â€” are preserved rather than overwritten.
+  const existing = await readIndex();
+  const index = {};
+
+  await Promise.all(
+    tabs.map(async (tab) => {
+      index[tab.id] = await buildEntry(tab, existing[tab.id]);
+    }),
+  );
+
+  await writeIndex(index);
+2026-07-25T04:45:27.892337Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 3 seconds
+Output:
+✔ serializes concurrent read-modify-write operations for one key (600.5064ms)
+✔ a failed mutation does not block later mutations (0.7377ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 689.361
+warning: in the working copy of 'components/WorkspaceLane.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'utils/browserSearch.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'utils/workspaceManager.js', LF will be replaced by CRLF the next time Git touches it
+tabOrder : The term 'tabOrder' is not recognized as the name of a cmdlet, function, script file, or operable program. 
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+At line:2 char:801
++ ... WorkspaceData\(\)|chrome\.storage\.local\s*\.get\(\"(tabOrder|collaps ...
++                                                          ~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (tabOrder:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+ 
+

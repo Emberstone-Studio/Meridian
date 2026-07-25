@@ -1,0 +1,119 @@
+{
+  "id": "contextmenu-js-use-static-import-for-getworkspac-fabf",
+  "title": "ContextMenu.js: use static import for getWorkspaceData",
+  "description": "components/ContextMenu.js statically imports assignTab/unassignTab/createWorkspace from ../utils/workspaceManager.js at the top, then in show() dynamically does (await import('../utils/workspaceManager.js')).getWorkspaceData(). Redundant and inconsistent. Add getWorkspaceData to the existing static import and drop the dynamic import. Pure cleanup, no behavior change.",
+  "status": "done",
+  "priority": "low",
+  "label": "Maintenance",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T04:35:28.487Z",
+  "updated_at": "2026-07-25T05:10:38.145Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T04:35:28.487Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T04:35:28.487Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "contextmenu-js-use-static-import-for-getworkspac-fabf",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T04:37:33.785Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "contextmenu-js-use-static-import-for-getworkspac-fabf",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T04:40:18.609Z",
+      "type": "moved",
+      "content": "Moved from ready to in_progress"
+    },
+    {
+      "timestamp": "2026-07-25T04:40:24.287Z",
+      "type": "moved",
+      "content": "Moved from in_progress to ready"
+    },
+    {
+      "timestamp": "2026-07-25T04:42:06.516Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T04:43:05.703Z",
+      "type": "output",
+      "content": "Updated `components/ContextMenu.js` to statically import `getWorkspaceData` alongside the other workspace manager helpers and replaced the dynamic import call with `getWorkspaceData()`.\n\nValidation:\n- `node --check components/ContextMenu.js` passed.\n- Confirmed the dynamic workspace manager import is absent.\n- `git diff --check` passed.",
+      "attachment": "active/contextmenu-js-use-static-import-for-getworkspac-fabf/contextmenu-js-use-static-import-for-getworkspaced.md"
+    },
+    {
+      "timestamp": "2026-07-25T04:47:16.272Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T05:10:38.145Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Model explicitly set on agent (codex-gpt-5-6-sol)",
+    "alternates": [],
+    "shape": "Maintenance",
+    "decided_by": "explicit-role",
+    "decided_at": "2026-07-25T04:41:24.901Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=false,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "agent_attempt_id": "attempt-e213bad4f8015e3e21b1",
+  "agent_startup_started_at": "2026-07-25T04:42:06.493Z"
+}

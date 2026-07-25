@@ -1,0 +1,86 @@
+{
+  "id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
+  "title": "refreshAllThumbnails: restore active tab even if capture throws mid-loop",
+  "description": "background.js refreshAllThumbnails() records the originally-active tab per window, sets isRefreshing, then cycles every capturable tab activating each in turn. The try/finally only resets isRefreshing; the loop that restores the user's original active tab (originalActive) runs AFTER the try block. If chrome.tabs.update / captureTab / sleep throws mid-loop, the function rejects before restoring, leaving the user stranded on whatever tab was active when it failed (and the REFRESH_THUMBNAILS message never resolves, so the Settings button stays on 'Refreshing…').\n\nFix: move the restore loop into the finally block (alongside isRefreshing = false) so the original active tab is always restored, and ensure the message responder still resolves on failure. Consider wrapping per-tab work so one bad tab doesn't abort the whole sweep.",
+  "status": "done",
+  "priority": "low",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T04:35:26.330Z",
+  "updated_at": "2026-07-25T05:10:37.320Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T04:35:26.330Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T04:35:26.330Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T04:37:32.969Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T04:40:37.188Z",
+      "type": "moved",
+      "content": "Moved from ready to backlog"
+    },
+    {
+      "timestamp": "2026-07-25T04:42:28.991Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-07-25T04:47:31.227Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T04:53:42.136Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T04:55:18.748Z",
+      "type": "output",
+      "content": "Implemented failure-safe thumbnail refresh behavior.\n\n- Each tab refresh is isolated so a failed activation/capture does not abort the remaining sweep.\n- Original active tabs are restored from `finally`, before `isRefreshing` is cleared.\n- The `REFRESH_THUMBNAILS` responder now sends `{ done: false }` when setup or refresh fails, ensuring callers settle.\n- Added regression coverage for a mid-loop tab failure, continued capture, and restoration across windows.\n\nVerification: `node --test tests/*.test.mjs` (9 passing); `git diff --check` passed.",
+      "attachment": "active/refreshallthumbnails-restore-active-tab-even-if-23bb/refreshallthumbnails-restore-active-tab-even-if-ca.md"
+    },
+    {
+      "timestamp": "2026-07-25T05:10:37.320Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-07-25T04:53:41.379Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-9f5104f5df34e3270109",
+  "agent_startup_started_at": "2026-07-25T04:53:42.108Z",
+  "agent_session_confirmed_run_id": "agent-refreshallthumbnails-restore-active-tab-even-if-23bb",
+  "agent_session_confirmed_at": "2026-07-25T04:53:42.919Z"
+}

@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "attemptId": "attempt-8f62aae8e54d6d2b379b",
+  "status": "completed",
+  "spawnRequestedAt": "2026-07-25T04:42:04.697Z",
+  "updatedAt": "2026-07-25T04:43:10.552Z",
+  "taskId": "fix-stale-search-results-race-in-handlebrowserqu-c50b",
+  "runId": "agent-fix-stale-search-results-race-in-handlebrowserqu-c50b",
+  "kind": "peer",
+  "roleSlug": "coder",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": null,
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 21008,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 25628,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019f9794-9559-7dc2-b44b-d2ca44267de2",
+    "waitingSince": "2026-07-25T04:42:04.775Z",
+    "establishedAt": "2026-07-25T04:42:05.230Z"
+  },
+  "stderrTail": "archResults = null;\r\n 150: \r\n 151: function setupKeyboardNav() {\r\n 152:   document.addEventListener(\"keydown\", (e) => {\r\n 153:     const tag = document.activeElement?.tagName;\r\n 154:     const isEditing =\r\n 155:       tag === \"INPUT\" ||\r\n 156:       tag === \"TEXTAREA\" ||\r\n 157:       document.activeElement?.contentEditable === \"true\";\r\n 158: \r\n 159:     if (e.key === \"/\" && !isEditing) {\r\n 160:       e.preventDefault();\r\n 161:       searchBarApi?.focus();\r\n 162:       return;\r\n 163:     }\r\n 164: \r\n 165:     if ((e.key === \"n\" || e.key === \"N\") && !isEditing) {\r\n 166:       e.preventDefault();\r\n 167:       handleNewGroup();\r\n 168:       return;\r\n 169:     }\r\n 170: \r\n 171:     if (e.key === \"Escape\") {\r\n 172:       if (lightboxApi?.isVisible()) {\r\n 173:         lightboxApi.hide();\r\n 174:         return;\r\n 175:       }\r\n 176:       const overlay = document.getElementById(\"settings-overlay\");\r\n 177:       if (!overlay.classList.contains(\"hidden\")) {\r\n 178:         closeSettings();\r\n 179:         return;\r\n 180:       }\r\n 181:       if (browserSearchActive) {\r\n 182:         clearBrowserSearch();\r\n 183:         searchBarApi?.clearSearch?.();\r\n 184:         return;\r\n 185:       }\r\n 186:       if (document.activeElement?.tagName === \"INPUT\") {\r\n 187:         document.activeElement.blur();\r\n 188:         focusFirstCard();\r\n 189:       }\r\n 190:       return;\r\n 191:     }\r\n 192: \r\n 193:     if ([\"ArrowRight\", \"ArrowLeft\", \"ArrowUp\", \"ArrowDown\"].includes(e.key)) {\r\n 194:       if (isEditing) return;\r\n 195:       e.preventDefault();\r\n 420: \r\n 421: function filterGrid(query) {\r\n 422:   const q = query.toLowerCase();\r\n 423:   document.querySelectorAll(\".workspace-lane\").forEach((lane) => {\r\n 424:     const cards = [...lane.querySelectorAll(\".tab-card\")];\r\n 425:     let anyVisible = false;\r\n 426:     for (const card of cards) {\r\n 427:       const title = (\r\n 428:         card.querySelector(\".card-title\")?.textContent ?? \"\"\r\n 429:       ).toLowerCase();\r\n 430:       const url = (card.dataset.tabUrl ?? \"\").toLowerCase();\r\n 431:       const matches = title.includes(q) || url.includes(q);\r\n 432:       card.style.display = matches ? \"\" : \"none\";\r\n 433:       if (matches) anyVisible = true;\r\n 434:     }\r\n 435:     lane.style.display = anyVisible || cards.length === 0 ? \"\" : \"none\";\r\n 436:   });\r\n 437: }\r\n 438: \r\n 439: function clearBrowserSearch() {\r\n 440:   browserSearchActive = false;\r\n 441:   browserSearchResults = null;\r\n 442: \r\n 443:   document.querySelectorAll(\".workspace-lane\").forEach((lane) => {\r\n 444:     lane.style.display = \"\";\r\n 445:     lane.querySelectorAll(\".tab-card\").forEach((card) => {\r\n 446:       card.style.display = \"\";\r\n 447:     });\r\n 448:   });\r\n 449: \r\n 450:   const existing = document.getElementById(\"browser-search-results\");\r\n 451:   if (existing) existing.remove();\r\n 452: }\r\n 453: \r\n 454: function buildResultRow(item) {\r\n 455:   const row = document.createElement(\"div\");\r\n 500:       chrome.tabs.create({ url: item.url });\r\n 501:     }\r\n 502:   });\r\n 503: \r\n 504:   row.addEventListener(\"keydown\", (e) => {\r\n 505:     if (e.key === \"Enter\") row.click();\r\n 506:   });\r\n 507: \r\n 508:   return row;\r\n 509: }\r\n 510: \r\n 511: function renderSearchResults(results, query) {\r\n 512:   let container = document.getElementById(\"browser-search-results\");\r\n 513:   if (!container) {\r\n 514:     container = document.createElement(\"div\");\r\n 515:     container.id = \"browser-search-results\";\r\n 516:     document\r\n 517:       .getElementById(\"workspace-container\")\r\n 518:       .insertAdjacentElement(\"afterend\", container);\r\n 519:   }\r\n 520:   container.innerHTML = \"\";\r\n 521: \r\n 522:   const sections = [\r\n 523:     { label: \"Open Tabs\", items: results.tabs },\r\n 524:     { label: \"Bookmarks\", items: results.bookmarks },\r\n 525:     { label: \"History\", items: results.history },\r\n 526:   ];\r\n 527: \r\n 528:   for (const { label, items } of sections) {\r\n 529:     if (!items.length) continue;\r\n 530:     const section = document.createElement(\"div\");\r\n 531:     section.className = \"search-results-section\";\r\n 532: \r\n 533:     const heading = document.createElement(\"div\");\r\n 534:     heading.className = \"search-results-label\";\r\n 535:     heading.textContent = label;\r\n 536:     section.appendChild(heading);\r\n 537: \r\n 538:     for (const item of items.slice(0, 10)) {\r\n 539:       section.appendChild(buildResultRow(item));\r\n 540:     }\r\n 541:     container.appendChild(section);\r\n 542:   }\r\n 543: \r\n 544:   if (\r\n 545:     !results.tabs.length &&\r\n 546:     !results.bookmarks.length &&\r\n 547:     !results.history.length\r\n 548:   ) {\r\n 549:     const empty = document.createElement(\"div\");\r\n 550:     empty.className = \"search-results-empty\";\r\n 551:     const msg = document.createElement(\"span\");\r\n 552:     msg.textContent = `No results for \"${query}\" â€” `;\r\n 553:     const webBtn = document.createElement(\"button\");\r\n 554:     webBtn.className = \"search-web-fallback\";\r\n 555:     webBtn.textContent = \"search the web\";\r\n 556:     webBtn.addEventListener(\"click\", async () => {\r\n 557:       const PROVIDER_URLS = {\r\n 558:         google: \"https://www.google.com/search?q=\",\r\n 559:         duckduckgo: \"https://duckduckgo.com/?q=\",\r\n 560:         bing: \"https://www.bing.com/search?q=\",\r\n 561:         brave: \"https://search.brave.com/search?q=\",\r\n 562:       };\r\n 563:       const { searchProvider } = await chrome.storage.sync.get(\"searchProvider\");\r\n 564:       const base = PROVIDER_URLS[searchProvider] ?? PROVIDER_URLS.google;\r\n 565:       chrome.tabs.create({ url: base + encodeURIComponent(query) });\r\n 566:     });\r\n 567:     empty.appendChild(msg);\r\n 568:     empty.appendChild(webBtn);\r\n 569:     container.appendChild(empty);\r\n 570:   }\r\n 571: }\r\n 572: \r\n 573: async function handleBrowserQuery(query) {\r\n 574:   browserSearchActive = true;\r\n 575: \r\n 576:   filterGrid(query);\r\n 577: \r\n 578:   const r = await search(query);\r\n 579:   const { localSearch } = await chrome.storage.sync.get(\"localSearch\");\r\n 580:   const ls = localSearch ?? { tabs: true, bookmarks: true, history: true };\r\n 581:   if (!ls.tabs) r.tabs = [];\r\n 582:   if (!ls.bookmarks) r.bookmarks = [];\r\n 583:   if (!ls.history) r.history = [];\r\n 584:   if (!browserSearchActive) return;\r\n 585:   browserSearchResults = r;\r\n 586: \r\n 587:   renderSearchResults(r, query);\r\n 588: }\r\n 589: \r\n 590: async function init() {\r\n 591:   // Inject styles for browser search results\r\n 592:   const style = document.createElement(\"style\");\r\n 593:   style.textContent = `\r\n 594:     #browser-search-results {\r\n 595:       max-width: 900px;\r\n 596:       margin: 16px auto 0;\r\n 597:       padding: 16px 20px 24px;\r\n 598:       background: rgba(245, 245, 245, 0.80);\r\n 599:       backdrop-filter: blur(20px);\r\n 600:       -webkit-backdrop-filter: blur(20px);\r\n 645:       font-size: 16px; padding: 0 4px; line-height: 1;\r\n 646:     }\r\n 647:     .search-clear-btn:hover { color: var(--text-primary); }\r\n 648:     .search-clear-btn.hidden { display: none; }\r\n 649:     .search-web-fallback {\r\n 650:       background: none; border: none; padding: 0; cursor: pointer;\r\n 651:       color: var(--accent); font-size: 14px; font-family: inherit; text-decoration: underline;\r\n 652:     }\r\n 653:     .search-web-fallback:hover { opacity: 0.8; }\r\n 654:   `;\r\n 655:   document.head.appendChild(style);\r\n 656: \r\n 657:   await applyStoredAppearance();\r\n 658:   await handleNewTabBehavior();\r\n 659: \r\n 660:   lightboxApi = setupLightbox();\r\n 661: \r\n 662:   searchBarApi = createSearchBar(document.getElementById(\"search-bar\"));\r\n 663: \r\n 664:   searchBarApi.onBrowserQuery = (query) => {\r\n 665:     if (!query) {\r\n 666:       clearBrowserSearch();\r\n 667:     } else {\r\n 668:       handleBrowserQuery(query);\r\n 669:     }\r\n 670:   };\r\n 671: \r\n 672:   searchBarApi.onArrowDown = () => {\r\n 673:     document.querySelector(\"#browser-search-results .result-row\")?.focus();\r\n 674:   };\r\n 675: \r\n 676:   const settingsOverlay = document.getElementById(\"settings-overlay\");\r\n 677:   const settingsContainer = document.getElementById(\"settings-panel\");\r\n 678:   const settingsBtn = document.getElementById(\"settings-btn\");\r\n 679:   const newGroupBtn = document.getElementById(\"new-group-btn\");\r\n 680: \r\n\n",
+  "transitions": [
+    {
+      "at": "2026-07-25T04:42:04.697Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-25T04:42:04.704Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-25T04:42:04.715Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 21008
+    },
+    {
+      "at": "2026-07-25T04:42:04.757Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 21008
+    },
+    {
+      "at": "2026-07-25T04:42:04.776Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 25628
+    },
+    {
+      "at": "2026-07-25T04:42:04.781Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-25T04:42:05.231Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-25T04:43:10.534Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-25T04:43:10.552Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

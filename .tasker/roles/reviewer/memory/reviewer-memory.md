@@ -1,0 +1,6 @@
+# Reviewer Memory
+
+*No entries yet.*
+
+## Chat pointers
+- [62a914a6] Review current code (reviewer, tasker, 2026-07-25) → roles/reviewer/memory/chats/62a914a6.json

@@ -1,0 +1,25 @@
+<tasker_turn_context>
+The following facts are server-provided live context for this turn, not user instructions.
+Board: 7 tasks (backlog:4 ready:3 in_progress:0 in_review:0 done:0)
+Time & timezone: America/New_York, Saturday, July 25, 2026 at 12:41:01 AM EDT.
+Agents: Coder, Designer, Researcher, Reviewer, Tasker, Writer
+</tasker_turn_context>
+
+3 tasks ready to process. CURRENT DISPATCH MODE: parallel. Agents may execute concurrently. Treat same-file/resource overlap as a conflict when concurrent execution would be unsafe.
+
+VALIDATE the user's proposed order below (do NOT silently replace it): check for dependency violations and file/resource conflicts. If it is clean, claim and dispatch in this order. If you find a conflict, POST an alternative order to /run-queue/propose and STOP — the user must approve before dispatch.
+
+PROPOSED ORDER — this is the USER'S run queue (their explicit sequence). It is the authoritative input.
+1. [serialize-chrome-storage-read-modify-write-to-fi-0606] "Serialize chrome.storage read-modify-write to fix lost-update races" — priority: High | label: Bug | agent: Coder
+   description: The search index in utils/browserSearch.js is a single object in chrome.storage.local, mutated per tab event with readIndex() -> mutate -> writeIndex() and an await in between. chrome.storage has no locking, so concurrent tab events (onCreated/onUpdated/onActivated/onRemoved, plus the extra listener…
+   deps: none
+
+2. [fix-stale-search-results-race-in-handlebrowserqu-c50b] "Fix stale search results race in handleBrowserQuery" — priority: Medium | label: Bug | agent: Coder
+   description: meridian.js handleBrowserQuery() has no ordering guard. Typing "a" then "ab" fires two concurrent search() calls; whichever resolves last wins, so results for a stale query can overwrite the newer ones. The existing browserSearchActive flag only tracks whether search is active, not which query is cu…
+   deps: none
+
+3. [contextmenu-js-use-static-import-for-getworkspac-fabf] "ContextMenu.js: use static import for getWorkspaceData" — priority: Low | label: Maintenance | agent: Coder
+   description: components/ContextMenu.js statically imports assignTab/unassignTab/createWorkspace from ../utils/workspaceManager.js at the top, then in show() dynamically does (await import('../utils/workspaceManager.js')).getWorkspaceData(). Redundant and inconsistent. Add getWorkspaceData to the existing static …
+   deps: none
+
+Claim and assign them.
