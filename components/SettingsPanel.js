@@ -41,9 +41,12 @@ const GRADIENT_PRESETS = [
   },
 ];
 
-export const SYNCED_BACKGROUND_KEY = "meridian_bg_custom_synced";
-export const USE_SYNCED_BACKGROUND_KEY = "meridian_bg_use_synced";
-export const MAX_SYNCED_BACKGROUND_LENGTH = 7000;
+// Default background when the user hasn't chosen one (matches the "Ocean"
+// gradient preset so its swatch shows selected).
+export const DEFAULT_BACKGROUND = {
+  type: "gradient",
+  value: "linear-gradient(135deg,#0f2027,#203a43,#2c5364)",
+};
 
 function generateSeeds(count = 12, exclude = new Set()) {
   const seeds = new Set();
@@ -72,7 +75,7 @@ export async function resizeToDataUrl(
       canvas.width = w;
       canvas.height = h;
       canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL("image/webp", quality));
+      resolve(canvas.toDataURL("image/jpeg", quality));
     };
     img.onerror = () => {
       URL.revokeObjectURL(objectUrl);
@@ -82,55 +85,12 @@ export async function resizeToDataUrl(
   });
 }
 
-export async function compressBackgroundForSync(
-  dataUrl,
-  maxLength = MAX_SYNCED_BACKGROUND_LENGTH,
-) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      let scale = Math.min(1, 640 / img.width, 640 / img.height);
-      let quality = 0.45;
-
-      for (let attempt = 0; attempt < 10; attempt += 1) {
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(img.width * scale));
-        canvas.height = Math.max(1, Math.round(img.height * scale));
-        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
-        const compressed = canvas.toDataURL("image/webp", quality);
-        if (compressed.length <= maxLength) {
-          resolve(compressed);
-          return;
-        }
-        scale *= 0.72;
-        quality = Math.max(0.2, quality - 0.05);
-      }
-
-      resolve(null);
-    };
-    img.onerror = () => resolve(null);
-    img.src = dataUrl;
-  });
-}
-
-export async function getCustomBackgroundDataUrl() {
-  const [localSettings, syncedSettings] = await Promise.all([
-    chrome.storage.local.get(USE_SYNCED_BACKGROUND_KEY),
-    chrome.storage.sync.get(SYNCED_BACKGROUND_KEY),
-  ]);
-  return localSettings[USE_SYNCED_BACKGROUND_KEY]
-    ? syncedSettings[SYNCED_BACKGROUND_KEY] ?? null
-    : localStorage.getItem("meridian_bg_custom");
-}
-
 export function createSettingsPanel(container, onClose) {
   let newTabBehavior = "meridian-view";
   let groupByDomain = false;
   let homepageUrl = "";
   let currentTheme = "system";
-  let currentBg = { type: "none", value: "" };
-  let useSyncedBackground = false;
-  let syncedBackground = null;
+  let currentBg = DEFAULT_BACKGROUND;
   let photoSeeds = generateSeeds();
 
   const panel = document.createElement("div");
@@ -338,15 +298,8 @@ export function createSettingsPanel(container, onClose) {
   function selectBg(type, value) {
     currentBg = { type, value };
     chrome.storage.sync.set({ background: currentBg });
-    applyCurrentBackground();
+    applyBackground(currentBg);
     renderBgSection();
-  }
-
-  function applyCurrentBackground() {
-    const customDataUrl = useSyncedBackground
-      ? syncedBackground
-      : localStorage.getItem("meridian_bg_custom");
-    applyBackground(currentBg, customDataUrl);
   }
 
   function makeSwatch(opts) {
@@ -376,7 +329,7 @@ export function createSettingsPanel(container, onClose) {
   function renderBgSection() {
     bgGroup
       .querySelectorAll(
-        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-upload-btn, .settings-bg-file-input, .settings-bg-sync-controls",
+        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-upload-btn, .settings-bg-file-input",
       )
       .forEach((el) => el.remove());
 
@@ -505,67 +458,6 @@ export function createSettingsPanel(container, onClose) {
     uploadBtn.addEventListener("click", () => fileInput.click());
     bgGroup.appendChild(fileInput);
     bgGroup.appendChild(uploadBtn);
-
-    const syncControls = document.createElement("div");
-    syncControls.className = "settings-bg-sync-controls";
-
-    const syncToggleRow = document.createElement("label");
-    syncToggleRow.className = "settings-toggle-row";
-    const syncToggle = document.createElement("input");
-    syncToggle.type = "checkbox";
-    syncToggle.className = "settings-toggle";
-    syncToggle.checked = useSyncedBackground;
-    syncToggle.setAttribute("aria-label", "Use synced background");
-    const syncToggleLabel = document.createElement("span");
-    syncToggleLabel.textContent = "Use synced background";
-    syncToggle.addEventListener("change", async () => {
-      useSyncedBackground = syncToggle.checked;
-      await chrome.storage.local.set({
-        [USE_SYNCED_BACKGROUND_KEY]: useSyncedBackground,
-      });
-      applyCurrentBackground();
-    });
-    syncToggleRow.appendChild(syncToggle);
-    syncToggleRow.appendChild(syncToggleLabel);
-
-    const syncBtn = document.createElement("button");
-    syncBtn.className = "settings-action-btn";
-    syncBtn.textContent = "Sync current background";
-    syncBtn.disabled = !localStorage.getItem("meridian_bg_custom");
-    syncBtn.addEventListener("click", async () => {
-      const localBackground = localStorage.getItem("meridian_bg_custom");
-      if (!localBackground) return;
-      syncBtn.disabled = true;
-      syncBtn.textContent = "Compressing…";
-      const compressed = await compressBackgroundForSync(localBackground);
-      if (!compressed) {
-        syncBtn.textContent = "Could not compress background";
-        setTimeout(() => {
-          syncBtn.disabled = false;
-          syncBtn.textContent = "Sync current background";
-        }, 2000);
-        return;
-      }
-      try {
-        await chrome.storage.sync.set({
-          [SYNCED_BACKGROUND_KEY]: compressed,
-        });
-        syncedBackground = compressed;
-        if (useSyncedBackground) applyCurrentBackground();
-        syncBtn.textContent = "Background synced";
-      } catch {
-        syncBtn.textContent = "Could not sync background";
-      } finally {
-        setTimeout(() => {
-          syncBtn.disabled = false;
-          syncBtn.textContent = "Sync current background";
-        }, 2000);
-      }
-    });
-
-    syncControls.appendChild(syncToggleRow);
-    syncControls.appendChild(syncBtn);
-    bgGroup.appendChild(syncControls);
   }
 
   panel.appendChild(bgGroup);
@@ -597,25 +489,21 @@ export function createSettingsPanel(container, onClose) {
 
   container.appendChild(panel);
 
-  Promise.all([
-    chrome.storage.sync.get([
+  chrome.storage.sync
+    .get([
       "newTabBehavior",
       "groupByDomain",
       "homepageUrl",
       "theme",
       "background",
       "localSearch",
-      SYNCED_BACKGROUND_KEY,
-    ]),
-    chrome.storage.local.get(USE_SYNCED_BACKGROUND_KEY),
-  ]).then(([saved, localSettings]) => {
+    ])
+    .then((saved) => {
       if (saved.newTabBehavior) newTabBehavior = saved.newTabBehavior;
       groupByDomain = !!saved.groupByDomain;
       homepageUrl = saved.homepageUrl ?? "";
       currentTheme = saved.theme ?? "system";
-      currentBg = saved.background ?? { type: "none", value: "" };
-      syncedBackground = saved[SYNCED_BACKGROUND_KEY] ?? null;
-      useSyncedBackground = !!localSettings[USE_SYNCED_BACKGROUND_KEY];
+      currentBg = saved.background ?? DEFAULT_BACKGROUND;
       toggleCheckbox.checked = groupByDomain;
       if (saved.localSearch) {
         localSearch = { ...localSearch, ...saved.localSearch };

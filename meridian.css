@@ -732,12 +732,6 @@ html {
   cursor: default;
 }
 
-.settings-bg-sync-controls {
-  display: grid;
-  gap: 6px;
-  margin-top: 8px;
-}
-
 /* ---- Drag and drop ---- */
 
 .tab-card.dragging {

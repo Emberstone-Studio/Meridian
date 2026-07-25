@@ -5,9 +5,7 @@ import {
   createSettingsPanel,
   applyTheme,
   applyBackground,
-  getCustomBackgroundDataUrl,
-  SYNCED_BACKGROUND_KEY,
-  USE_SYNCED_BACKGROUND_KEY,
+  DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
@@ -28,10 +26,7 @@ async function applyStoredAppearance() {
     "background",
   ]);
   applyTheme(theme ?? "system");
-  applyBackground(
-    background ?? { type: "none", value: "" },
-    await getCustomBackgroundDataUrl(),
-  );
+  applyBackground(background ?? DEFAULT_BACKGROUND);
 }
 
 function setupLightbox() {
@@ -754,11 +749,7 @@ async function init() {
   });
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (
-      (area === "sync" &&
-        (changes.background || changes[SYNCED_BACKGROUND_KEY])) ||
-      (area === "local" && changes[USE_SYNCED_BACKGROUND_KEY])
-    ) {
+    if (area === "sync" && changes.background) {
       applyStoredAppearance();
     }
     if (area !== "local") return;
