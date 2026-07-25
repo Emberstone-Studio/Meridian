@@ -65,9 +65,11 @@ function sleep(ms) {
 
 async function captureTab(tabId, windowId) {
   try {
+    // captureVisibleTab only supports "jpeg" | "png" (NOT webp). unlimitedStorage
+    // covers the size; the LRU cap in thumbnailCache bounds total usage.
     const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
-      format: "webp",
-      quality: 55,
+      format: "jpeg",
+      quality: 60,
     });
     await saveThumbnail(tabId, dataUrl);
     console.log("[Meridian] Saved thumbnail for tab", tabId);
