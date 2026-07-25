@@ -598,11 +598,10 @@ function renderSearchResults(results, query, scope = "all") {
   else resultsPopup.close();
 }
 
-const CHEVRON_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
-
 function buildWebSearchRow(query, noLocal) {
-  const providers = searchBarApi?.getProviders?.() ?? [];
-  let provider = searchBarApi?.getProvider?.() ?? providers[0];
+  // The provider is chosen in Settings now; this row just launches it.
+  const provider =
+    searchBarApi?.getProvider?.() ?? searchBarApi?.getProviders?.()?.[0];
 
   const row = document.createElement("div");
   row.className = "search-web-row";
@@ -613,9 +612,6 @@ function buildWebSearchRow(query, noLocal) {
     note.textContent = "No matches in your tabs, bookmarks, or history.";
     row.appendChild(note);
   }
-
-  const bar = document.createElement("div");
-  bar.className = "search-web-bar";
 
   const go = document.createElement("button");
   go.className = "search-web-go result-row";
@@ -631,10 +627,7 @@ function buildWebSearchRow(query, noLocal) {
 
   const label = document.createElement("span");
   label.className = "result-title";
-  const setLabel = () => {
-    label.textContent = `Search ${provider?.name ?? "the web"} for "${query}"`;
-  };
-  setLabel();
+  label.textContent = `Search ${provider?.name ?? "the web"} for "${query}"`;
 
   go.appendChild(fav);
   go.appendChild(label);
@@ -643,70 +636,7 @@ function buildWebSearchRow(query, noLocal) {
     chrome.tabs.create({ url: provider.url + encodeURIComponent(query) });
   });
 
-  const picker = document.createElement("button");
-  picker.className = "search-web-provider";
-  picker.type = "button";
-  picker.setAttribute("aria-haspopup", "listbox");
-  picker.setAttribute("aria-label", "Choose search engine");
-  picker.setAttribute("aria-expanded", "false");
-  picker.innerHTML = CHEVRON_ICON;
-
-  const dropdown = document.createElement("div");
-  dropdown.className = "provider-dropdown hidden";
-  dropdown.setAttribute("role", "listbox");
-
-  const closeDropdown = () => {
-    dropdown.classList.add("hidden");
-    picker.setAttribute("aria-expanded", "false");
-  };
-
-  for (const p of providers) {
-    const opt = document.createElement("div");
-    opt.className = "provider-option" + (p.id === provider?.id ? " active" : "");
-    opt.setAttribute("role", "option");
-
-    const f = document.createElement("img");
-    f.width = 16;
-    f.height = 16;
-    f.alt = "";
-    f.src = p.favicon;
-    f.onerror = () => {
-      f.style.visibility = "hidden";
-    };
-
-    const n = document.createElement("span");
-    n.textContent = p.name;
-
-    opt.appendChild(f);
-    opt.appendChild(n);
-    opt.addEventListener("click", (e) => {
-      e.stopPropagation();
-      provider = p;
-      searchBarApi?.setProvider?.(p.id);
-      fav.src = p.favicon;
-      fav.style.visibility = "";
-      setLabel();
-      dropdown
-        .querySelectorAll(".provider-option")
-        .forEach((o) => o.classList.remove("active"));
-      opt.classList.add("active");
-      closeDropdown();
-    });
-    dropdown.appendChild(opt);
-  }
-
-  picker.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const nowOpen = dropdown.classList.contains("hidden");
-    dropdown.classList.toggle("hidden");
-    picker.setAttribute("aria-expanded", String(nowOpen));
-  });
-  document.addEventListener("click", closeDropdown);
-
-  bar.appendChild(go);
-  bar.appendChild(picker);
-  bar.appendChild(dropdown);
-  row.appendChild(bar);
+  row.appendChild(go);
   return row;
 }
 
@@ -783,16 +713,7 @@ async function init() {
     .search-web-fallback:hover { opacity: 0.8; }
     .search-web-row { margin-top: 8px; }
     .search-web-note { font-size: 13px; color: var(--text-secondary); padding: 4px 0 8px; }
-    .search-web-bar { display: flex; align-items: center; gap: 4px; position: relative; }
-    .search-web-go { flex: 1; }
-    .search-web-provider {
-      background: none; border: none; cursor: pointer; color: var(--text-secondary);
-      display: flex; align-items: center; justify-content: center;
-      width: 28px; height: 28px; border-radius: var(--radius-sm); flex-shrink: 0;
-      transition: background var(--transition), color var(--transition);
-    }
-    .search-web-provider:hover { background: var(--surface-hover); color: var(--text-primary); }
-    .provider-dropdown.hidden { display: none; }
+    .search-web-go { width: 100%; }
   `;
   document.head.appendChild(style);
 
@@ -863,15 +784,20 @@ async function init() {
   const settingsBtn = document.getElementById("settings-btn");
   const newGroupBtn = document.getElementById("new-group-btn");
 
-  // Settings dropdown — same shell as the other search-zone popups.
+  // Settings dropdown — same shell as the other search-zone popups. The gear
+  // lights up in the accent while open, exactly like the scope chips.
   settingsPopup = createSearchPopup({
     anchor: searchBarEl,
     id: "settings-panel",
     ariaLabel: "Settings",
+    onOpenChange: (open) => settingsBtn.classList.toggle("active", open),
   });
   createSettingsPanel(settingsPopup.el, closeSettings);
 
-  settingsBtn.addEventListener("click", openSettings);
+  // Clicking the gear toggles the dropdown, matching the scope chips.
+  settingsBtn.addEventListener("click", () =>
+    settingsPopup.isOpen() ? closeSettings() : openSettings(),
+  );
   newGroupBtn.addEventListener("click", handleNewGroup);
 
   const scopeButtons = {
@@ -894,8 +820,12 @@ async function init() {
       scopePopup.close();
     }
   };
-  // A click outside the settings dropdown (and not on its trigger) closes it.
-  document.addEventListener("click", (e) => {
+  // A press outside the settings dropdown (and not on its trigger) closes it.
+  // Uses pointerdown, not click: selecting a card re-renders its grid, which
+  // detaches the clicked node before a bubbled click would reach here — making
+  // contains() falsely read "outside" and close the panel. pointerdown fires
+  // while the target is still in the DOM, so the check stays correct.
+  document.addEventListener("pointerdown", (e) => {
     if (!settingsPopup.isOpen()) return;
     if (settingsPopup.el.contains(e.target) || settingsBtn.contains(e.target)) {
       return;

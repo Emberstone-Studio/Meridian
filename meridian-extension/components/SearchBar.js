@@ -1,4 +1,4 @@
-const PROVIDERS = [
+export const PROVIDERS = [
   {
     id: "google",
     name: "Google",
@@ -217,6 +217,16 @@ export function createSearchBar(container) {
       notifyQuery();
     },
   };
+
+  // Keep the active provider in sync when it's changed elsewhere (Settings).
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync" || !changes.searchProvider) return;
+    const p = PROVIDERS.find((x) => x.id === changes.searchProvider.newValue);
+    if (p && p.id !== currentProvider.id) {
+      currentProvider = p;
+      api.onProviderChange?.(p);
+    }
+  });
 
   return api;
 }

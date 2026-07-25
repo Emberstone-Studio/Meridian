@@ -6,7 +6,7 @@
 
 const registry = new Set();
 
-export function createSearchPopup({ anchor, id, ariaLabel } = {}) {
+export function createSearchPopup({ anchor, id, ariaLabel, onOpenChange } = {}) {
   const el = document.createElement("div");
   el.className = "search-popup hidden";
   if (id) el.id = id;
@@ -18,14 +18,18 @@ export function createSearchPopup({ anchor, id, ariaLabel } = {}) {
     el,
     isOpen: () => !el.classList.contains("hidden"),
     open() {
+      if (api.isOpen()) return;
       // Only one dropdown may sit under the pill at a time.
       for (const other of registry) {
         if (other !== api && other.isOpen()) other.close();
       }
       el.classList.remove("hidden");
+      onOpenChange?.(true);
     },
     close() {
+      if (!api.isOpen()) return;
       el.classList.add("hidden");
+      onOpenChange?.(false);
     },
     setContent(...nodes) {
       el.replaceChildren(...nodes);

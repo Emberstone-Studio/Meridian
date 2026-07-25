@@ -2,12 +2,68 @@ import {
   saveCustomBackground,
   getCustomBackgroundUrl,
 } from "../utils/customBackground.js";
+import { PROVIDERS } from "./SearchBar.js";
 
 const NEW_TAB_OPTIONS = [
   { id: "meridian-view", label: "Open a new Meridian tab" },
   { id: "focus-pinned", label: "Return to the pinned Meridian tab" },
   { id: "open-homepage", label: "Open a specific page" },
 ];
+
+// Tiny diagrams (one per option). Each has a DISTINCT hero silhouette so the
+// options read apart at a glance — a plus, a return arrow, a globe — rather
+// than three near-identical browser windows. The frame is thin and muted
+// (`currentColor`, pinned to gray by CSS: just context); the hero is solid
+// `--accent` (that shape IS the behavior). Two-tone, no opacity.
+const NEW_TAB_DIAGRAMS = {
+  // A gray (inactive) tab, then a new blue tab to its right; hero "+" reinforces
+  // "new." Every tab is a solid 14x5 fill so they read as identical in size.
+  "meridian-view": `<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="6" width="68" height="38" rx="6" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M6 17H74" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="11" y="9.5" width="14" height="5" rx="2" fill="currentColor"/>
+    <rect x="28" y="9.5" width="14" height="5" rx="2" fill="var(--accent)"/>
+    <path d="M40 24V38M33 31H47" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>`,
+  // The blue (pinned) tab is on the LEFT; hero is a centered left arrow, drawn
+  // at the same size and stroke as the "+" and globe. Same solid 14x5 tabs.
+  "focus-pinned": `<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="6" width="68" height="38" rx="6" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M6 17H74" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="11" y="9.5" width="14" height="5" rx="2" fill="var(--accent)"/>
+    <rect x="28" y="9.5" width="14" height="5" rx="2" fill="currentColor"/>
+    <path d="M48 31H32M39 24L32 31L39 38" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+  // Globe hero, plus the same [gray][blue] tab strip as the "new" diagram.
+  "open-homepage": `<svg viewBox="0 0 80 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="6" width="68" height="38" rx="6" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M6 17H74" stroke="currentColor" stroke-width="1.5"/>
+    <rect x="11" y="9.5" width="14" height="5" rx="2" fill="currentColor"/>
+    <rect x="28" y="9.5" width="14" height="5" rx="2" fill="var(--accent)"/>
+    <circle cx="40" cy="31" r="8" stroke="var(--accent)" stroke-width="2"/>
+    <path d="M32 31H48M40 23V39" stroke="var(--accent)" stroke-width="1.5"/>
+    <path d="M40 23C44.4 26 44.4 36 40 39C35.6 36 35.6 26 40 23Z" stroke="var(--accent)" stroke-width="1.5"/>
+  </svg>`,
+};
+
+// Theme icons (sun / moon / auto). Line style, `currentColor` so they recolor
+// with the button text — muted normally, accent when the theme is selected.
+const THEME_ICONS = {
+  // Sun.
+  light: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.5"/>
+    <path d="M12 1.5v2.5M12 20v2.5M3.9 3.9l1.8 1.8M18.3 18.3l1.8 1.8M1.5 12h2.5M20 12h2.5M3.9 20.1l1.8-1.8M18.3 5.7l1.8-1.8"/>
+  </svg>`,
+  // Crescent moon.
+  dark: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20 12.8A8.5 8.5 0 1 1 11.2 4 6.6 6.6 0 0 0 20 12.8z"/>
+  </svg>`,
+  // Auto/contrast: a circle with one half filled (follows the system).
+  system: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="8.5"/>
+    <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" stroke="none"/>
+  </svg>`,
+};
 
 const SOLID_COLORS = [
   { id: "s1", value: "#000000", label: "Black" },
@@ -73,23 +129,21 @@ export function createSettingsPanel(container, onClose) {
 
   const panel = document.createElement("div");
 
-  // --- Header ---
-  const header = document.createElement("div");
-  header.className = "settings-header";
+  // Settings are grouped into labeled sections; each control group is
+  // appended to one of these rather than straight onto the panel.
+  function makeSection(titleText) {
+    const section = document.createElement("div");
+    section.className = "settings-section";
+    const heading = document.createElement("h3");
+    heading.className = "settings-section-title";
+    heading.textContent = titleText;
+    section.appendChild(heading);
+    return section;
+  }
 
-  const title = document.createElement("h2");
-  title.className = "settings-title";
-  title.textContent = "Settings";
-
-  const closeBtn = document.createElement("button");
-  closeBtn.className = "settings-close";
-  closeBtn.textContent = "×";
-  closeBtn.setAttribute("aria-label", "Close settings");
-  closeBtn.addEventListener("click", onClose);
-
-  header.appendChild(title);
-  header.appendChild(closeBtn);
-  panel.appendChild(header);
+  const appearanceSection = makeSection("Appearance");
+  const searchSection = makeSection("Search");
+  const tabsSection = makeSection("Tabs");
 
   // --- New tab behavior ---
   const newTabGroup = document.createElement("div");
@@ -100,48 +154,87 @@ export function createSettingsPanel(container, onClose) {
   newTabLabel.textContent = "New Tab Behavior";
   newTabGroup.appendChild(newTabLabel);
 
-  function renderNewTabOptions() {
-    newTabGroup
-      .querySelectorAll(".settings-option, .settings-homepage-input")
-      .forEach((el) => el.remove());
-    for (const opt of NEW_TAB_OPTIONS) {
-      const btn = document.createElement("button");
-      btn.className =
-        "settings-option" + (opt.id === newTabBehavior ? " selected" : "");
-      btn.setAttribute("role", "radio");
-      btn.setAttribute("aria-checked", String(opt.id === newTabBehavior));
+  // Card grid (radiogroup): each option shows a diagram of what happens,
+  // replacing the native <select>. Full radio semantics + arrow-key nav.
+  const newTabRow = document.createElement("div");
+  newTabRow.className = "settings-behavior-grid";
+  newTabRow.setAttribute("role", "radiogroup");
+  newTabRow.setAttribute("aria-label", "New Tab Behavior");
+  newTabGroup.appendChild(newTabRow);
 
-      const dot = document.createElement("span");
-      dot.className = "settings-option-dot";
-      btn.appendChild(dot);
-      btn.appendChild(document.createTextNode(opt.label));
+  function renderNewTabCards() {
+    newTabRow.innerHTML = "";
+    NEW_TAB_OPTIONS.forEach((o, i) => {
+      const selected = o.id === newTabBehavior;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className =
+        "settings-behavior-card" + (selected ? " selected" : "");
+      card.setAttribute("role", "radio");
+      card.setAttribute("aria-checked", selected ? "true" : "false");
+      card.tabIndex = selected ? 0 : -1;
 
-      btn.addEventListener("click", () => {
-        newTabBehavior = opt.id;
-        chrome.storage.sync.set({ newTabBehavior: opt.id });
-        renderNewTabOptions();
-      });
-      newTabGroup.appendChild(btn);
-    }
+      const fig = document.createElement("span");
+      fig.className = "settings-behavior-diagram";
+      fig.setAttribute("aria-hidden", "true");
+      fig.innerHTML = NEW_TAB_DIAGRAMS[o.id] ?? "";
+      card.appendChild(fig);
 
-    if (newTabBehavior === "open-homepage") {
-      const input = document.createElement("input");
-      input.type = "url";
-      input.className = "settings-homepage-input";
-      input.placeholder = "https://example.com";
-      input.value = homepageUrl;
-      input.addEventListener("change", () => {
-        homepageUrl = input.value.trim();
-        chrome.storage.sync.set({ homepageUrl });
+      const cap = document.createElement("span");
+      cap.className = "settings-behavior-caption";
+      cap.textContent = o.label;
+      card.appendChild(cap);
+
+      card.addEventListener("click", () => selectNewTab(o.id));
+      card.addEventListener("keydown", (e) => {
+        let ni = -1;
+        if (e.key === "ArrowRight" || e.key === "ArrowDown")
+          ni = (i + 1) % NEW_TAB_OPTIONS.length;
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+          ni = (i - 1 + NEW_TAB_OPTIONS.length) % NEW_TAB_OPTIONS.length;
+        if (ni >= 0) {
+          e.preventDefault();
+          selectNewTab(NEW_TAB_OPTIONS[ni].id, true);
+        }
       });
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") input.blur();
-      });
-      newTabGroup.appendChild(input);
+
+      newTabRow.appendChild(card);
+    });
+  }
+
+  function selectNewTab(id, focus) {
+    newTabBehavior = id;
+    chrome.storage.sync.set({ newTabBehavior: id });
+    syncNewTab();
+    if (focus) {
+      const el = newTabRow.querySelector(".settings-behavior-card.selected");
+      if (el) el.focus();
     }
   }
 
-  panel.appendChild(newTabGroup);
+  // Only the "open a specific page" option needs a URL field; it appears
+  // beneath the grid when that option is selected.
+  const homepageInput = document.createElement("input");
+  homepageInput.type = "url";
+  homepageInput.className = "settings-homepage-input";
+  homepageInput.placeholder = "https://example.com";
+  homepageInput.addEventListener("change", () => {
+    homepageUrl = homepageInput.value.trim();
+    chrome.storage.sync.set({ homepageUrl });
+  });
+  homepageInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") homepageInput.blur();
+  });
+  newTabGroup.appendChild(homepageInput);
+
+  function syncNewTab() {
+    renderNewTabCards();
+    homepageInput.value = homepageUrl;
+    homepageInput.style.display =
+      newTabBehavior === "open-homepage" ? "" : "none";
+  }
+
+  tabsSection.appendChild(newTabGroup);
 
   // --- Group by domain ---
   const domainGroup = document.createElement("div");
@@ -172,7 +265,7 @@ export function createSettingsPanel(container, onClose) {
   toggleRow.appendChild(toggleCheckbox);
   toggleRow.appendChild(toggleLabel);
   domainGroup.appendChild(toggleRow);
-  panel.appendChild(domainGroup);
+  tabsSection.appendChild(domainGroup);
 
   // --- Local Search ---
   const localSearchGroup = document.createElement("div");
@@ -218,7 +311,87 @@ export function createSettingsPanel(container, onClose) {
     localSearchCheckboxes[source.key] = checkbox;
   }
 
-  panel.appendChild(localSearchGroup);
+  // (Appended below, after Search Engine, so the engine picker sits on top.)
+
+  // --- Search Engine ---
+  let searchProvider = PROVIDERS[0].id;
+
+  const searchEngineGroup = document.createElement("div");
+  searchEngineGroup.className = "settings-group";
+
+  const searchEngineLabel = document.createElement("span");
+  searchEngineLabel.className = "settings-label";
+  searchEngineLabel.textContent = "Search Engine";
+  searchEngineGroup.appendChild(searchEngineLabel);
+
+  // Provider card grid (radiogroup): each card shows the provider's favicon +
+  // name — the native <select> couldn't render provider marks.
+  const searchEngineRow = document.createElement("div");
+  searchEngineRow.className = "settings-provider-grid";
+  searchEngineRow.setAttribute("role", "radiogroup");
+  searchEngineRow.setAttribute("aria-label", "Search Engine");
+  searchEngineGroup.appendChild(searchEngineRow);
+
+  function renderProviderCards() {
+    searchEngineRow.innerHTML = "";
+    PROVIDERS.forEach((p, i) => {
+      const selected = p.id === searchProvider;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className =
+        "settings-provider-card" + (selected ? " selected" : "");
+      card.setAttribute("role", "radio");
+      card.setAttribute("aria-checked", selected ? "true" : "false");
+      card.tabIndex = selected ? 0 : -1;
+
+      const icon = document.createElement("img");
+      icon.className = "settings-provider-icon";
+      icon.src = p.favicon;
+      icon.alt = "";
+      icon.setAttribute("aria-hidden", "true");
+      icon.loading = "lazy";
+      // If a favicon fails to load, hide the broken-image glyph gracefully.
+      icon.addEventListener("error", () => {
+        icon.style.visibility = "hidden";
+      });
+      card.appendChild(icon);
+
+      const cap = document.createElement("span");
+      cap.className = "settings-provider-name";
+      cap.textContent = p.name;
+      card.appendChild(cap);
+
+      card.addEventListener("click", () => selectProvider(p.id));
+      card.addEventListener("keydown", (e) => {
+        let ni = -1;
+        if (e.key === "ArrowRight" || e.key === "ArrowDown")
+          ni = (i + 1) % PROVIDERS.length;
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+          ni = (i - 1 + PROVIDERS.length) % PROVIDERS.length;
+        if (ni >= 0) {
+          e.preventDefault();
+          selectProvider(PROVIDERS[ni].id, true);
+        }
+      });
+
+      searchEngineRow.appendChild(card);
+    });
+  }
+
+  function selectProvider(id, focus) {
+    searchProvider = id;
+    chrome.storage.sync.set({ searchProvider: id });
+    renderProviderCards();
+    if (focus) {
+      const el = searchEngineRow.querySelector(
+        ".settings-provider-card.selected"
+      );
+      if (el) el.focus();
+    }
+  }
+
+  // Search Engine on top, then Local Search beneath it.
+  searchSection.append(searchEngineGroup, localSearchGroup);
 
   // --- Theme ---
   const themeGroup = document.createElement("div");
@@ -246,7 +419,17 @@ export function createSettingsPanel(container, onClose) {
       const btn = document.createElement("button");
       btn.className =
         "settings-theme-btn" + (t.id === currentTheme ? " selected" : "");
-      btn.textContent = t.label;
+
+      const icon = document.createElement("span");
+      icon.className = "settings-theme-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = THEME_ICONS[t.id] ?? "";
+      btn.appendChild(icon);
+
+      const label = document.createElement("span");
+      label.textContent = t.label;
+      btn.appendChild(label);
+
       btn.addEventListener("click", () => {
         currentTheme = t.id;
         chrome.storage.sync.set({ theme: t.id });
@@ -258,7 +441,7 @@ export function createSettingsPanel(container, onClose) {
   }
 
   themeGroup.appendChild(themeRow);
-  panel.appendChild(themeGroup);
+  appearanceSection.appendChild(themeGroup);
 
   // --- Background ---
   const bgGroup = document.createElement("div");
@@ -331,7 +514,6 @@ export function createSettingsPanel(container, onClose) {
         isNone: true,
         selected: currentBg.type === "none",
         label: "No background",
-        text: "✕",
         onClick: () => selectBg("none", ""),
       }),
     );
@@ -437,9 +619,9 @@ export function createSettingsPanel(container, onClose) {
     bgGroup.appendChild(uploadBtn);
   }
 
-  panel.appendChild(bgGroup);
+  appearanceSection.appendChild(bgGroup);
 
-  // --- Refresh thumbnails ---
+  // --- Refresh thumbnails (a group under Tabs, at the bottom of the panel) ---
   const refreshGroup = document.createElement("div");
   refreshGroup.className = "settings-group";
 
@@ -462,7 +644,10 @@ export function createSettingsPanel(container, onClose) {
     }, 2000);
   });
   refreshGroup.appendChild(refreshBtn);
-  panel.appendChild(refreshGroup);
+  tabsSection.appendChild(refreshGroup);
+
+  // Order the sections: Appearance, Search, Tabs.
+  panel.append(appearanceSection, searchSection, tabsSection);
 
   container.appendChild(panel);
 
@@ -474,6 +659,7 @@ export function createSettingsPanel(container, onClose) {
       "theme",
       "background",
       "localSearch",
+      "searchProvider",
     ])
     .then((saved) => {
       if (saved.newTabBehavior) newTabBehavior = saved.newTabBehavior;
@@ -496,14 +682,22 @@ export function createSettingsPanel(container, onClose) {
           localSearchCheckboxes[key].checked = localSearch[key] ?? true;
         }
       }
-      renderNewTabOptions();
+      if (
+        saved.searchProvider &&
+        PROVIDERS.some((p) => p.id === saved.searchProvider)
+      ) {
+        searchProvider = saved.searchProvider;
+      }
+      syncNewTab();
       renderThemeButtons();
       renderBgSection();
+      renderProviderCards();
     });
 
-  renderNewTabOptions();
+  syncNewTab();
   renderThemeButtons();
   renderBgSection();
+  renderProviderCards();
 }
 
 // ── Auto accent: derive the accent hue from the active background ──
