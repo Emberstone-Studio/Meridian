@@ -1,0 +1,244 @@
+Reading additional input from stdin...
+2026-07-25T04:42:22.899350Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.3 seconds
+Output:
+ 130:       chrome.tabs.getCurrent(),
+ 131:       chrome.storage.local.get("meridianTabId"),
+ 132:     ]);
+ 133:     if (meridianTabId && currentTab && meridianTabId !== currentTab.id) {
+ 134:       await chrome.tabs.update(meridianTabId, { active: true });
+ 135:       window.close();
+ 136:     }
+ 137:   } else if (newTabBehavior === "open-homepage" && homepageUrl?.trim()) {
+ 138:     const [currentTab, { meridianTabId }] = await Promise.all([
+ 139:       chrome.tabs.getCurrent(),
+ 140:       chrome.storage.local.get("meridianTabId"),
+ 141:     ]);
+ 142:     if (!currentTab || currentTab.id === meridianTabId) return;
+ 143:     await chrome.tabs.update(currentTab.id, { url: homepageUrl.trim() });
+ 144:   }
+ 145: }
+ 146: 
+ 147: let searchBarApi = null;
+ 148: let browserSearchActive = false;
+ 149: let browserSearchResults = null;
+ 150: 
+ 151: function setupKeyboardNav() {
+ 152:   document.addEventListener("keydown", (e) => {
+ 153:     const tag = document.activeElement?.tagName;
+ 154:     const isEditing =
+ 155:       tag === "INPUT" ||
+ 156:       tag === "TEXTAREA" ||
+ 157:       document.activeElement?.contentEditable === "true";
+ 158: 
+ 159:     if (e.key === "/" && !isEditing) {
+ 160:       e.preventDefault();
+ 161:       searchBarApi?.focus();
+ 162:       return;
+ 163:     }
+ 164: 
+ 165:     if ((e.key === "n" || e.key === "N") && !isEditing) {
+ 166:       e.preventDefault();
+ 167:       handleNewGroup();
+ 168:       return;
+ 169:     }
+ 170: 
+ 171:     if (e.key === "Escape") {
+ 172:       if (lightboxApi?.isVisible()) {
+ 173:         lightboxApi.hide();
+ 174:         return;
+ 175:       }
+ 176:       const overlay = document.getElementById("settings-overlay");
+ 177:       if (!overlay.classList.contains("hidden")) {
+ 178:         closeSettings();
+ 179:         return;
+ 180:       }
+ 181:       if (browserSearchActive) {
+ 182:         clearBrowserSearch();
+ 183:         searchBarApi?.clearSearch?.();
+ 184:         return;
+ 185:       }
+ 186:       if (document.activeElement?.tagName === "INPUT") {
+ 187:         document.activeElement.blur();
+ 188:         focusFirstCard();
+ 189:       }
+ 190:       return;
+ 191:     }
+ 192: 
+ 193:     if (["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)) {
+ 194:       if (isEditing) return;
+ 195:       e.preventDefault();
+ 420: 
+ 421: function filterGrid(query) {
+ 422:   const q = query.toLowerCase();
+ 423:   document.querySelectorAll(".workspace-lane").forEach((lane) => {
+ 424:     const cards = [...lane.querySelectorAll(".tab-card")];
+ 425:     let anyVisible = false;
+ 426:     for (const card of cards) {
+ 427:       const title = (
+ 428:         card.querySelector(".card-title")?.textContent ?? ""
+ 429:       ).toLowerCase();
+ 430:       const url = (card.dataset.tabUrl ?? "").toLowerCase();
+ 431:       const matches = title.includes(q) || url.includes(q);
+ 432:       card.style.display = matches ? "" : "none";
+ 433:       if (matches) anyVisible = true;
+ 434:     }
+ 435:     lane.style.display = anyVisible || cards.length === 0 ? "" : "none";
+ 436:   });
+ 437: }
+ 438: 
+ 439: function clearBrowserSearch() {
+ 440:   browserSearchActive = false;
+ 441:   browserSearchResults = null;
+ 442: 
+ 443:   document.querySelectorAll(".workspace-lane").forEach((lane) => {
+ 444:     lane.style.display = "";
+ 445:     lane.querySelectorAll(".tab-card").forEach((card) => {
+ 446:       card.style.display = "";
+ 447:     });
+ 448:   });
+ 449: 
+ 450:   const existing = document.getElementById("browser-search-results");
+ 451:   if (existing) existing.remove();
+ 452: }
+ 453: 
+ 454: function buildResultRow(item) {
+ 455:   const row = document.createElement("div");
+ 500:       chrome.tabs.create({ url: item.url });
+ 501:     }
+ 502:   });
+ 503: 
+ 504:   row.addEventListener("keydown", (e) => {
+ 505:     if (e.key === "Enter") row.click();
+ 506:   });
+ 507: 
+ 508:   return row;
+ 509: }
+ 510: 
+ 511: function renderSearchResults(results, query) {
+ 512:   let container = document.getElementById("browser-search-results");
+ 513:   if (!container) {
+ 514:     container = document.createElement("div");
+ 515:     container.id = "browser-search-results";
+ 516:     document
+ 517:       .getElementById("workspace-container")
+ 518:       .insertAdjacentElement("afterend", container);
+ 519:   }
+ 520:   container.innerHTML = "";
+ 521: 
+ 522:   const sections = [
+ 523:     { label: "Open Tabs", items: results.tabs },
+ 524:     { label: "Bookmarks", items: results.bookmarks },
+ 525:     { label: "History", items: results.history },
+ 526:   ];
+ 527: 
+ 528:   for (const { label, items } of sections) {
+ 529:     if (!items.length) continue;
+ 530:     const section = document.createElement("div");
+ 531:     section.className = "search-results-section";
+ 532: 
+ 533:     const heading = document.createElement("div");
+ 534:     heading.className = "search-results-label";
+ 535:     heading.textContent = label;
+ 536:     section.appendChild(heading);
+ 537: 
+ 538:     for (const item of items.slice(0, 10)) {
+ 539:       section.appendChild(buildResultRow(item));
+ 540:     }
+ 541:     container.appendChild(section);
+ 542:   }
+ 543: 
+ 544:   if (
+ 545:     !results.tabs.length &&
+ 546:     !results.bookmarks.length &&
+ 547:     !results.history.length
+ 548:   ) {
+ 549:     const empty = document.createElement("div");
+ 550:     empty.className = "search-results-empty";
+ 551:     const msg = document.createElement("span");
+ 552:     msg.textContent = `No results for "${query}" â€” `;
+ 553:     const webBtn = document.createElement("button");
+ 554:     webBtn.className = "search-web-fallback";
+ 555:     webBtn.textContent = "search the web";
+ 556:     webBtn.addEventListener("click", async () => {
+ 557:       const PROVIDER_URLS = {
+ 558:         google: "https://www.google.com/search?q=",
+ 559:         duckduckgo: "https://duckduckgo.com/?q=",
+ 560:         bing: "https://www.bing.com/search?q=",
+ 561:         brave: "https://search.brave.com/search?q=",
+ 562:       };
+ 563:       const { searchProvider } = await chrome.storage.sync.get("searchProvider");
+ 564:       const base = PROVIDER_URLS[searchProvider] ?? PROVIDER_URLS.google;
+ 565:       chrome.tabs.create({ url: base + encodeURIComponent(query) });
+ 566:     });
+ 567:     empty.appendChild(msg);
+ 568:     empty.appendChild(webBtn);
+ 569:     container.appendChild(empty);
+ 570:   }
+ 571: }
+ 572: 
+ 573: async function handleBrowserQuery(query) {
+ 574:   browserSearchActive = true;
+ 575: 
+ 576:   filterGrid(query);
+ 577: 
+ 578:   const r = await search(query);
+ 579:   const { localSearch } = await chrome.storage.sync.get("localSearch");
+ 580:   const ls = localSearch ?? { tabs: true, bookmarks: true, history: true };
+ 581:   if (!ls.tabs) r.tabs = [];
+ 582:   if (!ls.bookmarks) r.bookmarks = [];
+ 583:   if (!ls.history) r.history = [];
+ 584:   if (!browserSearchActive) return;
+ 585:   browserSearchResults = r;
+ 586: 
+ 587:   renderSearchResults(r, query);
+ 588: }
+ 589: 
+ 590: async function init() {
+ 591:   // Inject styles for browser search results
+ 592:   const style = document.createElement("style");
+ 593:   style.textContent = `
+ 594:     #browser-search-results {
+ 595:       max-width: 900px;
+ 596:       margin: 16px auto 0;
+ 597:       padding: 16px 20px 24px;
+ 598:       background: rgba(245, 245, 245, 0.80);
+ 599:       backdrop-filter: blur(20px);
+ 600:       -webkit-backdrop-filter: blur(20px);
+ 645:       font-size: 16px; padding: 0 4px; line-height: 1;
+ 646:     }
+ 647:     .search-clear-btn:hover { color: var(--text-primary); }
+ 648:     .search-clear-btn.hidden { display: none; }
+ 649:     .search-web-fallback {
+ 650:       background: none; border: none; padding: 0; cursor: pointer;
+ 651:       color: var(--accent); font-size: 14px; font-family: inherit; text-decoration: underline;
+ 652:     }
+ 653:     .search-web-fallback:hover { opacity: 0.8; }
+ 654:   `;
+ 655:   document.head.appendChild(style);
+ 656: 
+ 657:   await applyStoredAppearance();
+ 658:   await handleNewTabBehavior();
+ 659: 
+ 660:   lightboxApi = setupLightbox();
+ 661: 
+ 662:   searchBarApi = createSearchBar(document.getElementById("search-bar"));
+ 663: 
+ 664:   searchBarApi.onBrowserQuery = (query) => {
+ 665:     if (!query) {
+ 666:       clearBrowserSearch();
+ 667:     } else {
+ 668:       handleBrowserQuery(query);
+ 669:     }
+ 670:   };
+ 671: 
+ 672:   searchBarApi.onArrowDown = () => {
+ 673:     document.querySelector("#browser-search-results .result-row")?.focus();
+ 674:   };
+ 675: 
+ 676:   const settingsOverlay = document.getElementById("settings-overlay");
+ 677:   const settingsContainer = document.getElementById("settings-panel");
+ 678:   const settingsBtn = document.getElementById("settings-btn");
+ 679:   const newGroupBtn = document.getElementById("new-group-btn");
+ 680: 
+

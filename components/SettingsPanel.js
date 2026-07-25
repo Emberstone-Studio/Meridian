@@ -1,3 +1,8 @@
+import {
+  saveCustomBackground,
+  getCustomBackgroundUrl,
+} from "../utils/customBackground.js";
+
 const NEW_TAB_OPTIONS = [
   { id: "meridian-view", label: "Open a new Meridian tab" },
   { id: "focus-pinned", label: "Return to the pinned Meridian tab" },
@@ -41,6 +46,13 @@ const GRADIENT_PRESETS = [
   },
 ];
 
+// Default background when the user hasn't chosen one (matches the "Ocean"
+// gradient preset so its swatch shows selected).
+export const DEFAULT_BACKGROUND = {
+  type: "gradient",
+  value: "linear-gradient(135deg,#0f2027,#203a43,#2c5364)",
+};
+
 function generateSeeds(count = 12, exclude = new Set()) {
   const seeds = new Set();
   while (seeds.size < count) {
@@ -50,31 +62,13 @@ function generateSeeds(count = 12, exclude = new Set()) {
   return [...seeds];
 }
 
-async function resizeToDataUrl(file, maxW = 1920, maxH = 1080, quality = 0.82) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
-      const scale = Math.min(1, maxW / img.width, maxH / img.height);
-      const w = Math.round(img.width * scale);
-      const h = Math.round(img.height * scale);
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL("image/jpeg", quality));
-    };
-    img.src = objectUrl;
-  });
-}
-
 export function createSettingsPanel(container, onClose) {
   let newTabBehavior = "meridian-view";
   let groupByDomain = false;
   let homepageUrl = "";
   let currentTheme = "system";
-  let currentBg = { type: "none", value: "" };
+  let currentBg = DEFAULT_BACKGROUND;
+  let customBgUrl = null;
   let photoSeeds = generateSeeds();
 
   const panel = document.createElement("div");
@@ -282,7 +276,7 @@ export function createSettingsPanel(container, onClose) {
   function selectBg(type, value) {
     currentBg = { type, value };
     chrome.storage.sync.set({ background: currentBg });
-    applyBackground(currentBg);
+    applyBackground(currentBg, customBgUrl);
     renderBgSection();
   }
 
@@ -427,9 +421,11 @@ export function createSettingsPanel(container, onClose) {
       uploadBtn.disabled = true;
       uploadBtn.textContent = "Processing…";
       try {
-        const dataUrl = await resizeToDataUrl(file);
-        localStorage.setItem("meridian_bg_custom", dataUrl);
+        await saveCustomBackground(file);
+        customBgUrl = await getCustomBackgroundUrl();
         selectBg("custom", "");
+      } catch {
+        uploadBtn.textContent = "Could not save image — try another file";
       } finally {
         uploadBtn.disabled = false;
       }
@@ -483,8 +479,15 @@ export function createSettingsPanel(container, onClose) {
       groupByDomain = !!saved.groupByDomain;
       homepageUrl = saved.homepageUrl ?? "";
       currentTheme = saved.theme ?? "system";
-      currentBg = saved.background ?? { type: "none", value: "" };
+      currentBg = saved.background ?? DEFAULT_BACKGROUND;
       toggleCheckbox.checked = groupByDomain;
+      if (currentBg.type === "custom") {
+        getCustomBackgroundUrl().then((url) => {
+          customBgUrl = url;
+          applyBackground(currentBg, customBgUrl);
+          renderBgSection();
+        });
+      }
       if (saved.localSearch) {
         localSearch = { ...localSearch, ...saved.localSearch };
         for (const key of Object.keys(localSearchCheckboxes)) {
@@ -512,7 +515,7 @@ export function applyTheme(theme) {
   }
 }
 
-export function applyBackground(bg) {
+export function applyBackground(bg, customDataUrl = null) {
   const root = document.documentElement;
   root.style.removeProperty("--bg");
   if (!bg || bg.type === "none") {
@@ -525,9 +528,8 @@ export function applyBackground(bg) {
   } else if (bg.type === "photo") {
     root.style.setProperty("--bg-image", `url("${bg.value}")`);
   } else if (bg.type === "custom") {
-    const dataUrl = localStorage.getItem("meridian_bg_custom");
-    if (dataUrl) {
-      root.style.setProperty("--bg-image", `url("${dataUrl}")`);
+    if (customDataUrl) {
+      root.style.setProperty("--bg-image", `url("${customDataUrl}")`);
     } else {
       root.style.removeProperty("--bg-image");
     }

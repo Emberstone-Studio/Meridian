@@ -6,6 +6,8 @@
  *   B) Search functions  — search(query), getPreviousTab() (called from popup.js / meridian.js)
  */
 
+import { mutateStorageValue } from "./storageMutationQueue.js";
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
@@ -26,11 +28,17 @@ function extractDomain(url) {
 }
 
 /**
- * Build a Google favicon URL for a given domain or full URL.
+ * Build a favicon URL for a page using Chrome's local _favicon provider.
+ * This resolves against the browser's own favicon cache — no network request
+ * and no third-party leak of the user's browsing domains. Requires the
+ * "favicon" permission in the manifest.
  */
-function faviconUrl(domain) {
-  if (!domain) return "";
-  return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=16`;
+function faviconUrl(pageUrl) {
+  if (!pageUrl) return "";
+  const u = new URL(chrome.runtime.getURL("/_favicon/"));
+  u.searchParams.set("pageUrl", pageUrl);
+  u.searchParams.set("size", "16");
+  return u.toString();
 }
 
 /**
@@ -112,13 +120,6 @@ async function readIndex() {
 }
 
 /**
- * Write the full index back to storage.
- */
-async function writeIndex(index) {
-  await chrome.storage.local.set({ [INDEX_KEY]: index });
-}
-
-/**
  * Build a TabEntry from a Chrome Tab object.
  * metaDescription and headings start empty; they are filled asynchronously
  * by the content-script injection.
@@ -160,12 +161,11 @@ async function injectMetaExtractor(tabId) {
     const payload = results?.[0]?.result;
     if (!payload) return;
 
-    const index = await readIndex();
-    if (!index[tabId]) return; // tab may have been removed
-
-    index[tabId].metaDescription = payload.metaDescription;
-    index[tabId].headings = payload.headings;
-    await writeIndex(index);
+    await mutateStorageValue(INDEX_KEY, {}, (index) => {
+      if (!index[tabId]) return; // tab may have been removed
+      index[tabId].metaDescription = payload.metaDescription;
+      index[tabId].headings = payload.headings;
+    });
   } catch (_) {
     // Privileged URLs (chrome://, chrome-extension://, about:, etc.) throw here.
     // Intentionally swallowed — leave metaDescription/headings as "".
@@ -179,18 +179,24 @@ async function injectMetaExtractor(tabId) {
 export function initTabIndex() {
   // New tab created
   chrome.tabs.onCreated.addListener(async (tab) => {
-    const index = await readIndex();
-    index[tab.id] = await buildEntry(tab, index[tab.id]);
-    await writeIndex(index);
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+        index[tab.id] = await buildEntry(tab, index[tab.id]);
+      });
+    } catch (_) {}
   });
 
   // Tab updated (title change or navigation complete)
   chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status !== "complete" && !changeInfo.title) return;
 
-    const index = await readIndex();
-    index[tabId] = await buildEntry(tab, index[tabId]);
-    await writeIndex(index);
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+        index[tabId] = await buildEntry(tab, index[tabId]);
+      });
+    } catch (_) {
+      return;
+    }
 
     // Inject content script on full load to capture meta/headings
     if (changeInfo.status === "complete") {
@@ -200,20 +206,22 @@ export function initTabIndex() {
 
   // Tab activated — update lastActive timestamp
   chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    const index = await readIndex();
-    if (index[activeInfo.tabId]) {
-      index[activeInfo.tabId].lastActive = Date.now();
-      await writeIndex(index);
-    }
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, (index) => {
+        if (index[activeInfo.tabId]) {
+          index[activeInfo.tabId].lastActive = Date.now();
+        }
+      });
+    } catch (_) {}
   });
 
   // Tab removed — delete from index
   chrome.tabs.onRemoved.addListener(async (tabId) => {
-    const index = await readIndex();
-    if (index[tabId]) {
-      delete index[tabId];
-      await writeIndex(index);
-    }
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, (index) => {
+        delete index[tabId];
+      });
+    } catch (_) {}
   });
 }
 
@@ -223,15 +231,17 @@ export function initTabIndex() {
  */
 export async function rebuildIndex() {
   const tabs = await chrome.tabs.query({});
-  const index = {};
-
-  await Promise.all(
-    tabs.map(async (tab) => {
-      index[tab.id] = await buildEntry(tab, null);
-    }),
-  );
-
-  await writeIndex(index);
+  // Seed from the existing index so entries written by the event listeners
+  // (registered synchronously before this runs) — plus already-extracted
+  // meta/headings and lastActive — are preserved rather than overwritten.
+  await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+    const rebuiltEntries = await Promise.all(
+      tabs.map(async (tab) => [tab.id, await buildEntry(tab, index[tab.id])]),
+    );
+    for (const [tabId, entry] of rebuiltEntries) {
+      index[tabId] = entry;
+    }
+  });
 
   // Inject meta extractors for all currently loaded tabs (fire-and-forget)
   for (const tab of tabs) {
@@ -322,7 +332,7 @@ async function searchTabs(query) {
     tabId: entry.tabId,
     title: entry.title,
     url: entry.url,
-    favicon: faviconUrl(entry.domain),
+    favicon: faviconUrl(entry.url),
     domain: entry.domain,
     context: entry.workspaceName,
     score,
@@ -365,7 +375,7 @@ async function searchBookmarks(query) {
         tabId: null,
         title: node.title ?? "",
         url: node.url ?? "",
-        favicon: faviconUrl(domain),
+        favicon: faviconUrl(node.url),
         domain,
         context,
         score,
@@ -402,7 +412,7 @@ async function searchHistory(query) {
         tabId: null,
         title: item.title ?? "",
         url: item.url ?? "",
-        favicon: faviconUrl(domain),
+        favicon: faviconUrl(item.url),
         domain,
         context: formatDate(item.lastVisitTime),
         score,

@@ -1,0 +1,84 @@
+{
+  "status": "idle",
+  "task_id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
+  "task_title": "Harden thumbnail cache: serialize pruning + fix byte accounting",
+  "started_at": "2026-07-25T05:09:38.449Z",
+  "updated_at": "2026-07-25T05:11:54.800Z",
+  "completed_at": "2026-07-25T04:40:25.816Z",
+  "last_output": "Implemented the thumbnail-cache hardening follow-up.\n\n- Serialized thumbnail saves, pruning, and eviction through the access-map mutation queue.\n- Changed access metadata to `{ t, b }`, pruned from metadata without loading all thumbnail blobs, and corrected ASCII data URL byte accounting.\n- Removed the unused unsafe `saveWorkspaceData` export.\n- Swallowed queued mutation failures in all async tab event listeners.\n- Updated thumbnail tests for the metadata shape and byte-based pruning.\n\nValidation: `node --test tests/*.test.mjs` - 10 tests passed; `git diff --check` passed.",
+  "timeline": [
+    {
+      "timestamp": "2026-07-25T05:07:59.296Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T05:07:59.296Z",
+      "type": "actor",
+      "content": "chat chat-e29dbc37-00d9-4498-b8b0-778dab2f68ff-97a17bb6 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T05:09:28.534Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T05:09:37.134Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-25T05:09:37.991Z",
+      "type": "moved",
+      "content": "In progress"
+    }
+  ],
+  "history": [
+    {
+      "task_id": "fix-stale-search-results-race-in-handlebrowserqu-c50b",
+      "task_title": "Fix stale search results race in handleBrowserQuery",
+      "status": "ready",
+      "started_at": "2026-07-25T04:40:24.602Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": null,
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "contextmenu-js-use-static-import-for-getworkspac-fabf",
+      "task_title": "ContextMenu.js: use static import for getWorkspaceData",
+      "status": "in_review",
+      "started_at": "2026-07-25T04:42:19.986Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "Updated `components/ContextMenu.js` to statically import `getWorkspaceData` alongside the other workspace manager helpers and replaced the dynamic import call with `getWorkspaceData()`.\n\nValidation:\n- `node --check components/ContextMenu.js` passed.\n- Confirmed the dynamic workspace manager import is absent.\n- `git diff --check` passed.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "custom-background-upload-can-hang-on-processing-af5f",
+      "task_title": "Custom background upload can hang on 'Processing…' for bad files",
+      "status": "in_review",
+      "started_at": "2026-07-25T04:47:13.082Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "Implemented invalid custom-background upload recovery.\n\n- resizeToDataUrl() now revokes the blob URL and resolves null when image decoding fails.\n- The upload handler surfaces the error, preserves stored background data, and re-enables the upload button.\n- Added regression coverage for failed image decoding and object URL cleanup.\n\nVerification: node --test tests/*.test.mjs (3 passed); syntax checks passed; git diff --check passed.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "thumbnails-add-unlimitedstorage-switch-capture-t-ec14",
+      "task_title": "Thumbnails: add unlimitedStorage + switch capture to WebP",
+      "status": "in_review",
+      "started_at": "2026-07-25T04:49:27.892Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "Implemented thumbnail storage hardening and WebP conversion.\n\n- Added `unlimitedStorage` to the extension manifest.\n- Switched tab captures to WebP at quality 55 and custom background resizing to WebP.\n- Routed captures through the shared thumbnail cache, capped at 200 entries / approximately 50 MiB with least-recently-captured eviction.\n- Kept cache recency metadata synchronized when tabs close.\n- Added tests covering WebP resizing, 200-tab cache pruning, and eviction metadata cleanup.\n\nValidation: `node --test` (6/6 passing), `node --check background.js`, `node --check utils/thumbnailCache.js`, manifest JSON parse, and `git diff --check` all passed.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
+      "task_title": "Harden thumbnail cache: serialize pruning + fix byte accounting",
+      "status": "in_review",
+      "started_at": "2026-07-25T05:09:38.449Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "Implemented the thumbnail-cache hardening follow-up.\n\n- Serialized thumbnail saves, pruning, and eviction through the access-map mutation queue.\n- Changed access metadata to `{ t, b }`, pruned from metadata without loading all thumbnail blobs, and corrected ASCII data URL byte accounting.\n- Removed the unused unsafe `saveWorkspaceData` export.\n- Swallowed queued mutation failures in all async tab event listeners.\n- Updated thumbnail tests for the metadata shape and byte-based pruning.\n\nValidation: `node --test tests/*.test.mjs` - 10 tests passed; `git diff --check` passed.",
+      "pipeline_agents": []
+    }
+  ],
+  "entries": []
+}

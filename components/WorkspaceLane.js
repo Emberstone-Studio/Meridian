@@ -6,6 +6,7 @@ import {
   assignTab,
   unassignTab,
 } from "../utils/workspaceManager.js";
+import { mutateStorageValue } from "../utils/storageMutationQueue.js";
 
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
@@ -46,9 +47,9 @@ async function reorderInStorage(
     0,
     draggedTabId,
   );
-  const { tabOrder = {} } = await chrome.storage.local.get("tabOrder");
-  tabOrder[workspaceId] = newOrder;
-  await chrome.storage.local.set({ tabOrder });
+  await mutateStorageValue("tabOrder", {}, (tabOrder) => {
+    tabOrder[workspaceId] = newOrder;
+  });
 }
 
 const GROUP_COLORS = {
@@ -161,16 +162,13 @@ export function createWorkspaceLane(
       "aria-label",
       collapsed ? "Expand lane" : "Collapse lane",
     );
-    chrome.storage.local
-      .get("collapsedLanes")
-      .then(({ collapsedLanes = {} }) => {
-        if (collapsed) {
-          collapsedLanes[workspace.id] = true;
-        } else {
-          delete collapsedLanes[workspace.id];
-        }
-        chrome.storage.local.set({ collapsedLanes });
-      });
+    mutateStorageValue("collapsedLanes", {}, (collapsedLanes) => {
+      if (collapsed) {
+        collapsedLanes[workspace.id] = true;
+      } else {
+        delete collapsedLanes[workspace.id];
+      }
+    });
   });
 
   // ---- Tab cards ----

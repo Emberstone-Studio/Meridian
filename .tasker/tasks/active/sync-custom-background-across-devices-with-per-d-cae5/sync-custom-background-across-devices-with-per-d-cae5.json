@@ -1,0 +1,86 @@
+{
+  "id": "sync-custom-background-across-devices-with-per-d-cae5",
+  "title": "Sync custom background across devices with per-device override",
+  "description": "Today the custom uploaded background image is written only to localStorage (SettingsPanel.js resizeToDataUrl -> localStorage 'meridian_bg_custom'; read back in applyBackground for bg.type === 'custom'), while every other appearance setting goes to chrome.storage.sync. Result: background.type syncs across devices but the image bytes do not, so a synced device shows an empty/broken custom background.\n\nAdd opt-in sync with a per-device override, exposed in Settings:\n- A \"Use synced background\" toggle — when on, the device pulls the shared synced background; when off, this device keeps its own local background regardless of what is synced.\n- A \"Sync current background\" action — pushes THIS device's current custom background up so other devices can adopt it.\n\nImplementation notes:\n- chrome.storage.sync has an ~8KB per-item and ~100KB total quota, so a full-res data URL will NOT fit. Downscale/compress hard for the synced copy (small WebP, e.g. <=1280px, low quality) or store a reference/URL rather than raw bytes; keep the full-res image local for the device that owns it.\n- Preserve current behavior as the default (local, unsynced) so existing users are unaffected.\n- Define precedence clearly: per-device \"Use synced background\" off must win over a synced value.\nAcceptance: toggling and pushing behave per the two controls above; no quota errors; devices with sync off are untouched.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T04:35:16.307Z",
+  "updated_at": "2026-07-25T05:10:35.587Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T04:35:16.307Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T04:35:16.307Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "sync-custom-background-across-devices-with-per-d-cae5",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T04:37:31.475Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "sync-custom-background-across-devices-with-per-d-cae5",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T04:40:35.561Z",
+      "type": "moved",
+      "content": "Moved from ready to backlog"
+    },
+    {
+      "timestamp": "2026-07-25T04:42:27.970Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-07-25T04:47:28.347Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T04:51:08.296Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T04:53:41.362Z",
+      "type": "output",
+      "content": "Implemented opt-in custom background sync with a device-local override.\n\n- Added a device-only `Use synced background` preference in `chrome.storage.local`, defaulting off so existing devices continue using their local full-resolution image.\n- Added `Sync current background`, which creates an aggressively compressed WebP and iteratively keeps it below a 7,000-character payload budget before writing it to `chrome.storage.sync`.\n- Kept the original full-resolution upload in local storage.\n- Applied appearance updates when either the shared image or local override changes; an off override always resolves to the device-local image.\n- Added tests for quota-bounded compression and local/synced precedence.\n\nValidation: `node --test tests/*.test.mjs` (8 passing), JavaScript syntax checks, and `git diff --check`.",
+      "attachment": "active/sync-custom-background-across-devices-with-per-d-cae5/sync-custom-background-across-devices-with-per-dev.md"
+    },
+    {
+      "timestamp": "2026-07-25T05:10:35.587Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-07-25T04:51:07.559Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-db43cca0c586d8fa8b26",
+  "agent_startup_started_at": "2026-07-25T04:51:08.274Z",
+  "agent_session_confirmed_run_id": "agent-sync-custom-background-across-devices-with-per-d-cae5",
+  "agent_session_confirmed_at": "2026-07-25T04:51:08.814Z"
+}

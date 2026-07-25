@@ -1,0 +1,608 @@
+Reading additional input from stdin...
+2026-07-25T04:49:21.941999Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.4 seconds
+Output:
+{
+  "manifest_version": 3,
+  "name": "Meridian",
+  "version": "1.1.0",
+  "description": "Spatial tab command center",
+  "chrome_url_overrides": {
+    "newtab": "meridian.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["tabs", "tabGroups", "storage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
+  "host_permissions": ["<all_urls>"],
+  "commands": {
+    "focus-meridian": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+M"
+      },
+      "description": "Focus Meridian tab"
+    },
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Space"
+      },
+      "description": "Open Meridian quick search"
+    }
+  },
+  "icons": {
+    "16": "img/icon16.png",
+    "32": "img/icon32.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  },
+  "side_panel": {
+    "default_path": "components/sidebar.html"
+  },
+  "action": {
+    "default_title": "Meridian",
+    "default_icon": {
+      "16": "img/icon16.png",
+      "32": "img/icon32.png",
+      "48": "img/icon48.png",
+      "128": "img/icon128.png"
+    }
+  }
+}
+import { initTabIndex, rebuildIndex } from './utils/browserSearch.js';
+
+let meridianTabId = null;
+
+function getMeridianUrl() {
+  return chrome.runtime.getURL("meridian.html");
+}
+
+function isMeridianTab(tab) {
+  const url = getMeridianUrl();
+  return (
+    tab.url === url ||
+    tab.pendingUrl === url ||
+    tab.url === "chrome://newtab/" ||
+    tab.pendingUrl === "chrome://newtab/"
+  );
+}
+
+async function ensureMeridianTab() {
+  const tabs = await chrome.tabs.query({ pinned: true });
+  const existing = tabs.find(isMeridianTab);
+  if (existing) {
+    meridianTabId = existing.id;
+    chrome.storage.local.set({ meridianTabId: existing.id });
+    return;
+  }
+  // Use the direct extension URL so Chrome doesn't redirect to the homepage
+  const tab = await chrome.tabs.create({
+    pinned: true,
+    index: 0,
+    url: getMeridianUrl(),
+  });
+  meridianTabId = tab.id;
+  chrome.storage.local.set({ meridianTabId: tab.id });
+}
+
+async function resolveMeridianTabId() {
+  if (meridianTabId !== null) return;
+  // Check persisted ID first â€” survives service worker restarts
+  const { meridianTabId: storedId } =
+    await chrome.storage.local.get("meridianTabId");
+  if (storedId) {
+    try {
+      const tab = await chrome.tabs.get(storedId);
+      if (tab && tab.pinned) {
+        meridianTabId = storedId;
+        return;
+      }
+    } catch (_) {
+      /* tab gone */
+    }
+  }
+  const tabs = await chrome.tabs.query({ pinned: true });
+  const m = tabs.find(isMeridianTab);
+  if (m) {
+    meridianTabId = m.id;
+    chrome.storage.local.set({ meridianTabId: m.id });
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function captureTab(tabId, windowId) {
+  try {
+    const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
+      format: "jpeg",
+      quality: 60,
+    });
+    await chrome.storage.local.set({ ["thumb_" + tabId]: dataUrl });
+    console.log("[Meridian] Saved thumbnail for tab", tabId);
+  } catch (err) {
+    console.warn(
+      "[Meridian] captureVisibleTab failed for tab",
+      tabId,
+      ":",
+      err.message,
+    );
+  }
+}
+
+chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason !== "install") {
+    // On reload/update: navigate the existing Meridian tab back to the extension page
+    const { meridianTabId: storedId } =
+      await chrome.storage.local.get("meridianTabId");
+    if (storedId) {
+      try {
+        await chrome.tabs.update(storedId, { url: getMeridianUrl() });
+        meridianTabId = storedId;
+        return;
+      } catch (_) {
+        /* tab was closed, fall through to create */
+      }
+    }
+  }
+  ensureMeridianTab();
+});
+
+chrome.runtime.onStartup.addListener(ensureMeridianTab);
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  chrome.storage.local.remove("thumb_" + tabId);
+  if (tabId === meridianTabId) {
+    meridianTabId = null;
+    chrome.storage.local.remove("meridianTabId");
+    setTimeout(ensureMeridianTab, 500);
+  }
+});
+
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command !== "focus-meridian") return;
+  await resolveMeridianTabId();
+  if (meridianTabId !== null) {
+    chrome.tabs.update(meridianTabId, { active: true });
+  } else {
+    ensureMeridianTab();
+  }
+});
+
+let isRefreshing = false;
+let lastActivation = { tabId: null, windowId: null, time: 0 };
+
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  if (isRefreshing) return;
+  await resolveMeridianTabId();
+  if (activeInfo.tabId === meridianTabId) return;
+  const captureTime = Date.now();
+  lastActivation = {
+const PREFIX = "thumb_";
+
+export async function getThumbnail(tabId) {
+  const key = PREFIX + tabId;
+  const result = await chrome.storage.local.get(key);
+  return result[key] ?? null;
+}
+
+export async function saveThumbnail(tabId, dataUrl) {
+  await chrome.storage.local.set({ [PREFIX + tabId]: dataUrl });
+}
+
+export async function evictThumbnail(tabId) {
+  await chrome.storage.local.remove(PREFIX + tabId);
+}
+
+export async function getAllThumbnails() {
+  const all = await chrome.storage.local.get(null);
+  const thumbnails = {};
+  for (const [key, value] of Object.entries(all)) {
+    if (key.startsWith(PREFIX)) {
+      thumbnails[key.slice(PREFIX.length)] = value;
+    }
+  }
+  return thumbnails;
+}
+const NEW_TAB_OPTIONS = [
+  { id: "meridian-view", label: "Open a new Meridian tab" },
+  { id: "focus-pinned", label: "Return to the pinned Meridian tab" },
+  { id: "open-homepage", label: "Open a specific page" },
+];
+
+const SOLID_COLORS = [
+  { id: "s1", value: "#000000", label: "Black" },
+  { id: "s2", value: "#1e2028", label: "Ink" },
+  { id: "s3", value: "#0d1b2a", label: "Midnight" },
+  { id: "s4", value: "#0f2218", label: "Forest" },
+  { id: "s5", value: "#1a0a2e", label: "Plum" },
+];
+
+const GRADIENT_PRESETS = [
+  {
+    id: "g1",
+    value: "linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)",
+    label: "Midnight",
+  },
+  {
+    id: "g2",
+    value: "linear-gradient(135deg,#0f2027,#203a43,#2c5364)",
+    label: "Ocean",
+  },
+  { id: "g3", value: "linear-gradient(135deg,#667eea,#764ba2)", label: "Dusk" },
+  {
+    id: "g4",
+    value: "linear-gradient(135deg,#11998e,#38ef7d)",
+    label: "Emerald",
+  },
+  {
+    id: "g5",
+    value: "linear-gradient(135deg,#f7971e,#ffd200)",
+    label: "Amber",
+  },
+  {
+    id: "g6",
+    value: "linear-gradient(135deg,#f093fb,#f5576c)",
+    label: "Bloom",
+  },
+];
+
+function generateSeeds(count = 12, exclude = new Set()) {
+  const seeds = new Set();
+  while (seeds.size < count) {
+    const s = String(Math.floor(Math.random() * 9000) + 1000);
+    if (!exclude.has(s)) seeds.add(s);
+  }
+  return [...seeds];
+}
+
+export async function resizeToDataUrl(
+  file,
+  maxW = 1920,
+  maxH = 1080,
+  quality = 0.82,
+) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const scale = Math.min(1, maxW / img.width, maxH / img.height);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(null);
+    };
+    img.src = objectUrl;
+  });
+}
+
+export function createSettingsPanel(container, onClose) {
+  let newTabBehavior = "meridian-view";
+  let groupByDomain = false;
+  let homepageUrl = "";
+  let currentTheme = "system";
+  let currentBg = { type: "none", value: "" };
+  let photoSeeds = generateSeeds();
+
+  const panel = document.createElement("div");
+
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import { resizeToDataUrl } from "../components/SettingsPanel.js";
+
+test("returns null and revokes the object URL when an image cannot be decoded", async () => {
+  const revokedUrls = [];
+
+  globalThis.URL = {
+    createObjectURL() {
+      return "blob:invalid-image";
+    },
+    revokeObjectURL(url) {
+      revokedUrls.push(url);
+    },
+  };
+  globalThis.Image = class {
+    set src(_url) {
+      queueMicrotask(() => this.onerror());
+    }
+  };
+
+  const result = await resizeToDataUrl({ type: "image/png" });
+
+  assert.equal(result, null);
+  assert.deepEqual(revokedUrls, ["blob:invalid-image"]);
+});
+Get-Content : Cannot find path 'C:\Users\russp\AppData\Local\Temp\tasker-task-worktrees\2b13ff41ffe7\thumbnails-add-unl
+imitedstorage-switch-capture-t-a6e6e3a740c83c08\package.json' because it does not exist.
+At line:2 char:164
++ ... nts\SettingsPanel.js -TotalCount 90; Get-Content package.json; Get-Co ...
++                                          ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (C:\Users\russp\...08\package.json:String) [Get-Content], ItemNotFoundEx 
+   ception
+    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand
+ 
+rg: *.js: The filename, directory name, or volume label syntax is incorrect. (os error 123)
+
+2026-07-25T04:49:21.984505Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5
+2026-07-25T04:49:29.475785Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5
+2026-07-25T04:49:34.008185Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5
+2026-07-25T04:50:48.315339Z ERROR codex_core::tools::router: error=Exit code: 1
+Wall time: 0.5 seconds
+Output:
+manifest.json:13:  "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
+components\SettingsPanel.js:71:      resolve(canvas.toDataURL("image/webp", quality));
+utils\thumbnailCache.js:3:const MAX_ENTRIES = 200;
+utils\thumbnailCache.js:4:const MAX_BYTES = 50 * 1024 * 1024;
+utils\thumbnailCache.js:23:    entries.length - remove.length > MAX_ENTRIES ||
+utils\thumbnailCache.js:24:    totalBytes > MAX_BYTES
+background.js:70:      quality: 55,
+tests\thumbnailCache.test.mjs:42:    initial[`thumb_${i}`] = `data:image/webp;base64,${i}`;
+tests\thumbnailCache.test.mjs:48:  await saveThumbnail(200, "data:image/webp;base64,new");
+tests\thumbnailCache.test.mjs:51:  assert.equal(values.thumb_200, "data:image/webp;base64,new");
+tests\thumbnailCache.test.mjs:57:    thumb_7: "data:image/webp;base64,test",
+tests\settingsPanel.test.mjs:54:          return "data:image/webp;base64,test";
+tests\settingsPanel.test.mjs:62:  assert.equal(result, "data:image/webp;base64,test");
+tests\settingsPanel.test.mjs:64:    type: "image/webp",
+diff --git a/background.js b/background.js
+index 29e0ccf..6368902 100644
+--- a/background.js
++++ b/background.js
+@@ -1,4 +1,5 @@
+ import { initTabIndex, rebuildIndex } from './utils/browserSearch.js';
++import { evictThumbnail, saveThumbnail } from "./utils/thumbnailCache.js";
+ 
+ let meridianTabId = null;
+ 
+@@ -65,10 +66,10 @@ function sleep(ms) {
+ async function captureTab(tabId, windowId) {
+   try {
+     const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
+-      format: "jpeg",
+-      quality: 60,
++      format: "webp",
++      quality: 55,
+     });
+-    await chrome.storage.local.set({ ["thumb_" + tabId]: dataUrl });
++    await saveThumbnail(tabId, dataUrl);
+     console.log("[Meridian] Saved thumbnail for tab", tabId);
+   } catch (err) {
+     console.warn(
+@@ -101,7 +102,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
+ chrome.runtime.onStartup.addListener(ensureMeridianTab);
+ 
+ chrome.tabs.onRemoved.addListener((tabId) => {
+-  chrome.storage.local.remove("thumb_" + tabId);
++  evictThumbnail(tabId);
+   if (tabId === meridianTabId) {
+     meridianTabId = null;
+     chrome.storage.local.remove("meridianTabId");
+diff --git a/components/SettingsPanel.js b/components/SettingsPanel.js
+index bb24d23..b4ca482 100644
+--- a/components/SettingsPanel.js
++++ b/components/SettingsPanel.js
+@@ -68,7 +68,7 @@ export async function resizeToDataUrl(
+       canvas.width = w;
+       canvas.height = h;
+       canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+-      resolve(canvas.toDataURL("image/jpeg", quality));
++      resolve(canvas.toDataURL("image/webp", quality));
+     };
+     img.onerror = () => {
+       URL.revokeObjectURL(objectUrl);
+diff --git a/manifest.json b/manifest.json
+index 13b4378..c2e5a5c 100644
+--- a/manifest.json
++++ b/manifest.json
+@@ -10,7 +10,7 @@
+     "service_worker": "background.js",
+     "type": "module"
+   },
+-  "permissions": ["tabs", "tabGroups", "storage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
++  "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
+   "host_permissions": ["<all_urls>"],
+   "commands": {
+     "focus-meridian": {
+diff --git a/tests/settingsPanel.test.mjs b/tests/settingsPanel.test.mjs
+index a39bec3..6407058 100644
+--- a/tests/settingsPanel.test.mjs
++++ b/tests/settingsPanel.test.mjs
+@@ -25,3 +25,45 @@ test("returns null and revokes the object URL when an image cannot be decoded",
+   assert.equal(result, null);
+   assert.deepEqual(revokedUrls, ["blob:invalid-image"]);
+ });
++
++test("resizes custom backgrounds as WebP", async () => {
++  let encodedAs;
++
++  globalThis.URL = {
++    createObjectURL() {
++      return "blob:valid-image";
++    },
++    revokeObjectURL() {},
++  };
++  globalThis.Image = class {
++    width = 2400;
++    height = 1200;
++
++    set src(_url) {
++      queueMicrotask(() => this.onload());
++    }
++  };
++  globalThis.document = {
++    createElement() {
++      return {
++        getContext() {
++          return { drawImage() {} };
++        },
++        toDataURL(type, quality) {
++          encodedAs = { type, quality, width: this.width, height: this.height };
++          return "data:image/webp;base64,test";
++        },
++      };
++    },
++  };
++
++  const result = await resizeToDataUrl({}, 1200, 900, 0.75);
++
++  assert.equal(result, "data:image/webp;base64,test");
++  assert.deepEqual(encodedAs, {
++    type: "image/webp",
++    quality: 0.75,
++    width: 1200,
++    height: 600,
++  });
++});
+diff --git a/utils/thumbnailCache.js b/utils/thumbnailCache.js
+index 6c0e201..a6f724c 100644
+--- a/utils/thumbnailCache.js
++++ b/utils/thumbnailCache.js
+@@ -1,4 +1,41 @@
+ const PREFIX = "thumb_";
++const ACCESS_KEY = "thumbnailCacheAccess";
++const MAX_ENTRIES = 200;
++const MAX_BYTES = 50 * 1024 * 1024;
++
++function dataUrlBytes(value) {
++  return typeof value === "string" ? value.length * 2 : 0;
++}
++
++async function pruneThumbnails(incomingKey, incomingDataUrl) {
++  const all = await chrome.storage.local.get(null);
++  const access = { ...(all[ACCESS_KEY] ?? {}), [incomingKey]: Date.now() };
++  const entries = Object.entries(all)
++    .filter(([key]) => key.startsWith(PREFIX) && key !== incomingKey)
++    .map(([key, value]) => ({ key, bytes: dataUrlBytes(value) }));
++
++  entries.push({ key: incomingKey, bytes: dataUrlBytes(incomingDataUrl) });
++  entries.sort((a, b) => (access[a.key] ?? 0) - (access[b.key] ?? 0));
++
++  let totalBytes = entries.reduce((total, entry) => total + entry.bytes, 0);
++  const remove = [];
++  while (
++    entries.length - remove.length > MAX_ENTRIES ||
++    totalBytes > MAX_BYTES
++  ) {
++    const entry = entries[remove.length];
++    if (!entry || entry.key === incomingKey) break;
++    remove.push(entry.key);
++    totalBytes -= entry.bytes;
++    delete access[entry.key];
++  }
++
++  if (remove.length) await chrome.storage.local.remove(remove);
++  await chrome.storage.local.set({
++    [incomingKey]: incomingDataUrl,
++    [ACCESS_KEY]: access,
++  });
++}
+ 
+ export async function getThumbnail(tabId) {
+   const key = PREFIX + tabId;
+@@ -7,11 +44,17 @@ export async function getThumbnail(tabId) {
+ }
+ 
+ export async function saveThumbnail(tabId, dataUrl) {
+-  await chrome.storage.local.set({ [PREFIX + tabId]: dataUrl });
++  await pruneThumbnails(PREFIX + tabId, dataUrl);
+ }
+ 
+ export async function evictThumbnail(tabId) {
+-  await chrome.storage.local.remove(PREFIX + tabId);
++  const key = PREFIX + tabId;
++  const { [ACCESS_KEY]: storedAccess = {} } =
++    await chrome.storage.local.get(ACCESS_KEY);
++  const access = { ...storedAccess };
++  delete access[key];
++  await chrome.storage.local.remove(key);
++  await chrome.storage.local.set({ [ACCESS_KEY]: access });
+ }
+ 
+ export async function getAllThumbnails() {
+diff --git "a/tests\\thumbnailCache.test.mjs" "b/tests\\thumbnailCache.test.mjs"
+new file mode 100644
+index 0000000..7a49f24
+--- /dev/null
++++ "b/tests\\thumbnailCache.test.mjs"
+@@ -0,0 +1,65 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++
++import {
++  evictThumbnail,
++  getAllThumbnails,
++  saveThumbnail,
++} from "../utils/thumbnailCache.js";
++
++function installStorage(initial = {}) {
++  const values = { ...initial };
++  globalThis.chrome = {
++    storage: {
++      local: {
++        async get(keys) {
++          if (keys === null) return { ...values };
++          const requested = Array.isArray(keys) ? keys : [keys];
++          return Object.fromEntries(
++            requested
++              .filter((key) => Object.hasOwn(values, key))
++              .map((key) => [key, values[key]]),
++          );
++        },
++        async set(next) {
++          Object.assign(values, next);
++        },
++        async remove(keys) {
++          for (const key of Array.isArray(keys) ? keys : [keys]) {
++            delete values[key];
++          }
++        },
++      },
++    },
++  };
++  return values;
++}
++
++test("keeps the 200 most recently saved thumbnails", async () => {
++  const initial = {};
++  const access = {};
++  for (let i = 0; i < 200; i += 1) {
++    initial[`thumb_${i}`] = `data:image/webp;base64,${i}`;
++    access[`thumb_${i}`] = i;
++  }
++  initial.thumbnailCacheAccess = access;
++  const values = installStorage(initial);
++
++  await saveThumbnail(200, "data:image/webp;base64,new");
++
++  assert.equal(values.thumb_0, undefined);
++  assert.equal(values.thumb_200, "data:image/webp;base64,new");
++  assert.equal(Object.keys(await getAllThumbnails()).length, 200);
++});
++
++test("eviction removes thumbnail data and recency metadata", async () => {
++  const values = installStorage({
++    thumb_7: "data:image/webp;base64,test",
++    thumbnailCacheAccess: { thumb_7: 1 },
++  });
++
++  await evictThumbnail(7);
++
++  assert.equal(values.thumb_7, undefined);
++  assert.deepEqual(values.thumbnailCacheAccess, {});
++});
+warning: in the working copy of 'background.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'components/SettingsPanel.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/settingsPanel.test.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'utils/thumbnailCache.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests\thumbnailCache.test.mjs', LF will be replaced by CRLF the next time Git touches it
+

@@ -5,7 +5,9 @@ import {
   createSettingsPanel,
   applyTheme,
   applyBackground,
+  DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
+import { getCustomBackgroundUrl } from "./utils/customBackground.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
 import {
@@ -25,7 +27,9 @@ async function applyStoredAppearance() {
     "background",
   ]);
   applyTheme(theme ?? "system");
-  applyBackground(background ?? { type: "none", value: "" });
+  const bg = background ?? DEFAULT_BACKGROUND;
+  const customUrl = bg.type === "custom" ? await getCustomBackgroundUrl() : null;
+  applyBackground(bg, customUrl);
 }
 
 function setupLightbox() {
@@ -147,6 +151,7 @@ async function handleNewTabBehavior() {
 let searchBarApi = null;
 let browserSearchActive = false;
 let browserSearchResults = null;
+let browserSearchSequence = 0;
 
 function setupKeyboardNav() {
   document.addEventListener("keydown", (e) => {
@@ -460,9 +465,7 @@ function buildResultRow(item) {
   favicon.className = "result-favicon";
   favicon.width = 16;
   favicon.height = 16;
-  favicon.src =
-    item.favicon ||
-    `https://www.google.com/s2/favicons?domain=${item.domain}&sz=16`;
+  favicon.src = item.favicon || "";
   favicon.onerror = () => {
     let letter = "?";
     try { letter = new URL(item.url).hostname.replace(/^www\./, "").charAt(0).toUpperCase() || "?"; } catch (_) {}
@@ -574,6 +577,7 @@ function renderSearchResults(results, query) {
 
 async function handleBrowserQuery(query) {
   browserSearchActive = true;
+  const searchSequence = ++browserSearchSequence;
 
   filterGrid(query);
 
@@ -583,7 +587,7 @@ async function handleBrowserQuery(query) {
   if (!ls.tabs) r.tabs = [];
   if (!ls.bookmarks) r.bookmarks = [];
   if (!ls.history) r.history = [];
-  if (!browserSearchActive) return;
+  if (!browserSearchActive || searchSequence !== browserSearchSequence) return;
   browserSearchResults = r;
 
   renderSearchResults(r, query);
@@ -748,6 +752,9 @@ async function init() {
   });
 
   chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "sync" && changes.background) {
+      applyStoredAppearance();
+    }
     if (area !== "local") return;
     const keys = Object.keys(changes);
     if (

@@ -1,0 +1,67 @@
+{
+  "id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
+  "title": "Harden thumbnail cache: serialize pruning + fix byte accounting",
+  "description": "Follow-up from review of the storage-serialization work (commit 609fd4d).\n\n1) MEDIUM — utils/thumbnailCache.js pruneThumbnails() does its own get(null) -> compute -> set/remove OUTSIDE the new storageMutationQueue. Two overlapping captures (e.g. Settings 'Refresh all thumbnails' racing an onActivated/onUpdated capture) can interleave and lose thumbnailCacheAccess updates or clobber an entry — the exact race class task 1 was meant to close. Route the access-map update + evictThumbnail through mutateStorageValue(ACCESS_KEY, ...) so prunes serialize.\n\n2) MEDIUM (perf) — pruneThumbnails loads EVERY thumbnail's full data URL into memory via get(null) on every save just to sum sizes. Store per-key byte counts in the access map (e.g. { [key]: { t: lastAccess, b: bytes } }) so pruning needs only the small access map, not all blobs. Update tests/thumbnailCache.test.mjs for the new shape.\n\n3) LOW — dataUrlBytes() uses value.length * 2 (UTF-16), but base64 data URLs are ASCII (~1 byte/char), so the 50MB cap effectively prunes at ~25MB. Use value.length.\n\n4) LOW — workspaceManager.saveWorkspaceData() is now dead (no callers) and would clobber concurrent queued mutations if used; remove it or make its mutator merge rather than replace.\n\n5) LOW — the async chrome.tabs.on* listeners in browserSearch.js initTabIndex await mutateStorageValue(...) with no .catch; a rejected mutation surfaces as an unhandled rejection in the service worker. Wrap/swallow.\n\nKeep the existing test suite green.",
+  "status": "done",
+  "priority": "high",
+  "label": "Maintenance",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T05:07:59.296Z",
+  "updated_at": "2026-07-25T05:14:00.370Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T05:07:59.296Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T05:07:59.296Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-e29dbc37-00d9-4498-b8b0-778dab2f68ff-97a17bb6",
+        "task_id": null
+      },
+      "task_id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
+      "content": "chat chat-e29dbc37-00d9-4498-b8b0-778dab2f68ff-97a17bb6 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T05:09:28.534Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T05:09:37.134Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-25T05:09:37.991Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T05:11:54.800Z",
+      "type": "output",
+      "content": "Implemented the thumbnail-cache hardening follow-up.\n\n- Serialized thumbnail saves, pruning, and eviction through the access-map mutation queue.\n- Changed access metadata to `{ t, b }`, pruned from metadata without loading all thumbnail blobs, and corrected ASCII data URL byte accounting.\n- Removed the unused unsafe `saveWorkspaceData` export.\n- Swallowed queued mutation failures in all async tab event listeners.\n- Updated thumbnail tests for the metadata shape and byte-based pruning.\n\nValidation: `node --test tests/*.test.mjs` - 10 tests passed; `git diff --check` passed.",
+      "attachment": "active/harden-thumbnail-cache-serialize-pruning-fix-byt-4568/harden-thumbnail-cache-serialize-pruning-fix-byte-.md"
+    },
+    {
+      "timestamp": "2026-07-25T05:14:00.370Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-07-25T05:09:37.164Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-9fbac232a0995e1a47d8",
+  "agent_startup_started_at": "2026-07-25T05:09:37.965Z"
+}

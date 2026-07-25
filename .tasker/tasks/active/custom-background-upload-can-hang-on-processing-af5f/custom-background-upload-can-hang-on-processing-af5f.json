@@ -1,0 +1,130 @@
+{
+  "id": "custom-background-upload-can-hang-on-processing-af5f",
+  "title": "Custom background upload can hang on 'Processing…' for bad files",
+  "description": "SettingsPanel.js resizeToDataUrl() (lines ~53-70) creates an Image with an onload handler but no onerror. If the selected file is corrupt or an unsupported format, the Image never loads, the returned Promise never settles, and the change handler's try/finally never reaches finally — leaving the upload button stuck disabled on 'Processing…' forever.\n\nFix: add img.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(null); } and have the caller handle a null result (surface an error, re-enable the button). Optionally validate file.type up front. Repro: upload a .txt renamed to .png, or a truncated image.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T04:35:20.819Z",
+  "updated_at": "2026-07-25T05:10:36.464Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T04:35:20.819Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T04:35:20.819Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "custom-background-upload-can-hang-on-processing-af5f",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T04:37:32.471Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-232db15790f97122e0ac72cb39412657-97fc402a",
+        "task_id": null
+      },
+      "task_id": "custom-background-upload-can-hang-on-processing-af5f",
+      "content": "chat chat-232db15790f97122e0ac72cb39412657-97fc402a called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T04:40:38.522Z",
+      "type": "moved",
+      "content": "Moved from ready to backlog"
+    },
+    {
+      "timestamp": "2026-07-25T04:42:19.661Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-07-25T04:47:10.175Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T04:47:20.847Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T04:48:54.367Z",
+      "type": "output",
+      "content": "Implemented invalid custom-background upload recovery.\n\n- resizeToDataUrl() now revokes the blob URL and resolves null when image decoding fails.\n- The upload handler surfaces the error, preserves stored background data, and re-enables the upload button.\n- Added regression coverage for failed image decoding and object URL cleanup.\n\nVerification: node --test tests/*.test.mjs (3 passed); syntax checks passed; git diff --check passed.",
+      "attachment": "active/custom-background-upload-can-hang-on-processing-af5f/custom-background-upload-can-hang-on-processing-fo.md"
+    },
+    {
+      "timestamp": "2026-07-25T04:49:33.613Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T04:50:27.125Z",
+      "type": "output",
+      "content": "Implemented and verified invalid custom-background upload recovery.\n\n- `resizeToDataUrl()` revokes the blob URL and resolves `null` when image decoding fails.\n- The upload handler displays an error for a null result and always re-enables the upload button through `finally`.\n- Regression coverage verifies failed decoding settles and cleans up the object URL.\n\nVerification: `node --test tests/*.test.mjs` (3 passed), syntax checks passed, `git diff --check` passed, and the worktree is clean.",
+      "attachment": "active/custom-background-upload-can-hang-on-processing-af5f/custom-background-upload-can-hang-on-processing-fo-2.md"
+    },
+    {
+      "timestamp": "2026-07-25T05:10:36.464Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "alternates": [],
+    "shape": "Bug",
+    "decided_by": "run-queue",
+    "decided_at": "2026-07-25T04:47:09.444Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": true,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=true,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "agent_attempt_id": "attempt-f5fec96c0fcd35bcc286",
+  "agent_startup_started_at": "2026-07-25T04:49:33.591Z"
+}

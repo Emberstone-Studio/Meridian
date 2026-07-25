@@ -1,0 +1,163 @@
+{
+  "019f8d48-72f6-7700-a452-e63b53aa74e5": {
+    "currentContextTokens": 36873,
+    "contextTokens": 36873,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 35168,
+      "cache_creation_input_tokens": 1703,
+      "output_tokens": 3,
+      "turn_cumulative_input_tokens": 8,
+      "turn_cumulative_cache_read_input_tokens": 135021,
+      "turn_cumulative_cache_creation_input_tokens": 5639,
+      "turn_cumulative_output_tokens": 1502,
+      "context_window": 1000000,
+      "current_context_tokens": 36873,
+      "context_tokens": 36873,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-sonnet-5",
+    "provider": "claude"
+  },
+  "6476c647-c72e-4ace-b7f4-8706402b641f": {
+    "currentContextTokens": 36873,
+    "contextTokens": 36873,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 35168,
+      "cache_creation_input_tokens": 1703,
+      "output_tokens": 3,
+      "turn_cumulative_input_tokens": 8,
+      "turn_cumulative_cache_read_input_tokens": 135021,
+      "turn_cumulative_cache_creation_input_tokens": 5639,
+      "turn_cumulative_output_tokens": 1502,
+      "context_window": 1000000,
+      "current_context_tokens": 36873,
+      "context_tokens": 36873,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-sonnet-5",
+    "provider": "claude"
+  },
+  "232db15790f97122e0ac72cb39412657": {
+    "currentContextTokens": 131085,
+    "contextTokens": 131085,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 129967,
+      "cache_creation_input_tokens": 1116,
+      "output_tokens": 4,
+      "turn_cumulative_input_tokens": 2,
+      "turn_cumulative_cache_read_input_tokens": 129967,
+      "turn_cumulative_cache_creation_input_tokens": 1116,
+      "turn_cumulative_output_tokens": 669,
+      "context_window": 1000000,
+      "current_context_tokens": 131085,
+      "context_tokens": 131085,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-opus-4-8",
+    "provider": "claude"
+  },
+  "b1034ec5639f915e22ea0e8d2ad42d54": {
+    "currentContextTokens": 40262,
+    "contextTokens": 40262,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 38478,
+      "cache_creation_input_tokens": 1782,
+      "output_tokens": 2,
+      "turn_cumulative_input_tokens": 8,
+      "turn_cumulative_cache_read_input_tokens": 148165,
+      "turn_cumulative_cache_creation_input_tokens": 6136,
+      "turn_cumulative_output_tokens": 1641,
+      "context_window": 1000000,
+      "current_context_tokens": 40262,
+      "context_tokens": 40262,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-sonnet-5",
+    "provider": "claude"
+  },
+  "4d35f81a-862a-46a2-b6fc-8b4468040dc2": {
+    "currentContextTokens": 40262,
+    "contextTokens": 40262,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 38478,
+      "cache_creation_input_tokens": 1782,
+      "output_tokens": 2,
+      "turn_cumulative_input_tokens": 8,
+      "turn_cumulative_cache_read_input_tokens": 148165,
+      "turn_cumulative_cache_creation_input_tokens": 6136,
+      "turn_cumulative_output_tokens": 1641,
+      "context_window": 1000000,
+      "current_context_tokens": 40262,
+      "context_tokens": 40262,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-sonnet-5",
+    "provider": "claude"
+  },
+  "062cb4bccdb6bface4bb59be83d0d754": {
+    "currentContextTokens": 89325,
+    "contextTokens": 89325,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 88717,
+      "cache_creation_input_tokens": 606,
+      "output_tokens": 2,
+      "turn_cumulative_input_tokens": 10,
+      "turn_cumulative_cache_read_input_tokens": 437898,
+      "turn_cumulative_cache_creation_input_tokens": 3213,
+      "turn_cumulative_output_tokens": 1645,
+      "context_window": 1000000,
+      "current_context_tokens": 89325,
+      "context_tokens": 89325,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-opus-4-8",
+    "provider": "claude"
+  },
+  "3c0a2278-ae0c-469b-adf9-6ab0ac187efb": {
+    "currentContextTokens": 89325,
+    "contextTokens": 89325,
+    "contextWindow": 1000000,
+    "usage": {
+      "turn_input_tokens": 2,
+      "input_tokens": 2,
+      "cache_read_input_tokens": 88717,
+      "cache_creation_input_tokens": 606,
+      "output_tokens": 2,
+      "turn_cumulative_input_tokens": 10,
+      "turn_cumulative_cache_read_input_tokens": 437898,
+      "turn_cumulative_cache_creation_input_tokens": 3213,
+      "turn_cumulative_output_tokens": 1645,
+      "context_window": 1000000,
+      "current_context_tokens": 89325,
+      "context_tokens": 89325,
+      "current_context_provenance": "claude.message_start.usage",
+      "current_context_freshness": "terminal"
+    },
+    "model": "claude-opus-4-8",
+    "provider": "claude"
+  }
+}

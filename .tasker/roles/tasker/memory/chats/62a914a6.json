@@ -1,0 +1,12 @@
+{
+  "chatId": "62a914a6",
+  "title": "Review current code",
+  "summary": "## Summary\n\nReviewed Meridian, a Manifest V3 browser extension, on branch `review/security-correctness-fixes`. Initial review found: storage index lost-update races, startup rebuild race, thumbnail quota issues, stale search race, and Google favicon privacy leak. Fixed favicon leak (local `_favicon` provider) and rebuild-merge myself; created tasks for the rest.\n\nCoders delivered 7 tasks + follow-up. Caught/fixed a High regression: `getWorkspaceData()` became a writer causing render loop. Follow-up hardened thumbnail cache.\n\nCommits on branch: `0fab5f3` (favicon), `609fd4d` (7-task batch + loop fix), `5100de7` (thumbnail hardening), `76745bc` (JPEG capture fix), `7ca43d1` (Ocean default + revert custom-bg rework).\n\nUser testing found: favicons good; **thumbnails broke** (WebP unsupported by `captureVisibleTab` — reverted to JPEG); **uploads pixelated** (WebP re-encode regression — reverted to JPEG, removed custom-bg sync, Ocean gradient now default).\n\n`meridian-extension/` is the unpacked build dir loaded in Chrome; synced via PowerShell `Copy-Item` (Bash sandbox blocked). Tests: 8/8. Nothing pushed. User must reload extension and re-upload image to verify JPEG fix.",
+  "agents": [
+    "reviewer",
+    "tasker"
+  ],
+  "threadPath": ".tasker/chats/62a914a6",
+  "createdAt": "2026-07-25T04:11:04.302Z",
+  "updatedAt": "2026-07-25T05:32:01.515Z"
+}

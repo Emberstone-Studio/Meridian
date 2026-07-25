@@ -1,3 +1,5 @@
+import { mutateStorageValue } from "./storageMutationQueue.js";
+
 const STORAGE_KEY = "workspaces";
 const SCHEMA_VERSION = 2;
 
@@ -7,12 +9,8 @@ const DEFAULT_DATA = {
   assignments: {},
 };
 
-export async function getWorkspaceData() {
-  const result = await chrome.storage.local.get(STORAGE_KEY);
-  const data = result[STORAGE_KEY];
-  // Clear stale data from old schema (auto-populated from initFromTabs)
+function normalizeWorkspaceData(data) {
   if (!data || data.version !== SCHEMA_VERSION) {
-    await chrome.storage.local.set({ [STORAGE_KEY]: DEFAULT_DATA });
     return structuredClone(DEFAULT_DATA);
   }
   if (!data.workspaces.find((w) => w.id === "unsorted")) {
@@ -21,46 +19,59 @@ export async function getWorkspaceData() {
   return data;
 }
 
-export async function saveWorkspaceData(data) {
-  data.version = SCHEMA_VERSION;
-  await chrome.storage.local.set({ [STORAGE_KEY]: data });
+function mutateWorkspaceData(mutate) {
+  return mutateStorageValue(STORAGE_KEY, DEFAULT_DATA, (data) => {
+    data = normalizeWorkspaceData(data);
+    mutate(data);
+    return data;
+  });
+}
+
+export async function getWorkspaceData() {
+  // Pure read: normalize in memory only. Writing here would fire
+  // storage.onChanged("workspaces") on every render() call, which the
+  // meridian.js listener turns back into scheduleRender() — a self-sustaining
+  // render/write loop. Schema migration is persisted lazily by the first
+  // actual mutation via mutateWorkspaceData().
+  const result = await chrome.storage.local.get(STORAGE_KEY);
+  return normalizeWorkspaceData(result[STORAGE_KEY]);
 }
 
 export async function assignTab(tabId, workspaceId) {
-  const data = await getWorkspaceData();
-  data.assignments[String(tabId)] = workspaceId;
-  await saveWorkspaceData(data);
+  await mutateWorkspaceData((data) => {
+    data.assignments[String(tabId)] = workspaceId;
+  });
 }
 
 export async function unassignTab(tabId) {
-  const data = await getWorkspaceData();
-  delete data.assignments[String(tabId)];
-  await saveWorkspaceData(data);
+  await mutateWorkspaceData((data) => {
+    delete data.assignments[String(tabId)];
+  });
 }
 
 export async function createWorkspace(name) {
-  const data = await getWorkspaceData();
   const workspace = { id: crypto.randomUUID(), name };
-  data.workspaces.push(workspace);
-  await saveWorkspaceData(data);
+  await mutateWorkspaceData((data) => {
+    data.workspaces.push(workspace);
+  });
   return workspace;
 }
 
 export async function renameWorkspace(workspaceId, newName) {
-  const data = await getWorkspaceData();
-  const ws = data.workspaces.find((w) => w.id === workspaceId);
-  if (ws) ws.name = newName;
-  await saveWorkspaceData(data);
+  await mutateWorkspaceData((data) => {
+    const ws = data.workspaces.find((w) => w.id === workspaceId);
+    if (ws) ws.name = newName;
+  });
 }
 
 export async function deleteWorkspace(workspaceId) {
   if (workspaceId === "unsorted") return;
-  const data = await getWorkspaceData();
-  data.workspaces = data.workspaces.filter((w) => w.id !== workspaceId);
-  for (const [tabId, wsId] of Object.entries(data.assignments)) {
-    if (wsId === workspaceId) data.assignments[tabId] = "unsorted";
-  }
-  await saveWorkspaceData(data);
+  await mutateWorkspaceData((data) => {
+    data.workspaces = data.workspaces.filter((w) => w.id !== workspaceId);
+    for (const [tabId, wsId] of Object.entries(data.assignments)) {
+      if (wsId === workspaceId) data.assignments[tabId] = "unsorted";
+    }
+  });
 }
 
 export async function getTabWorkspace(tabId) {
@@ -69,17 +80,17 @@ export async function getTabWorkspace(tabId) {
 }
 
 export async function initFromTabs(tabs, clusterFn) {
-  const data = await getWorkspaceData();
-  if (data.workspaces.length > 1) return;
+  await mutateWorkspaceData((data) => {
+    if (data.workspaces.length > 1) return;
 
-  const clusters = clusterFn(tabs);
-  for (const [name, clusterTabs] of clusters) {
-    if (name === "Unsorted") continue;
-    const ws = { id: crypto.randomUUID(), name };
-    data.workspaces.push(ws);
-    for (const tab of clusterTabs) {
-      data.assignments[String(tab.id)] = ws.id;
+    const clusters = clusterFn(tabs);
+    for (const [name, clusterTabs] of clusters) {
+      if (name === "Unsorted") continue;
+      const ws = { id: crypto.randomUUID(), name };
+      data.workspaces.push(ws);
+      for (const tab of clusterTabs) {
+        data.assignments[String(tab.id)] = ws.id;
+      }
     }
-  }
-  await saveWorkspaceData(data);
+  });
 }
