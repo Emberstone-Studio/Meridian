@@ -41,6 +41,10 @@ const GRADIENT_PRESETS = [
   },
 ];
 
+export const SYNCED_BACKGROUND_KEY = "meridian_bg_custom_synced";
+export const USE_SYNCED_BACKGROUND_KEY = "meridian_bg_use_synced";
+export const MAX_SYNCED_BACKGROUND_LENGTH = 7000;
+
 function generateSeeds(count = 12, exclude = new Set()) {
   const seeds = new Set();
   while (seeds.size < count) {
@@ -50,7 +54,12 @@ function generateSeeds(count = 12, exclude = new Set()) {
   return [...seeds];
 }
 
-async function resizeToDataUrl(file, maxW = 1920, maxH = 1080, quality = 0.82) {
+export async function resizeToDataUrl(
+  file,
+  maxW = 1920,
+  maxH = 1080,
+  quality = 0.82,
+) {
   return new Promise((resolve) => {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
@@ -63,10 +72,55 @@ async function resizeToDataUrl(file, maxW = 1920, maxH = 1080, quality = 0.82) {
       canvas.width = w;
       canvas.height = h;
       canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL("image/jpeg", quality));
+      resolve(canvas.toDataURL("image/webp", quality));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(null);
     };
     img.src = objectUrl;
   });
+}
+
+export async function compressBackgroundForSync(
+  dataUrl,
+  maxLength = MAX_SYNCED_BACKGROUND_LENGTH,
+) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let scale = Math.min(1, 640 / img.width, 640 / img.height);
+      let quality = 0.45;
+
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressed = canvas.toDataURL("image/webp", quality);
+        if (compressed.length <= maxLength) {
+          resolve(compressed);
+          return;
+        }
+        scale *= 0.72;
+        quality = Math.max(0.2, quality - 0.05);
+      }
+
+      resolve(null);
+    };
+    img.onerror = () => resolve(null);
+    img.src = dataUrl;
+  });
+}
+
+export async function getCustomBackgroundDataUrl() {
+  const [localSettings, syncedSettings] = await Promise.all([
+    chrome.storage.local.get(USE_SYNCED_BACKGROUND_KEY),
+    chrome.storage.sync.get(SYNCED_BACKGROUND_KEY),
+  ]);
+  return localSettings[USE_SYNCED_BACKGROUND_KEY]
+    ? syncedSettings[SYNCED_BACKGROUND_KEY] ?? null
+    : localStorage.getItem("meridian_bg_custom");
 }
 
 export function createSettingsPanel(container, onClose) {
@@ -75,6 +129,8 @@ export function createSettingsPanel(container, onClose) {
   let homepageUrl = "";
   let currentTheme = "system";
   let currentBg = { type: "none", value: "" };
+  let useSyncedBackground = false;
+  let syncedBackground = null;
   let photoSeeds = generateSeeds();
 
   const panel = document.createElement("div");
@@ -282,8 +338,15 @@ export function createSettingsPanel(container, onClose) {
   function selectBg(type, value) {
     currentBg = { type, value };
     chrome.storage.sync.set({ background: currentBg });
-    applyBackground(currentBg);
+    applyCurrentBackground();
     renderBgSection();
+  }
+
+  function applyCurrentBackground() {
+    const customDataUrl = useSyncedBackground
+      ? syncedBackground
+      : localStorage.getItem("meridian_bg_custom");
+    applyBackground(currentBg, customDataUrl);
   }
 
   function makeSwatch(opts) {
@@ -313,7 +376,7 @@ export function createSettingsPanel(container, onClose) {
   function renderBgSection() {
     bgGroup
       .querySelectorAll(
-        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-upload-btn, .settings-bg-file-input",
+        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-upload-btn, .settings-bg-file-input, .settings-bg-sync-controls",
       )
       .forEach((el) => el.remove());
 
@@ -428,6 +491,10 @@ export function createSettingsPanel(container, onClose) {
       uploadBtn.textContent = "Processing…";
       try {
         const dataUrl = await resizeToDataUrl(file);
+        if (!dataUrl) {
+          uploadBtn.textContent = "Could not process image — try another file";
+          return;
+        }
         localStorage.setItem("meridian_bg_custom", dataUrl);
         selectBg("custom", "");
       } finally {
@@ -438,6 +505,67 @@ export function createSettingsPanel(container, onClose) {
     uploadBtn.addEventListener("click", () => fileInput.click());
     bgGroup.appendChild(fileInput);
     bgGroup.appendChild(uploadBtn);
+
+    const syncControls = document.createElement("div");
+    syncControls.className = "settings-bg-sync-controls";
+
+    const syncToggleRow = document.createElement("label");
+    syncToggleRow.className = "settings-toggle-row";
+    const syncToggle = document.createElement("input");
+    syncToggle.type = "checkbox";
+    syncToggle.className = "settings-toggle";
+    syncToggle.checked = useSyncedBackground;
+    syncToggle.setAttribute("aria-label", "Use synced background");
+    const syncToggleLabel = document.createElement("span");
+    syncToggleLabel.textContent = "Use synced background";
+    syncToggle.addEventListener("change", async () => {
+      useSyncedBackground = syncToggle.checked;
+      await chrome.storage.local.set({
+        [USE_SYNCED_BACKGROUND_KEY]: useSyncedBackground,
+      });
+      applyCurrentBackground();
+    });
+    syncToggleRow.appendChild(syncToggle);
+    syncToggleRow.appendChild(syncToggleLabel);
+
+    const syncBtn = document.createElement("button");
+    syncBtn.className = "settings-action-btn";
+    syncBtn.textContent = "Sync current background";
+    syncBtn.disabled = !localStorage.getItem("meridian_bg_custom");
+    syncBtn.addEventListener("click", async () => {
+      const localBackground = localStorage.getItem("meridian_bg_custom");
+      if (!localBackground) return;
+      syncBtn.disabled = true;
+      syncBtn.textContent = "Compressing…";
+      const compressed = await compressBackgroundForSync(localBackground);
+      if (!compressed) {
+        syncBtn.textContent = "Could not compress background";
+        setTimeout(() => {
+          syncBtn.disabled = false;
+          syncBtn.textContent = "Sync current background";
+        }, 2000);
+        return;
+      }
+      try {
+        await chrome.storage.sync.set({
+          [SYNCED_BACKGROUND_KEY]: compressed,
+        });
+        syncedBackground = compressed;
+        if (useSyncedBackground) applyCurrentBackground();
+        syncBtn.textContent = "Background synced";
+      } catch {
+        syncBtn.textContent = "Could not sync background";
+      } finally {
+        setTimeout(() => {
+          syncBtn.disabled = false;
+          syncBtn.textContent = "Sync current background";
+        }, 2000);
+      }
+    });
+
+    syncControls.appendChild(syncToggleRow);
+    syncControls.appendChild(syncBtn);
+    bgGroup.appendChild(syncControls);
   }
 
   panel.appendChild(bgGroup);
@@ -469,21 +597,25 @@ export function createSettingsPanel(container, onClose) {
 
   container.appendChild(panel);
 
-  chrome.storage.sync
-    .get([
+  Promise.all([
+    chrome.storage.sync.get([
       "newTabBehavior",
       "groupByDomain",
       "homepageUrl",
       "theme",
       "background",
       "localSearch",
-    ])
-    .then((saved) => {
+      SYNCED_BACKGROUND_KEY,
+    ]),
+    chrome.storage.local.get(USE_SYNCED_BACKGROUND_KEY),
+  ]).then(([saved, localSettings]) => {
       if (saved.newTabBehavior) newTabBehavior = saved.newTabBehavior;
       groupByDomain = !!saved.groupByDomain;
       homepageUrl = saved.homepageUrl ?? "";
       currentTheme = saved.theme ?? "system";
       currentBg = saved.background ?? { type: "none", value: "" };
+      syncedBackground = saved[SYNCED_BACKGROUND_KEY] ?? null;
+      useSyncedBackground = !!localSettings[USE_SYNCED_BACKGROUND_KEY];
       toggleCheckbox.checked = groupByDomain;
       if (saved.localSearch) {
         localSearch = { ...localSearch, ...saved.localSearch };
@@ -512,7 +644,10 @@ export function applyTheme(theme) {
   }
 }
 
-export function applyBackground(bg) {
+export function applyBackground(
+  bg,
+  customDataUrl = localStorage.getItem("meridian_bg_custom"),
+) {
   const root = document.documentElement;
   root.style.removeProperty("--bg");
   if (!bg || bg.type === "none") {
@@ -525,9 +660,8 @@ export function applyBackground(bg) {
   } else if (bg.type === "photo") {
     root.style.setProperty("--bg-image", `url("${bg.value}")`);
   } else if (bg.type === "custom") {
-    const dataUrl = localStorage.getItem("meridian_bg_custom");
-    if (dataUrl) {
-      root.style.setProperty("--bg-image", `url("${dataUrl}")`);
+    if (customDataUrl) {
+      root.style.setProperty("--bg-image", `url("${customDataUrl}")`);
     } else {
       root.style.removeProperty("--bg-image");
     }

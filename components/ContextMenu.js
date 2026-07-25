@@ -2,6 +2,7 @@ import {
   assignTab,
   unassignTab,
   createWorkspace,
+  getWorkspaceData,
 } from "../utils/workspaceManager.js";
 
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
@@ -52,7 +53,7 @@ export async function show(tab, x, y) {
 
   const [chromeGroups, wsData] = await Promise.all([
     hasNativeGroups ? chrome.tabGroups.query({}) : Promise.resolve([]),
-    (await import("../utils/workspaceManager.js")).getWorkspaceData(),
+    getWorkspaceData(),
   ]);
 
   const inChromeGroup = hasNativeGroups && tab.groupId !== -1;

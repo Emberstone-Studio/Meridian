@@ -5,6 +5,9 @@ import {
   createSettingsPanel,
   applyTheme,
   applyBackground,
+  getCustomBackgroundDataUrl,
+  SYNCED_BACKGROUND_KEY,
+  USE_SYNCED_BACKGROUND_KEY,
 } from "./components/SettingsPanel.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
@@ -25,7 +28,10 @@ async function applyStoredAppearance() {
     "background",
   ]);
   applyTheme(theme ?? "system");
-  applyBackground(background ?? { type: "none", value: "" });
+  applyBackground(
+    background ?? { type: "none", value: "" },
+    await getCustomBackgroundDataUrl(),
+  );
 }
 
 function setupLightbox() {
@@ -147,6 +153,7 @@ async function handleNewTabBehavior() {
 let searchBarApi = null;
 let browserSearchActive = false;
 let browserSearchResults = null;
+let browserSearchSequence = 0;
 
 function setupKeyboardNav() {
   document.addEventListener("keydown", (e) => {
@@ -572,6 +579,7 @@ function renderSearchResults(results, query) {
 
 async function handleBrowserQuery(query) {
   browserSearchActive = true;
+  const searchSequence = ++browserSearchSequence;
 
   filterGrid(query);
 
@@ -581,7 +589,7 @@ async function handleBrowserQuery(query) {
   if (!ls.tabs) r.tabs = [];
   if (!ls.bookmarks) r.bookmarks = [];
   if (!ls.history) r.history = [];
-  if (!browserSearchActive) return;
+  if (!browserSearchActive || searchSequence !== browserSearchSequence) return;
   browserSearchResults = r;
 
   renderSearchResults(r, query);
@@ -746,6 +754,13 @@ async function init() {
   });
 
   chrome.storage.onChanged.addListener((changes, area) => {
+    if (
+      (area === "sync" &&
+        (changes.background || changes[SYNCED_BACKGROUND_KEY])) ||
+      (area === "local" && changes[USE_SYNCED_BACKGROUND_KEY])
+    ) {
+      applyStoredAppearance();
+    }
     if (area !== "local") return;
     const keys = Object.keys(changes);
     if (

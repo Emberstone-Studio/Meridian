@@ -1,4 +1,5 @@
 import { initTabIndex, rebuildIndex } from './utils/browserSearch.js';
+import { evictThumbnail, saveThumbnail } from "./utils/thumbnailCache.js";
 
 let meridianTabId = null;
 
@@ -65,10 +66,10 @@ function sleep(ms) {
 async function captureTab(tabId, windowId) {
   try {
     const dataUrl = await chrome.tabs.captureVisibleTab(windowId, {
-      format: "jpeg",
-      quality: 60,
+      format: "webp",
+      quality: 55,
     });
-    await chrome.storage.local.set({ ["thumb_" + tabId]: dataUrl });
+    await saveThumbnail(tabId, dataUrl);
     console.log("[Meridian] Saved thumbnail for tab", tabId);
   } catch (err) {
     console.warn(
@@ -101,7 +102,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 chrome.runtime.onStartup.addListener(ensureMeridianTab);
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  chrome.storage.local.remove("thumb_" + tabId);
+  evictThumbnail(tabId);
   if (tabId === meridianTabId) {
     meridianTabId = null;
     chrome.storage.local.remove("meridianTabId");
@@ -176,16 +177,28 @@ async function refreshAllThumbnails() {
   isRefreshing = true;
   try {
     for (const tab of capturable) {
-      await chrome.tabs.update(tab.id, { active: true });
-      await sleep(800);
-      await captureTab(tab.id, tab.windowId);
+      try {
+        await chrome.tabs.update(tab.id, { active: true });
+        await sleep(800);
+        await captureTab(tab.id, tab.windowId);
+      } catch (err) {
+        console.warn(
+          "[Meridian] Failed to refresh thumbnail for tab",
+          tab.id,
+          ":",
+          err.message,
+        );
+      }
     }
   } finally {
+    for (const [, tabId] of originalActive) {
+      try {
+        await chrome.tabs.update(tabId, { active: true });
+      } catch (_) {
+        /* tab gone */
+      }
+    }
     isRefreshing = false;
-  }
-
-  for (const [windowId, tabId] of originalActive) {
-    await chrome.tabs.update(tabId, { active: true }).catch(() => {});
   }
 }
 
@@ -198,7 +211,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.tabs.remove(msg.tabId);
   }
   if (msg.type === "REFRESH_THUMBNAILS") {
-    refreshAllThumbnails().then(() => sendResponse({ done: true }));
+    refreshAllThumbnails().then(
+      () => sendResponse({ done: true }),
+      (err) => {
+        console.warn("[Meridian] Failed to refresh thumbnails:", err.message);
+        sendResponse({ done: false });
+      },
+    );
     return true;
   }
 });

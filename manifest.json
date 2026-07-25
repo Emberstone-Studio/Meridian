@@ -10,7 +10,7 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["tabs", "tabGroups", "storage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
+  "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
   "host_permissions": ["<all_urls>"],
   "commands": {
     "focus-meridian": {

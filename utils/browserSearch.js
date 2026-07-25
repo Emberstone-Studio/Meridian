@@ -6,6 +6,8 @@
  *   B) Search functions  — search(query), getPreviousTab() (called from popup.js / meridian.js)
  */
 
+import { mutateStorageValue } from "./storageMutationQueue.js";
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
@@ -118,13 +120,6 @@ async function readIndex() {
 }
 
 /**
- * Write the full index back to storage.
- */
-async function writeIndex(index) {
-  await chrome.storage.local.set({ [INDEX_KEY]: index });
-}
-
-/**
  * Build a TabEntry from a Chrome Tab object.
  * metaDescription and headings start empty; they are filled asynchronously
  * by the content-script injection.
@@ -166,12 +161,11 @@ async function injectMetaExtractor(tabId) {
     const payload = results?.[0]?.result;
     if (!payload) return;
 
-    const index = await readIndex();
-    if (!index[tabId]) return; // tab may have been removed
-
-    index[tabId].metaDescription = payload.metaDescription;
-    index[tabId].headings = payload.headings;
-    await writeIndex(index);
+    await mutateStorageValue(INDEX_KEY, {}, (index) => {
+      if (!index[tabId]) return; // tab may have been removed
+      index[tabId].metaDescription = payload.metaDescription;
+      index[tabId].headings = payload.headings;
+    });
   } catch (_) {
     // Privileged URLs (chrome://, chrome-extension://, about:, etc.) throw here.
     // Intentionally swallowed — leave metaDescription/headings as "".
@@ -185,18 +179,18 @@ async function injectMetaExtractor(tabId) {
 export function initTabIndex() {
   // New tab created
   chrome.tabs.onCreated.addListener(async (tab) => {
-    const index = await readIndex();
-    index[tab.id] = await buildEntry(tab, index[tab.id]);
-    await writeIndex(index);
+    await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+      index[tab.id] = await buildEntry(tab, index[tab.id]);
+    });
   });
 
   // Tab updated (title change or navigation complete)
   chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status !== "complete" && !changeInfo.title) return;
 
-    const index = await readIndex();
-    index[tabId] = await buildEntry(tab, index[tabId]);
-    await writeIndex(index);
+    await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+      index[tabId] = await buildEntry(tab, index[tabId]);
+    });
 
     // Inject content script on full load to capture meta/headings
     if (changeInfo.status === "complete") {
@@ -206,20 +200,18 @@ export function initTabIndex() {
 
   // Tab activated — update lastActive timestamp
   chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    const index = await readIndex();
-    if (index[activeInfo.tabId]) {
-      index[activeInfo.tabId].lastActive = Date.now();
-      await writeIndex(index);
-    }
+    await mutateStorageValue(INDEX_KEY, {}, (index) => {
+      if (index[activeInfo.tabId]) {
+        index[activeInfo.tabId].lastActive = Date.now();
+      }
+    });
   });
 
   // Tab removed — delete from index
   chrome.tabs.onRemoved.addListener(async (tabId) => {
-    const index = await readIndex();
-    if (index[tabId]) {
+    await mutateStorageValue(INDEX_KEY, {}, (index) => {
       delete index[tabId];
-      await writeIndex(index);
-    }
+    });
   });
 }
 
@@ -232,16 +224,14 @@ export async function rebuildIndex() {
   // Seed from the existing index so entries written by the event listeners
   // (registered synchronously before this runs) — plus already-extracted
   // meta/headings and lastActive — are preserved rather than overwritten.
-  const existing = await readIndex();
-  const index = {};
-
-  await Promise.all(
-    tabs.map(async (tab) => {
-      index[tab.id] = await buildEntry(tab, existing[tab.id]);
-    }),
-  );
-
-  await writeIndex(index);
+  await mutateStorageValue(INDEX_KEY, {}, async (index) => {
+    const rebuiltEntries = await Promise.all(
+      tabs.map(async (tab) => [tab.id, await buildEntry(tab, index[tab.id])]),
+    );
+    for (const [tabId, entry] of rebuiltEntries) {
+      index[tabId] = entry;
+    }
+  });
 
   // Inject meta extractors for all currently loaded tabs (fire-and-forget)
   for (const tab of tabs) {
