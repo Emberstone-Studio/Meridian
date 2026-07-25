@@ -28,6 +28,10 @@ export function hide() {
   getMenu().classList.add("hidden");
 }
 
+export function isOpen() {
+  return !!menuEl && !menuEl.classList.contains("hidden");
+}
+
 function item(label, onClick) {
   const btn = document.createElement("button");
   btn.className = "context-menu-item";
@@ -60,19 +64,26 @@ export async function show(tab, x, y) {
   const wsId = wsData.assignments[String(tab.id)];
   const customWorkspaces = wsData.workspaces.filter((w) => w.id !== "unsorted");
 
-  // Move to new group
+  // Move to new group — create it, then drop the user straight into renaming
+  // the new lane (no prompt). meridian.js focuses the lane matching `laneId`.
   menu.appendChild(
     item("Move to new group", async () => {
-      const name = prompt("New group name:");
-      if (!name?.trim()) return;
       if (hasNativeGroups) {
         if (inChromeGroup) await chrome.tabs.ungroup([tab.id]).catch(() => {});
         const groupId = await chrome.tabs.group({ tabIds: [tab.id] });
-        await chrome.tabGroups.update(groupId, { title: name.trim() });
+        await chrome.tabGroups.update(groupId, { title: "New group" });
+        document.dispatchEvent(
+          new CustomEvent("focus-lane-rename", {
+            detail: { laneId: `cg_${groupId}` },
+          }),
+        );
       } else {
-        const ws = await createWorkspace(name.trim());
+        const ws = await createWorkspace("New group");
         await unassignTab(tab.id);
         await assignTab(tab.id, ws.id);
+        document.dispatchEvent(
+          new CustomEvent("focus-lane-rename", { detail: { laneId: ws.id } }),
+        );
       }
     }),
   );

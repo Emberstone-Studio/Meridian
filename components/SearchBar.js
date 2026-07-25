@@ -35,13 +35,13 @@ const SCOPE_GLYPHS = {
 };
 
 const SCOPE_PLACEHOLDERS = {
-  all: "Search everything…",
+  all: "Search anything…",
   bookmarks: "Search bookmarks…",
   history: "Search history…",
 };
 
 const SCOPE_LABELS = {
-  all: "Search everything",
+  all: "Search anything",
   bookmarks: "Search bookmarks",
   history: "Search history",
 };

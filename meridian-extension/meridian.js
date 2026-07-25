@@ -1,4 +1,4 @@
-﻿import { createSearchBar } from "./components/SearchBar.js";
+import { createSearchBar } from "./components/SearchBar.js";
 import { createWorkspaceLane } from "./components/WorkspaceLane.js";
 import { search } from "./utils/browserSearch.js";
 import {
@@ -16,7 +16,10 @@ import {
   createWorkspace,
   assignTab,
 } from "./utils/workspaceManager.js";
-import { show as showContextMenu } from "./components/ContextMenu.js";
+import {
+  show as showContextMenu,
+  isOpen as isContextMenuOpen,
+} from "./components/ContextMenu.js";
 import { createScopePopup } from "./components/BookmarksButton.js";
 import { createSearchPopup } from "./components/SearchPopup.js";
 
@@ -24,6 +27,9 @@ const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
 let lightboxApi = null;
 let bookmarksApi = null;
+// Set when a lane should open directly into inline rename on the next render
+// (e.g. after "Move to new group"); matched against each lane's workspace id.
+let pendingRenameLaneId = null;
 
 async function getNewTabBehavior() {
   const { newTabBehavior } =
@@ -126,7 +132,12 @@ function setupLightbox() {
 
   lightbox.addEventListener("click", navigate);
 
-  document.addEventListener("tab-lightbox-show", (e) => showLightbox(e.detail));
+  document.addEventListener("tab-lightbox-show", (e) => {
+    // Suppress the hover preview while a context menu is open (same intent as
+    // hovering the tab's close "X").
+    if (isContextMenuOpen()) return;
+    showLightbox(e.detail);
+  });
   document.addEventListener("dragstart", hideLightbox);
 
   return {
@@ -177,12 +188,6 @@ function setupKeyboardNav() {
     if (e.key === "/" && !isEditing) {
       e.preventDefault();
       searchBarApi?.focus();
-      return;
-    }
-
-    if ((e.key === "n" || e.key === "N") && !isEditing) {
-      e.preventDefault();
-      handleNewGroup();
       return;
     }
 
@@ -250,29 +255,6 @@ function navigateCards(key) {
 
 function focusFirstCard() {
   document.querySelector(".tab-card")?.focus();
-}
-
-async function handleNewGroup() {
-  const name = prompt("New group name:");
-  if (!name?.trim()) return;
-
-  if (hasNativeGroups) {
-    // Create a blank inactive tab to anchor the group; user fills it in or drags tabs in
-    const tab = await chrome.tabs.create({ active: false, url: "about:blank" });
-    const groupId = await chrome.tabs.group({ tabIds: [tab.id] });
-    await chrome.tabGroups.update(groupId, { title: name.trim() });
-    await render();
-    requestAnimationFrame(() => {
-      document
-        .querySelector(".new-tab-active:not(.hidden) .new-tab-url-input")
-        ?.focus();
-    });
-    return;
-  }
-
-  // Fallback only when browser has no native tab group support
-  await createWorkspace(name.trim());
-  scheduleRender();
 }
 
 async function handleTabClosed(tabId) {
@@ -424,12 +406,18 @@ async function render() {
   // 2. Meridian workspace lanes (always shown, even if empty)
   for (const ws of customWorkspaces) {
     const wsTabs = sortByTabOrder(wsTabMap.get(ws.id) ?? [], tabOrder[ws.id]);
+    const autoRename = pendingRenameLaneId === ws.id;
+    if (autoRename) pendingRenameLaneId = null;
     const lane = createWorkspaceLane(
       { id: ws.id, name: ws.name },
       wsTabs,
       thumbnails,
       handleTabClosed,
-      { meridianWorkspace: ws, collapsed: collapsedLanes[ws.id] ?? false },
+      {
+        meridianWorkspace: ws,
+        collapsed: collapsedLanes[ws.id] ?? false,
+        autoRename,
+      },
     );
     lane.addEventListener("workspace-reassigned", scheduleRender);
     container.appendChild(lane);
@@ -440,12 +428,18 @@ async function render() {
     const group = groupMap.get(groupId);
     const name = group?.title?.trim() || colorLabel(group?.color);
     const workspace = { id: `cg_${groupId}`, name };
+    const autoRename = pendingRenameLaneId === workspace.id;
+    if (autoRename) pendingRenameLaneId = null;
     const lane = createWorkspaceLane(
       workspace,
       tabs,
       thumbnails,
       handleTabClosed,
-      { chromeGroup: group, collapsed: collapsedLanes[workspace.id] ?? false },
+      {
+        chromeGroup: group,
+        collapsed: collapsedLanes[workspace.id] ?? false,
+        autoRename,
+      },
     );
     lane.addEventListener("workspace-reassigned", scheduleRender);
     container.appendChild(lane);
@@ -473,7 +467,6 @@ function filterGrid(query) {
 function clearBrowserSearch() {
   browserSearchActive = false;
   browserSearchResults = null;
-  document.getElementById("new-group-btn")?.classList.remove("hidden");
 
   document.querySelectorAll(".workspace-lane").forEach((lane) => {
     lane.style.display = "";
@@ -634,6 +627,9 @@ function buildWebSearchRow(query, noLocal) {
   go.addEventListener("click", () => {
     if (!provider) return;
     chrome.tabs.create({ url: provider.url + encodeURIComponent(query) });
+    // Launching the search is "done" — reset the field (and close this
+    // dropdown) so returning to the tab starts fresh, not on the stale query.
+    searchBarApi?.clearSearch?.();
   });
 
   row.appendChild(go);
@@ -643,7 +639,6 @@ function buildWebSearchRow(query, noLocal) {
 async function handleBrowserQuery(query, scope = "all") {
   browserSearchActive = true;
   const searchSequence = ++browserSearchSequence;
-  document.getElementById("new-group-btn")?.classList.add("hidden");
 
   // Results live in the popup only; leave the board unfiltered in every
   // scope so search-everything behaves like the bookmarks/history popup.
@@ -713,7 +708,14 @@ async function init() {
     .search-web-fallback:hover { opacity: 0.8; }
     .search-web-row { margin-top: 8px; }
     .search-web-note { font-size: 13px; color: var(--text-secondary); padding: 4px 0 8px; }
-    .search-web-go { width: 100%; }
+    .search-web-go {
+      width: 100%;
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      text-align: left;
+    }
   `;
   document.head.appendChild(style);
 
@@ -782,7 +784,9 @@ async function init() {
   };
 
   const settingsBtn = document.getElementById("settings-btn");
-  const newGroupBtn = document.getElementById("new-group-btn");
+  const searchGlyphBtn = document.querySelector(
+    "#search-bar .search-logo-btn--glyph",
+  );
 
   // Settings dropdown — same shell as the other search-zone popups. The gear
   // lights up in the accent while open, exactly like the scope chips.
@@ -794,11 +798,24 @@ async function init() {
   });
   createSettingsPanel(settingsPopup.el, closeSettings);
 
-  // Clicking the gear toggles the dropdown, matching the scope chips.
-  settingsBtn.addEventListener("click", () =>
-    settingsPopup.isOpen() ? closeSettings() : openSettings(),
-  );
-  newGroupBtn.addEventListener("click", handleNewGroup);
+  // The scope chips and the gear are one mutually-exclusive group: opening the
+  // gear drops any active scope, so the two are never lit at once.
+  settingsBtn.addEventListener("click", () => {
+    if (settingsPopup.isOpen()) {
+      closeSettings();
+    } else {
+      if (searchBarApi.getScope() !== "all") searchBarApi.setScope("all");
+      openSettings();
+    }
+  });
+
+  // The left magnifier is the group's "off" switch: one click clears whichever
+  // icon is lit and returns to plain search-everything. (It also refocuses the
+  // field via its own handler in SearchBar.js.)
+  searchGlyphBtn?.addEventListener("click", () => {
+    if (settingsPopup.isOpen()) closeSettings();
+    if (searchBarApi.getScope() !== "all") searchBarApi.setScope("all");
+  });
 
   const scopeButtons = {
     bookmarks: document.getElementById("scope-bookmarks"),
@@ -815,6 +832,8 @@ async function init() {
     }
     if (isPopupScope(activeScope)) {
       clearBrowserSearch();
+      // A scope wins the group — make sure the gear is closed.
+      closeSettings();
       scopePopup.openScope(activeScope);
     } else {
       scopePopup.close();
@@ -836,7 +855,16 @@ async function init() {
   setupKeyboardNav();
 
   document.addEventListener("tab-context-menu", (e) => {
+    // Opening the menu dismisses any hover preview and blocks a new one.
+    lightboxApi?.hide();
     showContextMenu(e.detail.tab, e.detail.x, e.detail.y);
+  });
+
+  // A context-menu "Move to new group" creates the lane, then asks us to drop
+  // the user straight into renaming it. Remember the target across the render.
+  document.addEventListener("focus-lane-rename", (e) => {
+    pendingRenameLaneId = e.detail.laneId;
+    scheduleRender();
   });
 
   const dropZone = document.getElementById("new-group-drop-zone");

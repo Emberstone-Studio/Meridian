@@ -71,7 +71,12 @@ export function createWorkspaceLane(
   tabs,
   thumbnails,
   onTabClosed,
-  { chromeGroup, meridianWorkspace, collapsed: initialCollapsed = false } = {},
+  {
+    chromeGroup,
+    meridianWorkspace,
+    collapsed: initialCollapsed = false,
+    autoRename = false,
+  } = {},
 ) {
   const lane = document.createElement("div");
   lane.className = "workspace-lane";
@@ -89,9 +94,18 @@ export function createWorkspaceLane(
   collapseBtn.setAttribute("aria-label", "Collapse lane");
 
   if (chromeGroup?.color) {
-    const dot = document.createElement("span");
+    // Clickable color dot: opens a palette of the browser's group colors.
+    const dot = document.createElement("button");
     dot.className = "lane-group-dot";
     dot.style.background = GROUP_COLORS[chromeGroup.color] ?? "#9aa0a6";
+    dot.setAttribute("aria-label", "Change group color");
+    dot.title = "Change color";
+    if (hasNativeGroups) {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openColorPicker(dot, chromeGroup);
+      });
+    }
     header.appendChild(collapseBtn);
     header.appendChild(dot);
   } else {
@@ -101,14 +115,30 @@ export function createWorkspaceLane(
   const title = document.createElement("button");
   title.className = "lane-title";
   title.textContent = workspace.name;
-  title.setAttribute("aria-label", `Workspace: ${workspace.name}`);
+  title.setAttribute("aria-label", `Rename: ${workspace.name}`);
 
-  if (!chromeGroup) {
-    title.addEventListener("dblclick", () => startRename(title, workspace.id));
+  // Renaming persists to the right place depending on the lane's kind. Only
+  // real user groups are renamable (not Unsorted or auto domain clusters).
+  let onCommitRename = null;
+  if (chromeGroup && hasNativeGroups) {
+    onCommitRename = (name) =>
+      chrome.tabGroups.update(chromeGroup.id, { title: name });
+  } else if (meridianWorkspace) {
+    onCommitRename = (name) => renameWorkspace(workspace.id, name);
+  }
+
+  if (onCommitRename) {
+    title.classList.add("lane-title--editable");
+    title.addEventListener("click", () => startRename(title, onCommitRename));
     title.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && title.contentEditable !== "true")
-        startRename(title, workspace.id);
+        startRename(title, onCommitRename);
     });
+    // "Move to new group" asks the new lane to open straight into rename.
+    if (autoRename)
+      requestAnimationFrame(() => startRename(title, onCommitRename));
+  } else {
+    title.setAttribute("aria-label", `Workspace: ${workspace.name}`);
   }
 
   const count = document.createElement("span");
@@ -376,7 +406,8 @@ export function createWorkspaceLane(
   return lane;
 }
 
-function startRename(titleEl, workspaceId) {
+function startRename(titleEl, onCommit) {
+  if (titleEl.contentEditable === "true") return;
   const original = titleEl.textContent;
   titleEl.contentEditable = "true";
   titleEl.focus();
@@ -386,7 +417,7 @@ function startRename(titleEl, workspaceId) {
     titleEl.contentEditable = "false";
     const newName = titleEl.textContent.trim() || original;
     titleEl.textContent = newName;
-    if (newName !== original) renameWorkspace(workspaceId, newName);
+    if (newName !== original) onCommit?.(newName);
   }
 
   titleEl.addEventListener("blur", commit, { once: true });
@@ -404,4 +435,69 @@ function startRename(titleEl, workspaceId) {
     },
     { once: true },
   );
+}
+
+// ---- Group color picker (a small palette popover off the color dot) ----
+let activeColorPopover = null;
+
+function closeColorPicker() {
+  if (activeColorPopover) {
+    activeColorPopover.remove();
+    activeColorPopover = null;
+  }
+  document.removeEventListener("mousedown", onColorPickerOutside);
+  document.removeEventListener("keydown", onColorPickerKey);
+}
+
+function onColorPickerOutside(e) {
+  if (activeColorPopover && !activeColorPopover.contains(e.target))
+    closeColorPicker();
+}
+
+function onColorPickerKey(e) {
+  if (e.key === "Escape") closeColorPicker();
+}
+
+function openColorPicker(anchor, chromeGroup) {
+  // Toggle off if the same picker is already open.
+  const wasOpen = !!activeColorPopover;
+  closeColorPicker();
+  if (wasOpen) return;
+
+  const pop = document.createElement("div");
+  pop.className = "lane-color-popover";
+  pop.setAttribute("role", "menu");
+
+  for (const [name, hex] of Object.entries(GROUP_COLORS)) {
+    const sw = document.createElement("button");
+    sw.className =
+      "lane-color-swatch" + (name === chromeGroup.color ? " selected" : "");
+    sw.style.background = hex;
+    sw.title = name.charAt(0).toUpperCase() + name.slice(1);
+    sw.setAttribute("aria-label", sw.title);
+    sw.addEventListener("click", (e) => {
+      e.stopPropagation();
+      chrome.tabGroups.update(chromeGroup.id, { color: name });
+      closeColorPicker();
+    });
+    pop.appendChild(sw);
+  }
+
+  document.body.appendChild(pop);
+  const r = anchor.getBoundingClientRect();
+  pop.style.left = `${r.left}px`;
+  pop.style.top = `${r.bottom + 6}px`;
+  // Nudge back on-screen if clipped at the right edge.
+  requestAnimationFrame(() => {
+    const pr = pop.getBoundingClientRect();
+    if (pr.right > window.innerWidth)
+      pop.style.left = `${window.innerWidth - pr.width - 8}px`;
+  });
+
+  activeColorPopover = pop;
+  // Defer so the click that opened it doesn't immediately close it.
+  setTimeout(() => {
+    document.addEventListener("mousedown", onColorPickerOutside);
+    document.addEventListener("keydown", onColorPickerKey);
+  }, 0);
 }
