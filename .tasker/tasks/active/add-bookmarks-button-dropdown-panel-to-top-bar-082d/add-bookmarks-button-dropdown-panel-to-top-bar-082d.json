@@ -2,13 +2,13 @@
   "id": "add-bookmarks-button-dropdown-panel-to-top-bar-082d",
   "title": "Add bookmarks button + dropdown panel to top bar",
   "description": "Add a round icon button alongside the other top-bar controls that opens a bookmarks dropdown panel.\n\nBehavior:\n- Default view: flat list of the Bookmarks Bar folder's items.\n- An \"All Bookmarks\" entry/link switches the whole panel into a flat list of all other bookmarks (non-bookmarks-bar). Panel toggles back and forth between \"Bookmarks Bar\" view and \"All Bookmarks\" view (not nested folders, not a tree — two flat lists with a switch).\n- No in-panel search/filter — the existing main search bar already searches bookmarks, so this is intentionally omitted.\n- Click behavior on a bookmark row depends on Meridian's existing \"new tab behavior\" setting: if Meridian is set as the pinned-tab New Tab replacement, open the bookmark in a new tab; if it's the current-tab New Tab replacement, navigate the current tab. Reuse whatever logic already resolves that setting elsewhere (don't reinvent it).\n- Requires chrome.bookmarks permission — add \"bookmarks\" to manifest.json.\n- Favicons in the list must reuse the local favicon fix (tab favIconUrl / chrome://favicon), NOT the Google favicon service — don't reintroduce the privacy leak just fixed elsewhere.\n\nLikely touches: new BookmarksButton/dropdown component, manifest.json (permission), and the top button row layout (same area as the other round buttons). Note manifest.json is also touched by the background-sync task — check for permission-block conflicts when merging.",
-  "status": "ready",
+  "status": "in_review",
   "priority": "medium",
   "label": "Feature",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-25T04:57:50.607Z",
-  "updated_at": "2026-07-25T05:10:15.997Z",
+  "updated_at": "2026-07-25T06:03:07.196Z",
   "activity": [
     {
       "timestamp": "2026-07-25T04:57:50.607Z",
@@ -31,6 +31,29 @@
       "timestamp": "2026-07-25T05:10:15.997Z",
       "type": "moved",
       "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-07-25T06:00:03.861Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T06:03:07.194Z",
+      "type": "output",
+      "content": "Implemented the bookmarks top-bar control and dropdown panel in both mirrored extension source trees.\n\n- Added a round bookmark icon beside the existing new-group and settings controls.\n- Added flat Bookmarks Bar and All Bookmarks views with an in-panel view switch, empty states, outside-click dismissal, and Escape dismissal.\n- Flattened folder descendants while excluding the Bookmarks Bar subtree from All Bookmarks.\n- Reused Meridian's `focus-pinned` new-tab behavior resolution: pinned mode opens a new tab; other modes navigate the current tab.\n- Uses Chrome's local `/_favicon/` provider only; no third-party favicon service.\n- Confirmed both manifests already contain the required `bookmarks` and `favicon` permissions, so no conflicting manifest edit was needed.\n\nValidation:\n- `node --check components/BookmarksButton.js`\n- `node --check meridian.js`\n- `node --test tests/*.test.mjs` - 8/8 passed\n- `git diff --check`\n- Root and `meridian-extension/` JS, CSS, HTML, and component mirrors match byte-for-byte.",
+      "attachment": "active/add-bookmarks-button-dropdown-panel-to-top-bar-082d/add-bookmarks-button-dropdown-panel-to-top-bar.md"
     }
-  ]
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Auto Router Roles mode: Tasker will choose a specialist role; that role's configured model is authoritative",
+    "alternates": [],
+    "shape": "Feature",
+    "decided_by": "auto-router-roles",
+    "decided_at": "2026-07-25T06:00:02.748Z",
+    "auto_router_mode": "roles",
+    "chosen_role": "coder"
+  },
+  "agent_attempt_id": "attempt-f7668d8c9090c33be4f4",
+  "agent_startup_started_at": "2026-07-25T06:00:03.648Z"
 }

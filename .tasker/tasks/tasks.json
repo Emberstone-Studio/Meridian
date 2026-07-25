@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 120,
+  "state_version": 130,
   "features": {
     "chat_pro": true
   },
@@ -207,28 +207,25 @@
   },
   "run_queue": {
     "sequence": [
-      "custom-background-upload-can-hang-on-processing-af5f",
-      "thumbnails-add-unlimitedstorage-switch-capture-t-ec14",
-      "sync-custom-background-across-devices-with-per-d-cae5",
-      "refreshallthumbnails-restore-active-tab-even-if-23bb"
+      "add-bookmarks-button-dropdown-panel-to-top-bar-082d"
     ],
     "conflicts": [],
     "rationale": "Built from your Ready tasks — toggle which ones to run.",
     "decided_by": "tasker",
-    "decided_at": "2026-07-25T04:46:10.712Z",
+    "decided_at": "2026-07-25T05:59:03.202Z",
     "approved_order": true,
-    "validated_at": "2026-07-25T04:46:39.131Z"
+    "validated_at": "2026-07-25T05:59:23.353Z"
   },
   "run_queue_active": false,
   "tasks": [
     {
       "id": "add-bookmarks-button-dropdown-panel-to-top-bar-082d",
       "title": "Add bookmarks button + dropdown panel to top bar",
-      "status": "ready",
+      "status": "in_review",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
-      "updated_at": "2026-07-25T05:10:15.997Z",
+      "updated_at": "2026-07-25T06:03:07.196Z",
       "file": "active/add-bookmarks-button-dropdown-panel-to-top-bar-082d/add-bookmarks-button-dropdown-panel-to-top-bar-082d.json"
     },
     {

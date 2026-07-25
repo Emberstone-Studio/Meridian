@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "Meridian",
+  "version": "1.1.0",
+  "description": "Spatial tab command center",
+  "chrome_url_overrides": {
+    "newtab": "meridian.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["tabs", "tabGroups", "storage", "unlimitedStorage", "scripting", "bookmarks", "history", "sidePanel", "favicon"],
+  "host_permissions": ["<all_urls>"],
+  "commands": {
+    "focus-meridian": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+M"
+      },
+      "description": "Focus Meridian tab"
+    },
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Space"
+      },
+      "description": "Open Meridian quick search"
+    }
+  },
+  "icons": {
+    "16": "img/icon16.png",
+    "32": "img/icon32.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  },
+  "side_panel": {
+    "default_path": "components/sidebar.html"
+  },
+  "action": {
+    "default_title": "Meridian",
+    "default_icon": {
+      "16": "img/icon16.png",
+      "32": "img/icon32.png",
+      "48": "img/icon48.png",
+      "128": "img/icon128.png"
+    }
+  }
+}
