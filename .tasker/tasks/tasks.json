@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 119,
+  "state_version": 120,
   "features": {
     "chat_pro": true
   },
@@ -222,70 +222,14 @@
   "run_queue_active": false,
   "tasks": [
     {
-      "id": "serialize-chrome-storage-read-modify-write-to-fi-0606",
-      "title": "Serialize chrome.storage read-modify-write to fix lost-update races",
-      "status": "done",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "high",
-      "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:32.729Z",
-      "file": "active/serialize-chrome-storage-read-modify-write-to-fi-0606/serialize-chrome-storage-read-modify-write-to-fi-0606.json"
-    },
-    {
-      "id": "thumbnails-add-unlimitedstorage-switch-capture-t-ec14",
-      "title": "Thumbnails: add unlimitedStorage + switch capture to WebP",
-      "status": "done",
+      "id": "add-bookmarks-button-dropdown-panel-to-top-bar-082d",
+      "title": "Add bookmarks button + dropdown panel to top bar",
+      "status": "ready",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
-      "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:33.758Z",
-      "file": "active/thumbnails-add-unlimitedstorage-switch-capture-t-ec14/thumbnails-add-unlimitedstorage-switch-capture-t-ec14.json"
-    },
-    {
-      "id": "fix-stale-search-results-race-in-handlebrowserqu-c50b",
-      "title": "Fix stale search results race in handleBrowserQuery",
-      "status": "done",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "medium",
-      "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:34.687Z",
-      "file": "active/fix-stale-search-results-race-in-handlebrowserqu-c50b/fix-stale-search-results-race-in-handlebrowserqu-c50b.json"
-    },
-    {
-      "id": "sync-custom-background-across-devices-with-per-d-cae5",
-      "title": "Sync custom background across devices with per-device override",
-      "status": "done",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "medium",
-      "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:35.587Z",
-      "file": "active/sync-custom-background-across-devices-with-per-d-cae5/sync-custom-background-across-devices-with-per-d-cae5.json"
-    },
-    {
-      "id": "custom-background-upload-can-hang-on-processing-af5f",
-      "title": "Custom background upload can hang on 'Processing…' for bad files",
-      "status": "done",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "medium",
-      "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:36.464Z",
-      "file": "active/custom-background-upload-can-hang-on-processing-af5f/custom-background-upload-can-hang-on-processing-af5f.json"
-    },
-    {
-      "id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
-      "title": "refreshAllThumbnails: restore active tab even if capture throws mid-loop",
-      "status": "done",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "low",
-      "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:37.320Z",
-      "file": "active/refreshallthumbnails-restore-active-tab-even-if-23bb/refreshallthumbnails-restore-active-tab-even-if-23bb.json"
+      "updated_at": "2026-07-25T05:10:15.997Z",
+      "file": "active/add-bookmarks-button-dropdown-panel-to-top-bar-082d/add-bookmarks-button-dropdown-panel-to-top-bar-082d.json"
     },
     {
       "id": "contextmenu-js-use-static-import-for-getworkspac-fabf",
@@ -299,14 +243,26 @@
       "file": "active/contextmenu-js-use-static-import-for-getworkspac-fabf/contextmenu-js-use-static-import-for-getworkspac-fabf.json"
     },
     {
-      "id": "add-bookmarks-button-dropdown-panel-to-top-bar-082d",
-      "title": "Add bookmarks button + dropdown panel to top bar",
-      "status": "ready",
+      "id": "custom-background-upload-can-hang-on-processing-af5f",
+      "title": "Custom background upload can hang on 'Processing…' for bad files",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
-      "updated_at": "2026-07-25T05:10:15.997Z",
-      "file": "active/add-bookmarks-button-dropdown-panel-to-top-bar-082d/add-bookmarks-button-dropdown-panel-to-top-bar-082d.json"
+      "agent_id": "coder",
+      "updated_at": "2026-07-25T05:10:36.464Z",
+      "file": "active/custom-background-upload-can-hang-on-processing-af5f/custom-background-upload-can-hang-on-processing-af5f.json"
+    },
+    {
+      "id": "fix-stale-search-results-race-in-handlebrowserqu-c50b",
+      "title": "Fix stale search results race in handleBrowserQuery",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-25T05:10:34.687Z",
+      "file": "active/fix-stale-search-results-race-in-handlebrowserqu-c50b/fix-stale-search-results-race-in-handlebrowserqu-c50b.json"
     },
     {
       "id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
@@ -318,6 +274,50 @@
       "agent_id": "coder",
       "updated_at": "2026-07-25T05:14:00.370Z",
       "file": "active/harden-thumbnail-cache-serialize-pruning-fix-byt-4568/harden-thumbnail-cache-serialize-pruning-fix-byt-4568.json"
+    },
+    {
+      "id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
+      "title": "refreshAllThumbnails: restore active tab even if capture throws mid-loop",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "low",
+      "agent_id": "coder",
+      "updated_at": "2026-07-25T05:10:37.320Z",
+      "file": "active/refreshallthumbnails-restore-active-tab-even-if-23bb/refreshallthumbnails-restore-active-tab-even-if-23bb.json"
+    },
+    {
+      "id": "serialize-chrome-storage-read-modify-write-to-fi-0606",
+      "title": "Serialize chrome.storage read-modify-write to fix lost-update races",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-07-25T05:10:32.729Z",
+      "file": "active/serialize-chrome-storage-read-modify-write-to-fi-0606/serialize-chrome-storage-read-modify-write-to-fi-0606.json"
+    },
+    {
+      "id": "sync-custom-background-across-devices-with-per-d-cae5",
+      "title": "Sync custom background across devices with per-device override",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-25T05:10:35.587Z",
+      "file": "active/sync-custom-background-across-devices-with-per-d-cae5/sync-custom-background-across-devices-with-per-d-cae5.json"
+    },
+    {
+      "id": "thumbnails-add-unlimitedstorage-switch-capture-t-ec14",
+      "title": "Thumbnails: add unlimitedStorage + switch capture to WebP",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-25T05:10:33.758Z",
+      "file": "active/thumbnails-add-unlimitedstorage-switch-capture-t-ec14/thumbnails-add-unlimitedstorage-switch-capture-t-ec14.json"
     }
   ]
 }
