@@ -53,7 +53,8 @@ function folderIcon() {
 // directly below the search field. Bookmarks: browsable tabbed / folder view
 // when empty, flat filtered results when typing. History: recent list when
 // empty, filtered when typing (via the injected historyProvider).
-export function createScopePopup(panel, { openItem, historyProvider }) {
+export function createScopePopup(popup, { openItem, historyProvider }) {
+  const panel = popup.el; // the shared search-popup shell element
   let scope = null; // "bookmarks" | "history"
   let query = "";
 
@@ -70,11 +71,11 @@ export function createScopePopup(panel, { openItem, historyProvider }) {
   let histSeq = 0;
 
   function isOpen() {
-    return !panel.classList.contains("hidden");
+    return popup.isOpen();
   }
 
   function close() {
-    panel.classList.add("hidden");
+    popup.close();
   }
 
   function renderEmpty(text) {
@@ -275,11 +276,11 @@ export function createScopePopup(panel, { openItem, historyProvider }) {
     } catch {
       panel.replaceChildren();
       renderEmpty("Could not load");
-      panel.classList.remove("hidden");
+      popup.open();
       return;
     }
 
-    panel.classList.remove("hidden");
+    popup.open();
     render();
   }
 

@@ -655,21 +655,24 @@ html {
   display: flex;
 }
 
-#bookmarks-panel {
+/* Shared dropdown shell — the bookmarks/history scope view, the
+   search-everything results, and settings all render into one of these.
+   Anchored beneath the search pill, borderless, separated by shadow alone
+   just like the pill itself. */
+.search-popup {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  max-height: min(520px, calc(100vh - 100px));
-  overflow: hidden;
+  max-height: min(560px, calc(100vh - 120px));
+  overflow: hidden auto;
   background: var(--surface);
-  /* Borderless; separated by shadow alone, like the search pill. */
   border-radius: var(--radius);
   box-shadow: var(--card-shadow-hover);
   z-index: 100;
 }
 
-#bookmarks-panel.hidden {
+.search-popup.hidden {
   display: none;
 }
 
@@ -857,28 +860,12 @@ html {
   color: var(--text-primary);
 }
 
-#settings-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 200;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
+/* Settings is now one of the shared .search-popup dropdowns; only its own
+   inner padding and scrollbar styling remain here. */
 #settings-panel {
-  background: var(--surface);
-  border-radius: var(--radius);
   padding: 24px;
-  min-width: 500px;
-  max-width: 1000px;
-  width: 50%;
-  max-height: 90vh;
-  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
 
 #settings-panel::-webkit-scrollbar {

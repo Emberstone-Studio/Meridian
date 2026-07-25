@@ -1,4 +1,4 @@
-import { createSearchBar } from "./components/SearchBar.js";
+﻿import { createSearchBar } from "./components/SearchBar.js";
 import { createWorkspaceLane } from "./components/WorkspaceLane.js";
 import { search } from "./utils/browserSearch.js";
 import {
@@ -18,6 +18,7 @@ import {
 } from "./utils/workspaceManager.js";
 import { show as showContextMenu } from "./components/ContextMenu.js";
 import { createScopePopup } from "./components/BookmarksButton.js";
+import { createSearchPopup } from "./components/SearchPopup.js";
 
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
@@ -162,6 +163,8 @@ let searchBarApi = null;
 let browserSearchActive = false;
 let browserSearchResults = null;
 let browserSearchSequence = 0;
+let resultsPopup = null; // shared shell for the "search everything" results
+let settingsPopup = null; // shared shell for the settings dropdown
 
 function setupKeyboardNav() {
   document.addEventListener("keydown", (e) => {
@@ -192,8 +195,7 @@ function setupKeyboardNav() {
         lightboxApi.hide();
         return;
       }
-      const overlay = document.getElementById("settings-overlay");
-      if (!overlay.classList.contains("hidden")) {
+      if (settingsPopup?.isOpen()) {
         closeSettings();
         return;
       }
@@ -278,11 +280,11 @@ async function handleTabClosed(tabId) {
 }
 
 function openSettings() {
-  document.getElementById("settings-overlay").classList.remove("hidden");
+  settingsPopup?.open();
 }
 
 function closeSettings() {
-  document.getElementById("settings-overlay").classList.add("hidden");
+  settingsPopup?.close();
 }
 
 async function openBookmark(url) {
@@ -480,8 +482,8 @@ function clearBrowserSearch() {
     });
   });
 
-  const existing = document.getElementById("browser-search-results");
-  if (existing) existing.remove();
+  resultsPopup?.close();
+  resultsPopup?.el.replaceChildren();
 }
 
 function buildResultRow(item) {
@@ -542,14 +544,8 @@ function buildResultRow(item) {
 }
 
 function renderSearchResults(results, query, scope = "all") {
-  let container = document.getElementById("browser-search-results");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "browser-search-results";
-    document
-      .getElementById("workspace-container")
-      .insertAdjacentElement("afterend", container);
-  }
+  if (!resultsPopup) return;
+  const container = resultsPopup.el;
   container.innerHTML = "";
 
   const sections = [
@@ -586,6 +582,7 @@ function renderSearchResults(results, query, scope = "all") {
         scope === "bookmarks" ? "No bookmarks found" : "No history found";
       container.appendChild(empty);
     }
+    resultsPopup.open();
     return;
   }
 
@@ -595,6 +592,10 @@ function renderSearchResults(results, query, scope = "all") {
       results.tabs.length || results.bookmarks.length || results.history.length;
     container.appendChild(buildWebSearchRow(query, !anyLocal));
   }
+
+  // Show the dropdown only when it actually has something to show.
+  if (container.childElementCount > 0) resultsPopup.open();
+  else resultsPopup.close();
 }
 
 const CHEVRON_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
@@ -714,8 +715,9 @@ async function handleBrowserQuery(query, scope = "all") {
   const searchSequence = ++browserSearchSequence;
   document.getElementById("new-group-btn")?.classList.add("hidden");
 
-  if (scope === "all") filterGrid(query);
-  else filterGrid(""); // scoped mode keeps the tab grid intact; ignore prior arg:"\u0000");
+  // Results live in the popup only; leave the board unfiltered in every
+  // scope so search-everything behaves like the bookmarks/history popup.
+  filterGrid("");
 
   const r = await search(query, scope);
   const { localSearch } = await chrome.storage.sync.get("localSearch");
@@ -735,25 +737,9 @@ async function init() {
   // Inject styles for browser search results
   const style = document.createElement("style");
   style.textContent = `
-    #browser-search-results {
-      max-width: 900px;
-      margin: 16px auto 0;
-      padding: 16px 20px 24px;
-      background: rgba(245, 245, 245, 0.80);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-    }
-    html[data-theme="dark"] #browser-search-results {
-      background: rgba(28, 28, 30, 0.80);
-    }
-    @media (prefers-color-scheme: dark) {
-      html:not([data-theme="light"]) #browser-search-results {
-        background: rgba(28, 28, 30, 0.80);
-      }
-    }
+    /* Placement + chrome come from the shared .search-popup class; only the
+       results' own inner padding lives here. */
+    #browser-search-results { padding: 16px 20px 24px; }
     .search-results-section { margin-bottom: 16px; }
     .search-results-label {
       font-size: 12px;
@@ -822,17 +808,25 @@ async function init() {
   const topActions = document.getElementById("top-actions");
   if (searchContainer && topActions) searchContainer.appendChild(topActions);
 
-  // Scope popup (Bookmarks / History): attached directly below the search field,
-  // shown while a scope is active.
-  const scopePanel = document.createElement("div");
-  scopePanel.id = "bookmarks-panel";
-  scopePanel.className = "hidden";
-  scopePanel.setAttribute("role", "dialog");
-  scopePanel.setAttribute("aria-label", "Bookmarks");
-  document.getElementById("search-bar").appendChild(scopePanel);
-  const scopePopup = createScopePopup(scopePanel, {
+  // All three search-zone dropdowns share one shell, anchored beneath the pill.
+  const searchBarEl = document.getElementById("search-bar");
+
+  // Scope popup (Bookmarks / History), shown while a scope is active.
+  const scopeShell = createSearchPopup({
+    anchor: searchBarEl,
+    id: "bookmarks-panel",
+    ariaLabel: "Bookmarks",
+  });
+  const scopePopup = createScopePopup(scopeShell, {
     openItem: openBookmark,
     historyProvider: (q) => search(q, "history").then((r) => r.history),
+  });
+
+  // "Search everything" results dropdown.
+  resultsPopup = createSearchPopup({
+    anchor: searchBarEl,
+    id: "browser-search-results",
+    ariaLabel: "Search results",
   });
 
   const isPopupScope = (scope) => scope === "bookmarks" || scope === "history";
@@ -866,12 +860,16 @@ async function init() {
     document.querySelector("#browser-search-results .result-row")?.click();
   };
 
-  const settingsOverlay = document.getElementById("settings-overlay");
-  const settingsContainer = document.getElementById("settings-panel");
   const settingsBtn = document.getElementById("settings-btn");
   const newGroupBtn = document.getElementById("new-group-btn");
 
-  createSettingsPanel(settingsContainer, closeSettings);
+  // Settings dropdown — same shell as the other search-zone popups.
+  settingsPopup = createSearchPopup({
+    anchor: searchBarEl,
+    id: "settings-panel",
+    ariaLabel: "Settings",
+  });
+  createSettingsPanel(settingsPopup.el, closeSettings);
 
   settingsBtn.addEventListener("click", openSettings);
   newGroupBtn.addEventListener("click", handleNewGroup);
@@ -896,8 +894,13 @@ async function init() {
       scopePopup.close();
     }
   };
-  settingsOverlay.addEventListener("click", (e) => {
-    if (e.target === settingsOverlay) closeSettings();
+  // A click outside the settings dropdown (and not on its trigger) closes it.
+  document.addEventListener("click", (e) => {
+    if (!settingsPopup.isOpen()) return;
+    if (settingsPopup.el.contains(e.target) || settingsBtn.contains(e.target)) {
+      return;
+    }
+    closeSettings();
   });
 
   setupKeyboardNav();
