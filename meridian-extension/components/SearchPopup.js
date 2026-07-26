@@ -31,12 +31,6 @@ export function createSearchPopup({ anchor, id, ariaLabel, onOpenChange } = {}) 
       el.classList.add("hidden");
       onOpenChange?.(false);
     },
-    setContent(...nodes) {
-      el.replaceChildren(...nodes);
-    },
-    setLabel(label) {
-      if (label) el.setAttribute("aria-label", label);
-    },
   };
 
   registry.add(api);

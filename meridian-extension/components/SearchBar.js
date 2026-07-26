@@ -26,13 +26,6 @@ export const PROVIDERS = [
 ];
 
 const MAGNIFIER_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
-const BOOKMARK_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>`;
-const HISTORY_ICON = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>`;
-const SCOPE_GLYPHS = {
-  all: MAGNIFIER_ICON,
-  bookmarks: BOOKMARK_ICON,
-  history: HISTORY_ICON,
-};
 
 const SCOPE_PLACEHOLDERS = {
   all: "Search anything…",
@@ -54,17 +47,16 @@ export function createSearchBar(container) {
   wrapper.className = "search-container";
   wrapper.dataset.scope = scope;
 
-  // Left: scope glyph — a signifier of the active mode, NOT an engine picker.
-  // Engine selection lives on the web-search row (see meridian.js).
+  // Left: search submit button. Engine selection lives on the web-search row
+  // (see meridian.js).
   const logoBtn = document.createElement("button");
   logoBtn.className = "search-logo-btn search-logo-btn--glyph";
   logoBtn.type = "button";
-  logoBtn.tabIndex = -1;
-  logoBtn.setAttribute("aria-label", SCOPE_LABELS.all);
+  logoBtn.setAttribute("aria-label", "Submit search");
 
   const glyph = document.createElement("span");
   glyph.className = "search-logo-glyph";
-  glyph.innerHTML = SCOPE_GLYPHS.all;
+  glyph.innerHTML = MAGNIFIER_ICON;
   logoBtn.appendChild(glyph);
 
   // Center: search input
@@ -102,15 +94,14 @@ export function createSearchBar(container) {
   function applyScope(next) {
     scope = next;
     wrapper.dataset.scope = scope;
-    // Left glyph stays the search magnifier across all scopes; only the
+    // The magnifier stays the submit control across all scopes; only the
     // placeholder signals the active mode.
     input.placeholder = SCOPE_PLACEHOLDERS[scope] ?? SCOPE_PLACEHOLDERS.all;
     const label = SCOPE_LABELS[scope] ?? SCOPE_LABELS.all;
     input.setAttribute("aria-label", label);
-    logoBtn.setAttribute("aria-label", label);
 
-    // Query text clears on scope switch (carrying a query across scopes misleads).
-    input.value = "";
+    // Keep the current query while switching between all, bookmarks, and
+    // history so users can compare the same search across scopes.
     updateClearBtn();
 
     api.onScopeChange?.(scope);
@@ -130,14 +121,13 @@ export function createSearchBar(container) {
       return;
     }
     chrome.tabs.create({ url: currentProvider.url + encodeURIComponent(q) });
-    input.value = "";
-    updateClearBtn();
+    api.clearSearch();
   }
 
-  // Left glyph is a signifier; clicking it just returns focus to the field.
+  // Clicking the magnifier submits exactly like pressing Enter in the field.
   logoBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    input.focus();
+    doSearch();
   });
 
   input.addEventListener("input", () => {
@@ -205,6 +195,7 @@ export function createSearchBar(container) {
     onProviderChange: null,
     setScope,
     getScope: () => scope,
+    getQuery: () => input.value.trim(),
     getProvider: () => currentProvider,
     getProviders: () => PROVIDERS.slice(),
     setProvider: (id) => {

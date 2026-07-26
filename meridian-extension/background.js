@@ -1,4 +1,5 @@
 import { initTabIndex, rebuildIndex } from './utils/browserSearch.js';
+import { disableRemovedLocalSearchPermissions } from "./utils/localSearch.js";
 import { evictThumbnail, saveThumbnail } from "./utils/thumbnailCache.js";
 
 let meridianTabId = null;
@@ -102,6 +103,10 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 });
 
 chrome.runtime.onStartup.addListener(ensureMeridianTab);
+
+chrome.permissions.onRemoved.addListener((removed) => {
+  disableRemovedLocalSearchPermissions(removed);
+});
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   evictThumbnail(tabId);

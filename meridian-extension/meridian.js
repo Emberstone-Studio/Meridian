@@ -12,6 +12,11 @@ import { getCustomBackgroundUrl } from "./utils/customBackground.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
 import {
+  getEnabledLocalSearchSources,
+  setLocalSearchSourceEnabled,
+} from "./utils/localSearch.js";
+import { normalizeHomepageUrl } from "./utils/homepageUrl.js";
+import {
   getWorkspaceData,
   createWorkspace,
   assignTab,
@@ -26,7 +31,7 @@ import { createSearchPopup } from "./components/SearchPopup.js";
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
 let lightboxApi = null;
-let bookmarksApi = null;
+let appearanceGeneration = 0;
 // Set when a lane should open directly into inline rename on the next render
 // (e.g. after "Move to new group"); matched against each lane's workspace id.
 let pendingRenameLaneId = null;
@@ -37,16 +42,26 @@ async function getNewTabBehavior() {
   return newTabBehavior ?? "meridian-view";
 }
 
-async function applyStoredAppearance() {
-  const { theme, background } = await chrome.storage.sync.get([
-    "theme",
-    "background",
-  ]);
-  applyTheme(theme ?? "system");
-  const bg = background ?? DEFAULT_BACKGROUND;
-  const customUrl = bg.type === "custom" ? await getCustomBackgroundUrl() : null;
+async function applyStoredAppearance(backgroundOverride = null) {
+  const generation = ++appearanceGeneration;
+  let bg = backgroundOverride;
+
+  if (!bg) {
+    const { theme, background } = await chrome.storage.sync.get([
+      "theme",
+      "background",
+    ]);
+    if (generation !== appearanceGeneration) return;
+    applyTheme(theme ?? "system");
+    bg = background ?? DEFAULT_BACKGROUND;
+  }
+
+  const customUrlPromise =
+    bg.type === "custom" ? getCustomBackgroundUrl() : null;
+  applyAccentFromBackground(bg, customUrlPromise);
+  const customUrl = customUrlPromise ? await customUrlPromise : null;
+  if (generation !== appearanceGeneration) return;
   applyBackground(bg, customUrl);
-  applyAccentFromBackground(bg, customUrl);
 }
 
 function setupLightbox() {
@@ -160,19 +175,25 @@ async function handleNewTabBehavior() {
       await chrome.tabs.update(meridianTabId, { active: true });
       window.close();
     }
-  } else if (newTabBehavior === "open-homepage" && homepageUrl?.trim()) {
+  } else if (newTabBehavior === "open-homepage") {
+    const normalizedHomepage = normalizeHomepageUrl(homepageUrl ?? "");
+    if (!normalizedHomepage) return;
+
     const [currentTab, { meridianTabId }] = await Promise.all([
       chrome.tabs.getCurrent(),
       chrome.storage.local.get("meridianTabId"),
     ]);
     if (!currentTab || currentTab.id === meridianTabId) return;
-    await chrome.tabs.update(currentTab.id, { url: homepageUrl.trim() });
+    try {
+      await chrome.tabs.update(currentTab.id, { url: normalizedHomepage });
+    } catch (error) {
+      console.warn("Could not open the configured homepage.", error);
+    }
   }
 }
 
 let searchBarApi = null;
 let browserSearchActive = false;
-let browserSearchResults = null;
 let browserSearchSequence = 0;
 let resultsPopup = null; // shared shell for the "search everything" results
 let settingsPopup = null; // shared shell for the settings dropdown
@@ -192,10 +213,6 @@ function setupKeyboardNav() {
     }
 
     if (e.key === "Escape") {
-      if (bookmarksApi?.isOpen()) {
-        bookmarksApi.close();
-        return;
-      }
       if (lightboxApi?.isVisible()) {
         lightboxApi.hide();
         return;
@@ -446,34 +463,18 @@ async function render() {
   }
 }
 
-function filterGrid(query) {
-  const q = query.toLowerCase();
-  document.querySelectorAll(".workspace-lane").forEach((lane) => {
-    const cards = [...lane.querySelectorAll(".tab-card")];
-    let anyVisible = false;
-    for (const card of cards) {
-      const title = (
-        card.querySelector(".card-title")?.textContent ?? ""
-      ).toLowerCase();
-      const url = (card.dataset.tabUrl ?? "").toLowerCase();
-      const matches = title.includes(q) || url.includes(q);
-      card.style.display = matches ? "" : "none";
-      if (matches) anyVisible = true;
-    }
-    lane.style.display = anyVisible || cards.length === 0 ? "" : "none";
-  });
-}
-
-function clearBrowserSearch() {
-  browserSearchActive = false;
-  browserSearchResults = null;
-
+function resetGridFilter() {
   document.querySelectorAll(".workspace-lane").forEach((lane) => {
     lane.style.display = "";
     lane.querySelectorAll(".tab-card").forEach((card) => {
       card.style.display = "";
     });
   });
+}
+
+function clearBrowserSearch() {
+  browserSearchActive = false;
+  resetGridFilter();
 
   resultsPopup?.close();
   resultsPopup?.el.replaceChildren();
@@ -579,11 +580,10 @@ function renderSearchResults(results, query, scope = "all") {
     return;
   }
 
-  // All scope: once text is entered, offer the web search with the engine picker.
+  // Web is a peer result section. With no local matches, it becomes the only
+  // fallback section instead of showing an empty-state message.
   if (query) {
-    const anyLocal =
-      results.tabs.length || results.bookmarks.length || results.history.length;
-    container.appendChild(buildWebSearchRow(query, !anyLocal));
+    container.appendChild(buildWebSearchSection(query));
   }
 
   // Show the dropdown only when it actually has something to show.
@@ -591,20 +591,18 @@ function renderSearchResults(results, query, scope = "all") {
   else resultsPopup.close();
 }
 
-function buildWebSearchRow(query, noLocal) {
-  // The provider is chosen in Settings now; this row just launches it.
+function buildWebSearchSection(query) {
+  // The provider is chosen in Settings; this section just launches it.
   const provider =
     searchBarApi?.getProvider?.() ?? searchBarApi?.getProviders?.()?.[0];
 
-  const row = document.createElement("div");
-  row.className = "search-web-row";
+  const section = document.createElement("div");
+  section.className = "search-results-section search-web-section";
 
-  if (noLocal) {
-    const note = document.createElement("div");
-    note.className = "search-web-note";
-    note.textContent = "No matches in your tabs, bookmarks, or history.";
-    row.appendChild(note);
-  }
+  const heading = document.createElement("div");
+  heading.className = "search-results-label";
+  heading.textContent = "Web";
+  section.appendChild(heading);
 
   const go = document.createElement("button");
   go.className = "search-web-go result-row";
@@ -618,12 +616,19 @@ function buildWebSearchRow(query, noLocal) {
     fav.style.visibility = "hidden";
   };
 
-  const label = document.createElement("span");
-  label.className = "result-title";
-  label.textContent = `Search ${provider?.name ?? "the web"} for "${query}"`;
+  const body = document.createElement("span");
+  body.className = "result-body";
 
-  go.appendChild(fav);
-  go.appendChild(label);
+  const title = document.createElement("span");
+  title.className = "result-title";
+  title.textContent = `Search ${provider?.name ?? "the web"} for "${query}"`;
+
+  const meta = document.createElement("span");
+  meta.className = "result-meta";
+  meta.textContent = "Web search";
+
+  body.append(title, meta);
+  go.append(fav, body);
   go.addEventListener("click", () => {
     if (!provider) return;
     chrome.tabs.create({ url: provider.url + encodeURIComponent(query) });
@@ -632,8 +637,8 @@ function buildWebSearchRow(query, noLocal) {
     searchBarApi?.clearSearch?.();
   });
 
-  row.appendChild(go);
-  return row;
+  section.appendChild(go);
+  return section;
 }
 
 async function handleBrowserQuery(query, scope = "all") {
@@ -642,18 +647,12 @@ async function handleBrowserQuery(query, scope = "all") {
 
   // Results live in the popup only; leave the board unfiltered in every
   // scope so search-everything behaves like the bookmarks/history popup.
-  filterGrid("");
+  resetGridFilter();
 
-  const r = await search(query, scope);
-  const { localSearch } = await chrome.storage.sync.get("localSearch");
-  const ls = localSearch ?? { tabs: true, bookmarks: true, history: true };
-  if (scope === "all") {
-    if (!ls.tabs) r.tabs = [];
-    if (!ls.bookmarks) r.bookmarks = [];
-    if (!ls.history) r.history = [];
-  }
+  const enabledSources = await getEnabledLocalSearchSources();
   if (!browserSearchActive || searchSequence !== browserSearchSequence) return;
-  browserSearchResults = r;
+  const r = await search(query, scope, enabledSources);
+  if (!browserSearchActive || searchSequence !== browserSearchSequence) return;
 
   renderSearchResults(r, query ?? "", scope);
 }
@@ -666,6 +665,7 @@ async function init() {
        results' own inner padding lives here. */
     #browser-search-results { padding: 16px 20px 24px; }
     .search-results-section { margin-bottom: 16px; }
+    .search-results-section:last-child { margin-bottom: 0; }
     .search-results-label {
       font-size: 12px;
       font-weight: 600;
@@ -697,17 +697,15 @@ async function init() {
     .search-results-empty { padding: 16px 0; color: var(--text-secondary); font-size: 14px; text-align: center; }
     .search-clear-btn {
       background: none; border: none; cursor: pointer; color: var(--text-secondary);
-      font-size: 16px; padding: 0 4px; line-height: 1;
+      width: 30px; height: 30px; padding: 0; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 20px; line-height: 1;
+      transition: background var(--transition), color var(--transition);
     }
-    .search-clear-btn:hover { color: var(--text-primary); }
+    .search-clear-btn:hover {
+      background: var(--surface-hover); color: var(--text-primary);
+    }
     .search-clear-btn.hidden { display: none; }
-    .search-web-fallback {
-      background: none; border: none; padding: 0; cursor: pointer;
-      color: var(--accent); font-size: 14px; font-family: inherit; text-decoration: underline;
-    }
-    .search-web-fallback:hover { opacity: 0.8; }
-    .search-web-row { margin-top: 8px; }
-    .search-web-note { font-size: 13px; color: var(--text-secondary); padding: 4px 0 8px; }
     .search-web-go {
       width: 100%;
       background: none;
@@ -716,6 +714,7 @@ async function init() {
       color: inherit;
       text-align: left;
     }
+    .search-web-go .result-body { display: flex; flex-direction: column; }
   `;
   document.head.appendChild(style);
 
@@ -742,7 +741,12 @@ async function init() {
   });
   const scopePopup = createScopePopup(scopeShell, {
     openItem: openBookmark,
-    historyProvider: (q) => search(q, "history").then((r) => r.history),
+    isSourceEnabled: async (source) =>
+      (await getEnabledLocalSearchSources())[source],
+    historyProvider: async (q) => {
+      const enabledSources = await getEnabledLocalSearchSources();
+      return search(q, "history", enabledSources).then((r) => r.history);
+    },
   });
 
   // "Search everything" results dropdown.
@@ -784,10 +788,6 @@ async function init() {
   };
 
   const settingsBtn = document.getElementById("settings-btn");
-  const searchGlyphBtn = document.querySelector(
-    "#search-bar .search-logo-btn--glyph",
-  );
-
   // Settings dropdown — same shell as the other search-zone popups. The gear
   // lights up in the accent while open, exactly like the scope chips.
   settingsPopup = createSearchPopup({
@@ -796,7 +796,7 @@ async function init() {
     ariaLabel: "Settings",
     onOpenChange: (open) => settingsBtn.classList.toggle("active", open),
   });
-  createSettingsPanel(settingsPopup.el, closeSettings);
+  createSettingsPanel(settingsPopup.el);
 
   // The scope chips and the gear are one mutually-exclusive group: opening the
   // gear drops any active scope, so the two are never lit at once.
@@ -809,20 +809,24 @@ async function init() {
     }
   });
 
-  // The left magnifier is the group's "off" switch: one click clears whichever
-  // icon is lit and returns to plain search-everything. (It also refocuses the
-  // field via its own handler in SearchBar.js.)
-  searchGlyphBtn?.addEventListener("click", () => {
-    if (settingsPopup.isOpen()) closeSettings();
-    if (searchBarApi.getScope() !== "all") searchBarApi.setScope("all");
-  });
-
   const scopeButtons = {
     bookmarks: document.getElementById("scope-bookmarks"),
     history: document.getElementById("scope-history"),
   };
   for (const [scopeName, btn] of Object.entries(scopeButtons)) {
-    btn?.addEventListener("click", () => searchBarApi.setScope(scopeName));
+    btn?.addEventListener("click", async () => {
+      if (searchBarApi.getScope() === scopeName) {
+        searchBarApi.setScope(scopeName);
+        return;
+      }
+      btn.disabled = true;
+      try {
+        await setLocalSearchSourceEnabled(scopeName, true);
+      } finally {
+        btn.disabled = false;
+      }
+      searchBarApi.setScope(scopeName);
+    });
   }
   searchBarApi.onScopeChange = (activeScope) => {
     for (const [scopeName, btn] of Object.entries(scopeButtons)) {
@@ -834,7 +838,7 @@ async function init() {
       clearBrowserSearch();
       // A scope wins the group — make sure the gear is closed.
       closeSettings();
-      scopePopup.openScope(activeScope);
+      scopePopup.openScope(activeScope, searchBarApi.getQuery());
     } else {
       scopePopup.close();
     }
@@ -922,7 +926,11 @@ async function init() {
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.background) {
-      applyStoredAppearance();
+      applyStoredAppearance(changes.background.newValue ?? DEFAULT_BACKGROUND);
+    }
+    if (area === "sync" && changes.localSearch) {
+      clearBrowserSearch();
+      if (searchBarApi?.getScope() !== "all") searchBarApi.setScope("all");
     }
     if (area !== "local") return;
     const keys = Object.keys(changes);

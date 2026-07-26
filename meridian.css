@@ -169,7 +169,7 @@ html {
   border: none;
   background: transparent;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: 15px;
   font-family: inherit;
   outline: none;
   height: 100%;
@@ -202,46 +202,19 @@ html {
 }
 
 .search-logo-btn--glyph {
-  cursor: text;
   color: var(--text-secondary);
+  border-radius: 50%;
 }
 
 .search-logo-btn--glyph:hover {
-  background: transparent;
+  background: var(--surface-hover);
+  color: var(--text-primary);
 }
 
 .search-logo-glyph {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.search-logo {
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-.search-logo-fallback {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  align-items: center;
-  justify-content: center;
-}
-
-.search-logo-btn--scope {
-  cursor: default;
-  color: var(--text-secondary);
-}
-
-.search-logo-btn--scope .search-logo-fallback {
-  background: transparent;
-  color: currentColor;
 }
 
 .scope-chip {
@@ -278,29 +251,6 @@ html {
   height: 20px;
   background: var(--border);
   margin: 0 2px;
-}
-
-.search-submit-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  flex-shrink: 0;
-  transition:
-    background var(--transition),
-    color var(--transition);
-}
-
-.search-submit-btn:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
 }
 
 /* ---- Workspace container ---- */
@@ -649,31 +599,6 @@ html {
 
 /* ---- Settings ---- */
 
-#bookmarks-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: var(--surface);
-  box-shadow: var(--card-shadow);
-  cursor: pointer;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-#bookmarks-btn:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-.bookmarks-anchor {
-  position: relative;
-  display: flex;
-}
-
 /* Shared dropdown shell — the bookmarks/history scope view, the
    search-everything results, and settings all render into one of these.
    Anchored beneath the search pill, borderless, separated by shadow alone
@@ -810,52 +735,6 @@ html {
   text-align: center;
 }
 
-#new-group-btn {
-  margin: 0 auto 40px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  /* Label sits on the wallpaper — use luminance-derived on-background text. */
-  color: var(--on-bg-muted, var(--text-secondary));
-  text-shadow: var(--on-bg-shadow, none);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: center;
-  font: 500 13px/1 inherit;
-  transition:
-    color var(--transition);
-}
-
-#new-group-btn span {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--surface);
-  box-shadow: var(--card-shadow);
-  /* The "+" glyph lives on a surface chip — keep it on surface text, not the
-     on-background color, or it would vanish against the chip. */
-  color: var(--text-secondary);
-  text-shadow: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 400;
-  transition:
-    background var(--transition),
-    color var(--transition);
-}
-
-#new-group-btn:hover {
-  color: var(--on-bg, var(--text-primary));
-}
-
-#new-group-btn:hover span {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
 #settings-btn {
   width: 36px;
   height: 36px;
@@ -925,38 +804,6 @@ html {
   letter-spacing: 0.05em;
 }
 
-/* Compact single-select control (New Tab Behavior, Search Engine). Native
-   <select> restyled to match the design system, with a custom chevron. */
-.settings-select {
-  width: 100%;
-  padding: 8px 34px 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background-color: var(--surface);
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23888" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 14px;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition);
-}
-
-.settings-select:hover {
-  border-color: var(--text-secondary);
-}
-
-.settings-select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-}
-
 .settings-homepage-input {
   display: block;
   width: 100%;
@@ -974,6 +821,17 @@ html {
 
 .settings-homepage-input:focus {
   border-color: var(--accent);
+}
+
+.settings-homepage-input[aria-invalid="true"] {
+  border-color: #dc2626;
+}
+
+.settings-homepage-feedback {
+  min-height: 16px;
+  margin: 4px 2px 0;
+  color: #dc2626;
+  font-size: 12px;
 }
 
 /* ---- Settings toggle ---- */
@@ -1001,6 +859,14 @@ html {
   flex-shrink: 0;
   cursor: pointer;
   accent-color: var(--accent);
+}
+
+.settings-permission-status {
+  min-height: 16px;
+  margin: 4px 12px 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 /* ---- Settings action button ---- */
@@ -1485,10 +1351,13 @@ html {
 }
 
 .settings-bg-upload-btn {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  min-height: 64px;
   margin-top: 8px;
-  padding: 8px 12px;
+  padding: 16px 12px;
   border-radius: var(--radius-sm);
   border: 1px dashed var(--border);
   background: transparent;
@@ -1509,10 +1378,22 @@ html {
   background: color-mix(in srgb, var(--accent) 6%, transparent);
 }
 
+.settings-bg-upload-btn.drag-over {
+  border-color: var(--accent);
+  border-style: solid;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
 .settings-bg-upload-btn.selected {
   border-color: var(--accent);
   color: var(--accent);
   border-style: solid;
+}
+
+.settings-bg-upload-btn.upload-error {
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .settings-bg-upload-btn:disabled {

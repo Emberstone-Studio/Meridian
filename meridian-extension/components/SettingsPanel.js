@@ -2,6 +2,12 @@ import {
   saveCustomBackground,
   getCustomBackgroundUrl,
 } from "../utils/customBackground.js";
+import {
+  DEFAULT_LOCAL_SEARCH,
+  getEnabledLocalSearchSources,
+  setLocalSearchSourceEnabled,
+} from "../utils/localSearch.js";
+import { normalizeHomepageUrl } from "../utils/homepageUrl.js";
 import { PROVIDERS } from "./SearchBar.js";
 
 const NEW_TAB_OPTIONS = [
@@ -118,7 +124,7 @@ function generateSeeds(count = 12, exclude = new Set()) {
   return [...seeds];
 }
 
-export function createSettingsPanel(container, onClose) {
+export function createSettingsPanel(container) {
   let newTabBehavior = "meridian-view";
   let groupByDomain = false;
   let homepageUrl = "";
@@ -214,23 +220,51 @@ export function createSettingsPanel(container, onClose) {
 
   // Only the "open a specific page" option needs a URL field; it appears
   // beneath the grid when that option is selected.
+  const homepageField = document.createElement("div");
+  homepageField.className = "settings-homepage-field";
+
   const homepageInput = document.createElement("input");
   homepageInput.type = "url";
   homepageInput.className = "settings-homepage-input";
   homepageInput.placeholder = "https://example.com";
+  homepageInput.setAttribute(
+    "aria-describedby",
+    "settings-homepage-feedback",
+  );
+
+  const homepageFeedback = document.createElement("p");
+  homepageFeedback.id = "settings-homepage-feedback";
+  homepageFeedback.className = "settings-homepage-feedback";
+  homepageFeedback.setAttribute("role", "alert");
+
+  function setHomepageError(message) {
+    homepageInput.setCustomValidity(message);
+    homepageInput.setAttribute("aria-invalid", String(!!message));
+    homepageFeedback.textContent = message;
+  }
+
   homepageInput.addEventListener("change", () => {
-    homepageUrl = homepageInput.value.trim();
+    const normalized = normalizeHomepageUrl(homepageInput.value);
+    if (normalized == null) {
+      setHomepageError("Enter a complete http:// or https:// URL.");
+      return;
+    }
+
+    setHomepageError("");
+    homepageUrl = normalized;
+    homepageInput.value = normalized;
     chrome.storage.sync.set({ homepageUrl });
   });
   homepageInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") homepageInput.blur();
   });
-  newTabGroup.appendChild(homepageInput);
+  homepageField.append(homepageInput, homepageFeedback);
+  newTabGroup.appendChild(homepageField);
 
   function syncNewTab() {
     renderNewTabCards();
     homepageInput.value = homepageUrl;
-    homepageInput.style.display =
+    homepageField.style.display =
       newTabBehavior === "open-homepage" ? "" : "none";
   }
 
@@ -276,15 +310,18 @@ export function createSettingsPanel(container, onClose) {
   localSearchLabel.textContent = "Local Search";
   localSearchGroup.appendChild(localSearchLabel);
 
-  let localSearch = { tabs: true, bookmarks: true, history: true };
+  let localSearch = { ...DEFAULT_LOCAL_SEARCH };
 
   const localSearchSources = [
     { key: "tabs", label: "Open Tabs" },
-    { key: "bookmarks", label: "Bookmarks" },
-    { key: "history", label: "History" },
+    { key: "bookmarks", label: "Bookmarks", optional: true },
+    { key: "history", label: "History", optional: true },
   ];
 
   const localSearchCheckboxes = {};
+  const permissionStatus = document.createElement("p");
+  permissionStatus.className = "settings-permission-status";
+  permissionStatus.setAttribute("aria-live", "polite");
 
   for (const source of localSearchSources) {
     const row = document.createElement("label");
@@ -294,15 +331,34 @@ export function createSettingsPanel(container, onClose) {
     checkbox.type = "checkbox";
     checkbox.className = "settings-toggle";
     checkbox.setAttribute("aria-label", source.label);
-    checkbox.checked = true;
+    checkbox.checked = localSearch[source.key];
 
     const label = document.createElement("span");
     label.textContent = source.label;
 
-    checkbox.addEventListener("change", () => {
-      localSearch[source.key] = checkbox.checked;
-      chrome.storage.sync.set({ localSearch });
-      window.dispatchEvent(new CustomEvent("settings-changed"));
+    checkbox.addEventListener("change", async () => {
+      const requested = checkbox.checked;
+      checkbox.disabled = true;
+      try {
+        const result = await setLocalSearchSourceEnabled(
+          source.key,
+          requested,
+        );
+        localSearch[source.key] = result.enabled;
+        checkbox.checked = result.enabled;
+        if (source.optional) {
+          permissionStatus.textContent = result.denied
+            ? `${source.label} permission was not granted. This source remains off.`
+            : `${source.label} access ${result.enabled ? "enabled" : "disabled"}.`;
+        }
+        window.dispatchEvent(new CustomEvent("settings-changed"));
+      } catch {
+        checkbox.checked = localSearch[source.key];
+        permissionStatus.textContent =
+          `Could not update ${source.label.toLowerCase()} access.`;
+      } finally {
+        checkbox.disabled = false;
+      }
     });
 
     row.appendChild(checkbox);
@@ -310,6 +366,20 @@ export function createSettingsPanel(container, onClose) {
     localSearchGroup.appendChild(row);
     localSearchCheckboxes[source.key] = checkbox;
   }
+  localSearchGroup.appendChild(permissionStatus);
+
+  async function syncLocalSearchCheckboxes(savedSources) {
+    const enabled = await getEnabledLocalSearchSources(savedSources);
+    localSearch = { ...localSearch, ...enabled };
+    for (const [key, checkbox] of Object.entries(localSearchCheckboxes)) {
+      checkbox.checked = enabled[key];
+    }
+  }
+
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "sync" || !changes.localSearch) return;
+    syncLocalSearchCheckboxes(changes.localSearch.newValue);
+  });
 
   // (Appended below, after Search Engine, so the engine picker sits on top.)
 
@@ -583,24 +653,29 @@ export function createSettingsPanel(container, onClose) {
 
     bgGroup.appendChild(photoGrid);
 
-    // ── Custom upload button ──
+    // ── Custom image drop zone ──
     const uploadBtn = document.createElement("button");
     uploadBtn.className =
       "settings-bg-upload-btn" +
       (currentBg.type === "custom" ? " selected" : "");
     uploadBtn.textContent =
       currentBg.type === "custom"
-        ? "✓ Custom image active — click to replace"
-        : "↑ Upload a custom image…";
+        ? "✓ Custom image active — drop or click to replace"
+        : "Drop an image here or click to upload";
 
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = "image/*";
     fileInput.className = "settings-bg-file-input";
     fileInput.style.display = "none";
-    fileInput.addEventListener("change", async () => {
-      const file = fileInput.files?.[0];
+    async function processCustomImage(file) {
       if (!file) return;
+      uploadBtn.classList.remove("drag-over", "upload-error");
+      if (!file.type.startsWith("image/")) {
+        uploadBtn.classList.add("upload-error");
+        uploadBtn.textContent = "Please choose an image file";
+        return;
+      }
       uploadBtn.disabled = true;
       uploadBtn.textContent = "Processing…";
       try {
@@ -608,13 +683,45 @@ export function createSettingsPanel(container, onClose) {
         customBgUrl = await getCustomBackgroundUrl();
         selectBg("custom", "");
       } catch {
+        uploadBtn.classList.add("upload-error");
         uploadBtn.textContent = "Could not save image — try another file";
       } finally {
         uploadBtn.disabled = false;
+        fileInput.value = "";
       }
+    }
+
+    fileInput.addEventListener("change", () =>
+      processCustomImage(fileInput.files?.[0]),
+    );
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    let dragDepth = 0;
+    uploadBtn.addEventListener("dragenter", (event) => {
+      event.preventDefault();
+      if (uploadBtn.disabled) return;
+      dragDepth += 1;
+      uploadBtn.classList.add("drag-over");
+    });
+    uploadBtn.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      if (uploadBtn.disabled) return;
+      event.dataTransfer.dropEffect = "copy";
+      uploadBtn.classList.add("drag-over");
+    });
+    uploadBtn.addEventListener("dragleave", (event) => {
+      event.preventDefault();
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) uploadBtn.classList.remove("drag-over");
+    });
+    uploadBtn.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dragDepth = 0;
+      uploadBtn.classList.remove("drag-over");
+      if (uploadBtn.disabled) return;
+      processCustomImage(event.dataTransfer.files?.[0]);
     });
 
-    uploadBtn.addEventListener("click", () => fileInput.click());
     bgGroup.appendChild(fileInput);
     bgGroup.appendChild(uploadBtn);
   }
@@ -669,19 +776,20 @@ export function createSettingsPanel(container, onClose) {
       currentBg = saved.background ?? DEFAULT_BACKGROUND;
       toggleCheckbox.checked = groupByDomain;
       if (currentBg.type === "custom") {
-        getCustomBackgroundUrl().then((url) => {
+        const background = currentBg;
+        const customUrlPromise = getCustomBackgroundUrl();
+        applyAccentFromBackground(background, customUrlPromise);
+        customUrlPromise.then((url) => {
           customBgUrl = url;
-          applyBackground(currentBg, customBgUrl);
-          applyAccentFromBackground(currentBg, customBgUrl);
+          if (currentBg !== background) return;
+          applyBackground(background, customBgUrl);
           renderBgSection();
         });
       }
       if (saved.localSearch) {
         localSearch = { ...localSearch, ...saved.localSearch };
-        for (const key of Object.keys(localSearchCheckboxes)) {
-          localSearchCheckboxes[key].checked = localSearch[key] ?? true;
-        }
       }
+      syncLocalSearchCheckboxes(saved.localSearch);
       if (
         saved.searchProvider &&
         PROVIDERS.some((p) => p.id === saved.searchProvider)
@@ -902,6 +1010,7 @@ const ACCENT_SAT = 80;
 // re-run the solver and re-pick on-background text without re-sampling.
 let lastDominant = null;
 let lastBgLum = null;
+let accentGeneration = 0;
 
 function docIsDark() {
   const t = document.documentElement.dataset.theme;
@@ -977,7 +1086,13 @@ function applyOnBackground(lum) {
 }
 
 export async function applyAccentFromBackground(bg, customDataUrl = null) {
-  const { dominant, lum } = await analyzeBackground(bg, customDataUrl);
+  const generation = ++accentGeneration;
+  const resolvedCustomDataUrl = await customDataUrl;
+  if (generation !== accentGeneration) return;
+
+  const { dominant, lum } = await analyzeBackground(bg, resolvedCustomDataUrl);
+  if (generation !== accentGeneration) return;
+
   lastDominant = dominant;
   lastBgLum = lum;
   applyDerivedAccent(dominant);

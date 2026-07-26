@@ -1,4 +1,6 @@
 import { search, getPreviousTab } from '../utils/browserSearch.js';
+import { createFavicon } from '../utils/favicon.js';
+import { getEnabledLocalSearchSources } from '../utils/localSearch.js';
 
 const PROVIDER_URLS = {
   google: 'https://www.google.com/search?q=',
@@ -29,6 +31,7 @@ let allTabs = [];
 let workspaceData = null;
 let chromeGroups = [];
 let isSearching = false;
+let searchGeneration = 0;
 let meridianTabId = null;
 let draggedTabId = null;
 let collapsedSections = new Set();
@@ -61,30 +64,20 @@ async function loadAll() {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function faviconUrl(url) {
-  try {
-    const domain = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=16`;
-  } catch {
-    return '';
-  }
+function makeFaviconImg(url) {
+  return createFavicon(url, 'tab-favicon');
 }
 
-function makeFaviconImg(url, favIconUrl) {
-  const img = document.createElement('img');
-  img.className = 'tab-favicon';
-  const src = favIconUrl || (url ? faviconUrl(url) : '');
-  if (src) img.src = src;
-  img.onerror = () => {
-    let letter = '?';
-    try { letter = new URL(url).hostname.replace(/^www\./, '').charAt(0).toUpperCase() || '?'; } catch (_) {}
-    const ph = document.createElement('span');
-    ph.className = 'favicon-placeholder tab-favicon';
-    ph.style.cssText = 'font-size:10px';
-    ph.textContent = letter;
-    img.replaceWith(ph);
-  };
-  return img;
+function makeRowInteractive(row, label, activate) {
+  row.tabIndex = 0;
+  row.setAttribute('role', 'button');
+  row.setAttribute('aria-label', label);
+  row.addEventListener('click', activate);
+  row.addEventListener('keydown', (e) => {
+    if (e.target !== row || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault();
+    activate();
+  });
 }
 
 function makeSection(label, colorDot) {
@@ -181,7 +174,7 @@ function buildTabRow(tab) {
   row.className = 'tab-row';
   row.title = tab.title || tab.url || '';
 
-  row.appendChild(makeFaviconImg(tab.url, tab.favIconUrl));
+  row.appendChild(makeFaviconImg(tab.url));
 
   const body = document.createElement('div');
   body.className = 'tab-body';
@@ -202,7 +195,11 @@ function buildTabRow(tab) {
   });
   row.appendChild(closeBtn);
 
-  row.addEventListener('click', () => chrome.tabs.update(tab.id, { active: true }));
+  makeRowInteractive(
+    row,
+    `Switch to tab: ${tab.title || tab.url || 'Untitled'}`,
+    () => chrome.tabs.update(tab.id, { active: true }),
+  );
 
   attachDragEvents(row, tab);
   return row;
@@ -229,7 +226,7 @@ function renderTabList() {
     label.textContent = '↩';
     row.appendChild(label);
 
-    row.appendChild(makeFaviconImg(previousTab.url, previousTab.favIconUrl));
+    row.appendChild(makeFaviconImg(previousTab.url));
 
     const body = document.createElement('div');
     body.className = 'tab-body';
@@ -239,7 +236,11 @@ function renderTabList() {
     body.appendChild(title);
     row.appendChild(body);
 
-    row.addEventListener('click', () => chrome.tabs.update(previousTab.id, { active: true }));
+    makeRowInteractive(
+      row,
+      `Switch to previous tab: ${previousTab.title || previousTab.url || 'Untitled'}`,
+      () => chrome.tabs.update(previousTab.id, { active: true }),
+    );
     section.appendChild(row);
     container.appendChild(section);
   }
@@ -325,7 +326,7 @@ function buildResultRow(item) {
   const row = document.createElement('div');
   row.className = 'tab-row';
 
-  row.appendChild(makeFaviconImg(item.url, null));
+  row.appendChild(makeFaviconImg(item.url));
 
   const body = document.createElement('div');
   body.className = 'tab-body';
@@ -346,13 +347,17 @@ function buildResultRow(item) {
 
   row.appendChild(body);
 
-  row.addEventListener('click', async () => {
-    if (item.tabId != null) {
-      await chrome.tabs.update(item.tabId, { active: true });
-    } else {
-      await chrome.tabs.create({ url: item.url });
-    }
-  });
+  makeRowInteractive(
+    row,
+    `Open ${item.title || item.url || 'result'}`,
+    async () => {
+      if (item.tabId != null) {
+        await chrome.tabs.update(item.tabId, { active: true });
+      } else {
+        await chrome.tabs.create({ url: item.url });
+      }
+    },
+  );
 
   return row;
 }
@@ -364,14 +369,16 @@ function renderResultSection(container, label, items) {
   container.appendChild(section);
 }
 
-async function runSearch(q) {
+function isCurrentSearch(q, generation) {
+  return generation === searchGeneration && query === q;
+}
+
+async function runSearch(q, generation) {
   const container = document.getElementById('tab-list');
-  const results = await search(q);
-  const { localSearch } = await chrome.storage.sync.get("localSearch");
-  const ls = localSearch ?? { tabs: true, bookmarks: true, history: true };
-  if (!ls.tabs) results.tabs = [];
-  if (!ls.bookmarks) results.bookmarks = [];
-  if (!ls.history) results.history = [];
+  const enabledSources = await getEnabledLocalSearchSources();
+  if (!isCurrentSearch(q, generation)) return;
+  const results = await search(q, 'all', enabledSources);
+  if (!isCurrentSearch(q, generation)) return;
   container.innerHTML = '';
 
   const total =
@@ -379,6 +386,8 @@ async function runSearch(q) {
 
   if (total === 0) {
     const { searchProvider } = await chrome.storage.sync.get('searchProvider');
+    if (!isCurrentSearch(q, generation)) return;
+
     const baseUrl = PROVIDER_URLS[searchProvider] ?? PROVIDER_URLS.google;
 
     const empty = document.createElement('div');
@@ -419,6 +428,10 @@ chrome.tabs.onUpdated.addListener((_id, changeInfo) => {
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && (changes.workspaces || changes.previousTabId))
     refreshIfIdle();
+  if (area === 'sync' && changes.localSearch && isSearching) {
+    const generation = ++searchGeneration;
+    runSearch(query, generation);
+  }
 });
 
 if (hasNativeGroups) {
@@ -436,12 +449,13 @@ function attachListeners() {
 
   input.addEventListener('input', async () => {
     query = input.value.trim();
+    const generation = ++searchGeneration;
     if (query === '') {
       isSearching = false;
       renderTabList();
     } else {
       isSearching = true;
-      await runSearch(query);
+      await runSearch(query, generation);
     }
   });
 
@@ -462,6 +476,7 @@ function attachListeners() {
       e.preventDefault();
       input.value = '';
       query = '';
+      searchGeneration++;
       isSearching = false;
       renderTabList();
     }

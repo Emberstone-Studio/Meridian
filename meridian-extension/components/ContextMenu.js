@@ -72,6 +72,7 @@ export async function show(tab, x, y) {
         if (inChromeGroup) await chrome.tabs.ungroup([tab.id]).catch(() => {});
         const groupId = await chrome.tabs.group({ tabIds: [tab.id] });
         await chrome.tabGroups.update(groupId, { title: "New group" });
+        await unassignTab(tab.id);
         document.dispatchEvent(
           new CustomEvent("focus-lane-rename", {
             detail: { laneId: `cg_${groupId}` },

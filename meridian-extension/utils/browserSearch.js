@@ -7,6 +7,7 @@
  */
 
 import { mutateStorageValue } from "./storageMutationQueue.js";
+import { faviconUrl } from "./favicon.js";
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -25,20 +26,6 @@ function extractDomain(url) {
   } catch (_) {
     return "";
   }
-}
-
-/**
- * Build a favicon URL for a page using Chrome's local _favicon provider.
- * This resolves against the browser's own favicon cache — no network request
- * and no third-party leak of the user's browsing domains. Requires the
- * "favicon" permission in the manifest.
- */
-function faviconUrl(pageUrl) {
-  if (!pageUrl) return "";
-  const u = new URL(chrome.runtime.getURL("/_favicon/"));
-  u.searchParams.set("pageUrl", pageUrl);
-  u.searchParams.set("size", "16");
-  return u.toString();
 }
 
 /**
@@ -162,7 +149,7 @@ async function injectMetaExtractor(tabId) {
     if (!payload) return;
 
     await mutateStorageValue(INDEX_KEY, {}, (index) => {
-      if (!index[tabId]) return; // tab may have been removed
+      if (!index[tabId]) return;
       index[tabId].metaDescription = payload.metaDescription;
       index[tabId].headings = payload.headings;
     });
@@ -198,9 +185,8 @@ export function initTabIndex() {
       return;
     }
 
-    // Inject content script on full load to capture meta/headings
     if (changeInfo.status === "complete") {
-      injectMetaExtractor(tabId);
+      await injectMetaExtractor(tabId);
     }
   });
 
@@ -233,7 +219,7 @@ export async function rebuildIndex() {
   const tabs = await chrome.tabs.query({});
   // Seed from the existing index so entries written by the event listeners
   // (registered synchronously before this runs) — plus already-extracted
-  // meta/headings and lastActive — are preserved rather than overwritten.
+  // metadata and lastActive values — are preserved rather than overwritten.
   await mutateStorageValue(INDEX_KEY, {}, async (index) => {
     const rebuiltEntries = await Promise.all(
       tabs.map(async (tab) => [tab.id, await buildEntry(tab, index[tab.id])]),
@@ -243,7 +229,6 @@ export async function rebuildIndex() {
     }
   });
 
-  // Inject meta extractors for all currently loaded tabs (fire-and-forget)
   for (const tab of tabs) {
     if (tab.status === "complete") {
       injectMetaExtractor(tab.id);
@@ -257,17 +242,21 @@ export async function rebuildIndex() {
 
 /**
  * Compute a weighted fuzzy score for a tab entry against a query string.
- * Weights: title ×3, workspaceName ×2, domain ×1.5, url ×1, metaDescription ×0.5
+ * Weights: title ×3, workspaceName ×2, domain ×1.5, url ×1, metadata ×0.5
  */
 function scoreTabEntry(query, entry) {
   const titleScore = fuzzyScore(query, entry.title) * 3;
   const wsScore = fuzzyScore(query, entry.workspaceName) * 2;
   const domainScore = fuzzyScore(query, entry.domain) * 1.5;
   const urlScore = fuzzyScore(query, entry.url) * 1;
-  const metaScore = fuzzyScore(query, entry.metaDescription) * 0.5;
-
+  const metadataScore =
+    Math.max(
+      fuzzyScore(query, entry.metaDescription),
+      fuzzyScore(query, entry.headings),
+    ) * 0.5;
   const maxPossible = 3 + 2 + 1.5 + 1 + 0.5; // 8.0
-  const raw = titleScore + wsScore + domainScore + urlScore + metaScore;
+  const raw =
+    titleScore + wsScore + domainScore + urlScore + metadataScore;
   return raw / maxPossible; // normalise to 0–1
 }
 
@@ -291,18 +280,28 @@ function formatDate(ts) {
  * search(query) — run a cross-source search across tabs, bookmarks, and history.
  *
  * @param {string} query
+ * @param {string} scope
+ * @param {{ tabs?: boolean, bookmarks?: boolean, history?: boolean }} sources
  * @returns {Promise<{ tabs: ResultItem[], bookmarks: ResultItem[], history: ResultItem[] }>}
  */
-export async function search(query, scope = "all") {
+export async function search(
+  query,
+  scope = "all",
+  sources = { tabs: true, bookmarks: false, history: false },
+) {
   const trimmed = query?.trim() ?? "";
   if (!trimmed && scope === "all") {
     return { tabs: [], bookmarks: [], history: [] };
   }
 
   const [tabs, bookmarks, history] = await Promise.all([
-    scope === "all" ? searchTabs(trimmed) : [],
-    scope === "all" || scope === "bookmarks" ? searchBookmarks(trimmed) : [],
-    scope === "all" || scope === "history" ? searchHistory(trimmed) : [],
+    scope === "all" && sources.tabs ? searchTabs(trimmed) : [],
+    (scope === "all" || scope === "bookmarks") && sources.bookmarks
+      ? searchBookmarks(trimmed)
+      : [],
+    (scope === "all" || scope === "history") && sources.history
+      ? searchHistory(trimmed)
+      : [],
   ]);
 
   return { tabs, bookmarks, history };

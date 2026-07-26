@@ -18,6 +18,14 @@ Meridian is a local extension with no build step required.
 
 ---
 
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md) for the extension's data handling, local and sync
+storage, thumbnail capture, network behavior, permissions, and Chrome Web Store
+disclosure checklist.
+
+---
+
 ## Features
 
 ### Tab Cards & Workspace Lanes
@@ -28,6 +36,13 @@ Hover a tab card for 2 seconds to open a full-size preview lightbox showing the 
 
 ### Search Bar
 A multi-engine search bar sits at the top of every new-tab page. Switch between **Google**, **DuckDuckGo**, **Bing**, and **Brave** with a single click on the engine logo. Your preference is saved across sessions.
+
+### Local Search
+Open-tab search is available by default. Bookmark and history search are
+optional: Meridian asks for the corresponding Chrome permission only when you
+enable that source in **Settings → Local Search** or select its search scope.
+If access is denied or later revoked, that source stays off and Meridian does
+not query its API.
 
 ### Theming
 Choose **Light**, **Dark**, or **System** (follows OS preference). The selected theme is synced via `chrome.storage.sync`.
@@ -50,6 +65,15 @@ Configure what happens when you open a new tab:
 
 ### Thumbnails
 Trigger a full thumbnail refresh from settings. The background service worker captures tab screenshots via `captureVisibleTab`.
+
+Meridian keeps `<all_urls>` access installed for thumbnail capture. Chrome does
+not allow `activeTab` to cover automatic captures after tab activation or page
+load, so this access cannot be deferred to a click without removing the shipped
+live-thumbnail behavior. Meridian also uses the installed `scripting`
+permission and host access after a tab finishes loading to read that page's
+meta description and H1/H2 text into the local open-tab search index. This
+automatic indexing is what lets local search match page context beyond the tab
+title and URL; it does not read form input or page-body text.
 
 ### Keyboard Navigation
 

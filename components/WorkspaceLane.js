@@ -50,6 +50,47 @@ async function reorderInStorage(
   await mutateStorageValue("tabOrder", {}, (tabOrder) => {
     tabOrder[workspaceId] = newOrder;
   });
+
+  // Meridian-only lanes are not native Chrome groups, but their visible order
+  // should still match the browser tab strip. Browser order is per-window, so
+  // only move the dragged tab relative to lane peers in its existing window.
+  try {
+    const draggedTab = await chrome.tabs.get(draggedTabId);
+    const windowTabs = await chrome.tabs.query({ windowId: draggedTab.windowId });
+    const movableIds = new Set(
+      windowTabs
+        .filter((tab) => tab.pinned === draggedTab.pinned)
+        .map((tab) => tab.id),
+    );
+    const windowOrder = newOrder.filter((id) => movableIds.has(id));
+    const position = windowOrder.indexOf(draggedTabId);
+    const previousId = position > 0 ? windowOrder[position - 1] : null;
+    const nextId =
+      position >= 0 && position < windowOrder.length - 1
+        ? windowOrder[position + 1]
+        : null;
+
+    if (nextId != null) {
+      const nextTab = windowTabs.find((tab) => tab.id === nextId);
+      if (nextTab) {
+        const targetIndex =
+          draggedTab.index < nextTab.index ? nextTab.index - 1 : nextTab.index;
+        await chrome.tabs.move(draggedTabId, { index: targetIndex });
+      }
+    } else if (previousId != null) {
+      const previousTab = windowTabs.find((tab) => tab.id === previousId);
+      if (previousTab) {
+        const targetIndex =
+          previousTab.index + (draggedTab.index > previousTab.index ? 1 : 0);
+        await chrome.tabs.move(draggedTabId, { index: targetIndex });
+      }
+    }
+  } catch (error) {
+    console.warn(
+      "[Meridian] Could not mirror lane order to the browser tab bar:",
+      error,
+    );
+  }
 }
 
 const GROUP_COLORS = {
@@ -413,28 +454,30 @@ function startRename(titleEl, onCommit) {
   titleEl.focus();
   document.execCommand("selectAll", false, null);
 
-  function commit() {
+  function finish(cancelled = false) {
+    titleEl.removeEventListener("blur", onBlur);
+    titleEl.removeEventListener("keydown", onKeydown);
     titleEl.contentEditable = "false";
-    const newName = titleEl.textContent.trim() || original;
+    const newName = cancelled
+      ? original
+      : titleEl.textContent.trim() || original;
     titleEl.textContent = newName;
-    if (newName !== original) onCommit?.(newName);
+    if (!cancelled && newName !== original) onCommit?.(newName);
   }
 
-  titleEl.addEventListener("blur", commit, { once: true });
-  titleEl.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        titleEl.blur();
-      }
-      if (e.key === "Escape") {
-        titleEl.textContent = original;
-        titleEl.blur();
-      }
-    },
-    { once: true },
-  );
+  function onBlur() {
+    finish();
+  }
+
+  function onKeydown(e) {
+    if (e.key !== "Enter" && e.key !== "Escape") return;
+    e.preventDefault();
+    finish(e.key === "Escape");
+    titleEl.blur();
+  }
+
+  titleEl.addEventListener("blur", onBlur);
+  titleEl.addEventListener("keydown", onKeydown);
 }
 
 // ---- Group color picker (a small palette popover off the color dot) ----

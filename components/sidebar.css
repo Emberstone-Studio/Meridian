@@ -182,6 +182,12 @@ body {
   background: color-mix(in srgb, CanvasText 8%, transparent);
 }
 
+.tab-row:focus-visible {
+  outline: 2px solid LinkText;
+  outline-offset: -2px;
+  background: color-mix(in srgb, CanvasText 8%, transparent);
+}
+
 .tab-row.dragging {
   opacity: 0.4;
 }
@@ -258,7 +264,8 @@ body {
   justify-content: center;
 }
 
-.tab-row:hover .tab-close-btn {
+.tab-row:hover .tab-close-btn,
+.tab-row:focus-within .tab-close-btn {
   visibility: visible;
   pointer-events: auto;
 }
@@ -331,7 +338,6 @@ body {
 
 /* ---- Narrow (icon-only) mode ---- */
 
-body.narrow .sidebar-title,
 body.narrow #search-zone,
 body.narrow .section-label span,
 body.narrow .tab-title,
@@ -343,11 +349,6 @@ body.narrow #new-tab-label {
 
 body.narrow .tab-close-btn {
   display: none;
-}
-
-body.narrow #sidebar-header {
-  justify-content: center;
-  padding: 10px 0;
 }
 
 body.narrow .tab-row {

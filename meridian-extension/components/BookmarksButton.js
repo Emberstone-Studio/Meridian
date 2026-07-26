@@ -1,3 +1,5 @@
+import { createFavicon } from "../utils/favicon.js";
+
 export function flattenBookmarks(nodes) {
   return nodes.flatMap((node) => [
     ...(node.url ? [node] : []),
@@ -23,13 +25,6 @@ export function allBookmarksRoot(root, bar) {
     .flatMap((node) => node.children || []);
 }
 
-function faviconUrl(pageUrl) {
-  const url = new URL(chrome.runtime.getURL("/_favicon/"));
-  url.searchParams.set("pageUrl", pageUrl);
-  url.searchParams.set("size", "16");
-  return url.toString();
-}
-
 function folderIcon() {
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   svg.setAttribute("viewBox", "0 0 24 24");
@@ -53,7 +48,10 @@ function folderIcon() {
 // directly below the search field. Bookmarks: browsable tabbed / folder view
 // when empty, flat filtered results when typing. History: recent list when
 // empty, filtered when typing (via the injected historyProvider).
-export function createScopePopup(popup, { openItem, historyProvider }) {
+export function createScopePopup(
+  popup,
+  { openItem, historyProvider, isSourceEnabled = async () => false },
+) {
   const panel = popup.el; // the shared search-popup shell element
   let scope = null; // "bookmarks" | "history"
   let query = "";
@@ -69,12 +67,14 @@ export function createScopePopup(popup, { openItem, historyProvider }) {
   // History state
   let historyItems = [];
   let histSeq = 0;
+  let scopeSeq = 0;
 
   function isOpen() {
     return popup.isOpen();
   }
 
   function close() {
+    scopeSeq += 1;
     popup.close();
   }
 
@@ -92,11 +92,7 @@ export function createScopePopup(popup, { openItem, historyProvider }) {
     row.className = "bookmark-row";
     row.title = item.url;
 
-    const favicon = document.createElement("img");
-    favicon.className = "bookmark-favicon";
-    favicon.alt = "";
-    favicon.src = item.favicon || faviconUrl(item.url);
-    favicon.addEventListener("error", () => favicon.classList.add("hidden"));
+    const favicon = createFavicon(item.url, "bookmark-favicon");
 
     const label = document.createElement("span");
     label.textContent = item.title || item.url;
@@ -259,27 +255,46 @@ export function createScopePopup(popup, { openItem, historyProvider }) {
     return true;
   }
 
-  async function openScope(next) {
+  async function openScope(next, initialQuery = "") {
+    const seq = ++scopeSeq;
     scope = next;
-    query = "";
+    query = initialQuery || "";
     panel.setAttribute(
       "aria-label",
       next === "history" ? "History" : "Bookmarks",
     );
 
     try {
+      if (!(await isSourceEnabled(next))) {
+        if (seq !== scopeSeq) return;
+        panel.replaceChildren();
+        renderEmpty(
+          `${next === "history" ? "History" : "Bookmark"} access is off. Enable it in Settings to search this source.`,
+        );
+        popup.open();
+        return;
+      }
       if (next === "bookmarks") {
         if (!bmLoaded) await loadBookmarks();
       } else if (next === "history") {
-        await fetchHistory("");
+        // The field can keep changing while permission/data loading is in
+        // flight. Fetch until the results match the latest retained query.
+        let requestedQuery;
+        do {
+          requestedQuery = query;
+          await fetchHistory(requestedQuery);
+          if (seq !== scopeSeq) return;
+        } while (requestedQuery !== query);
       }
     } catch {
+      if (seq !== scopeSeq) return;
       panel.replaceChildren();
       renderEmpty("Could not load");
       popup.open();
       return;
     }
 
+    if (seq !== scopeSeq) return;
     popup.open();
     render();
   }
