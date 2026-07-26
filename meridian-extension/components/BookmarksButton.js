@@ -1,4 +1,5 @@
 import { createFavicon } from "../utils/favicon.js";
+import { createSearchSelection } from "./SearchSelection.js";
 
 export function flattenBookmarks(nodes) {
   return nodes.flatMap((node) => [
@@ -23,6 +24,29 @@ export function allBookmarksRoot(root, bar) {
   return (root.children || [])
     .filter((node) => node !== bar)
     .flatMap((node) => node.children || []);
+}
+
+export async function openBookmarkFolderInGroup(folder, api = chrome) {
+  const bookmarks = flattenBookmarks(folder.children || []);
+  if (!bookmarks.length) return null;
+
+  const createdTabs = await Promise.all(
+    bookmarks.map(({ url }) => api.tabs.create({ url, active: false })),
+  );
+  const tabIds = createdTabs
+    .map((tab) => tab.id)
+    .filter((id) => Number.isInteger(id));
+
+  if (tabIds.length !== bookmarks.length) {
+    throw new Error("Chrome did not return an ID for every opened bookmark");
+  }
+
+  const groupId = await api.tabs.group({ tabIds });
+  await api.tabGroups.update(groupId, {
+    title: folder.title || "Untitled folder",
+  });
+  await api.tabs.update(tabIds[0], { active: true });
+  return groupId;
 }
 
 function folderIcon() {
@@ -50,9 +74,20 @@ function folderIcon() {
 // empty, filtered when typing (via the injected historyProvider).
 export function createScopePopup(
   popup,
-  { openItem, historyProvider, isSourceEnabled = async () => false },
+  {
+    openItem,
+    historyProvider,
+    isSourceEnabled = async () => false,
+    announce,
+    onActiveDescendantChange,
+  },
 ) {
   const panel = popup.el; // the shared search-popup shell element
+  const selection = createSearchSelection(popup, {
+    rowSelector: ".bookmark-row",
+    idPrefix: "bookmark-result",
+    onActiveDescendantChange,
+  });
   let scope = null; // "bookmarks" | "history"
   let query = "";
 
@@ -75,14 +110,27 @@ export function createScopePopup(
 
   function close() {
     scopeSeq += 1;
+    selection.reset();
     popup.close();
   }
 
-  function renderEmpty(text) {
+  function makeResultsList() {
+    const list = document.createElement("div");
+    list.className = "bookmarks-list";
+    list.id = "bookmarks-results-listbox";
+    list.setAttribute("role", "listbox");
+    list.setAttribute(
+      "aria-label",
+      `${scope === "history" ? "History" : "Bookmark"} results`,
+    );
+    return list;
+  }
+
+  function renderEmpty(list, text) {
     const message = document.createElement("p");
     message.className = "bookmarks-empty";
     message.textContent = text;
-    panel.appendChild(message);
+    list.appendChild(message);
   }
 
   // Generic result row (favicon + label). Works for bookmark leaves and history.
@@ -152,6 +200,7 @@ export function createScopePopup(
     if (view === "all" && path.length) {
       const subnav = document.createElement("div");
       subnav.className = "bookmarks-subnav";
+      const folder = path[path.length - 1];
 
       const back = document.createElement("button");
       back.type = "button";
@@ -164,9 +213,32 @@ export function createScopePopup(
 
       const title = document.createElement("strong");
       title.className = "bookmarks-subnav-title";
-      title.textContent = path[path.length - 1].title || "Folder";
+      title.textContent = folder.title || "Folder";
 
-      subnav.append(back, title);
+      const bookmarkCount = flattenBookmarks(folder.children || []).length;
+      const openAll = document.createElement("button");
+      openAll.type = "button";
+      openAll.className = "bookmarks-open-group";
+      openAll.textContent = "Open all in group";
+      openAll.disabled = bookmarkCount === 0;
+      openAll.title = bookmarkCount
+        ? `Open ${bookmarkCount} bookmark${bookmarkCount === 1 ? "" : "s"} in a new group`
+        : "This folder has no bookmarks";
+      openAll.addEventListener("click", async () => {
+        openAll.disabled = true;
+        openAll.setAttribute("aria-busy", "true");
+        try {
+          await openBookmarkFolderInGroup(folder);
+          close();
+        } catch (error) {
+          console.error("Could not open bookmark folder in a group", error);
+          openAll.textContent = "Could not open";
+        } finally {
+          openAll.removeAttribute("aria-busy");
+        }
+      });
+
+      subnav.append(back, title, openAll);
       header.appendChild(subnav);
     }
     return header;
@@ -188,12 +260,12 @@ export function createScopePopup(
           (b.title || "").toLowerCase().includes(q) ||
           (b.url || "").toLowerCase().includes(q),
       );
+      const list = makeResultsList();
       if (!matches.length) {
-        renderEmpty("No bookmarks match");
+        renderEmpty(list, "No bookmarks match");
+        panel.appendChild(list);
         return;
       }
-      const list = document.createElement("div");
-      list.className = "bookmarks-list";
       for (const b of matches.slice(0, 200)) list.appendChild(makeItemRow(b));
       panel.appendChild(list);
       return;
@@ -202,13 +274,13 @@ export function createScopePopup(
     // Empty → browsable tabbed / folder view.
     panel.appendChild(renderHeader());
     const nodes = currentNodes();
+    const list = makeResultsList();
     if (!nodes.length) {
-      renderEmpty("No bookmarks");
+      renderEmpty(list, "No bookmarks");
+      panel.appendChild(list);
       return;
     }
 
-    const list = document.createElement("div");
-    list.className = "bookmarks-list";
     // Folders first, then bookmarks — matches how bookmark managers group them.
     for (const node of nodes) {
       if (!node.url) list.appendChild(makeFolderRow(node));
@@ -220,12 +292,15 @@ export function createScopePopup(
   }
 
   function renderHistory() {
+    const list = makeResultsList();
     if (!historyItems.length) {
-      renderEmpty(query.trim() ? "No history match" : "No history");
+      renderEmpty(
+        list,
+        query.trim() ? "No history match" : "No history",
+      );
+      panel.appendChild(list);
       return;
     }
-    const list = document.createElement("div");
-    list.className = "bookmarks-list";
     for (const item of historyItems.slice(0, 200)) {
       list.appendChild(makeItemRow(item));
     }
@@ -233,9 +308,22 @@ export function createScopePopup(
   }
 
   function render() {
+    selection.reset();
     panel.replaceChildren();
     if (scope === "history") renderHistory();
     else renderBookmarks();
+    const count = selection.sync();
+    if (count) {
+      announce?.(
+        `${count} ${scope === "history" ? "history" : "bookmark"} result${count === 1 ? "" : "s"} available.`,
+      );
+    } else {
+      announce?.(
+        query.trim()
+          ? `No ${scope === "history" ? "history" : "bookmark"} results found.`
+          : `No ${scope === "history" ? "history entries" : "bookmarks"} available.`,
+      );
+    }
   }
 
   async function loadBookmarks() {
@@ -257,21 +345,32 @@ export function createScopePopup(
 
   async function openScope(next, initialQuery = "") {
     const seq = ++scopeSeq;
+    selection.reset();
     scope = next;
     query = initialQuery || "";
     panel.setAttribute(
       "aria-label",
       next === "history" ? "History" : "Bookmarks",
     );
+    announce?.(
+      `${next === "history" ? "History" : "Bookmarks"} search scope selected. Loading ${next === "history" ? "history" : "bookmark"} results.`,
+    );
 
     try {
       if (!(await isSourceEnabled(next))) {
         if (seq !== scopeSeq) return;
         panel.replaceChildren();
+        const list = makeResultsList();
         renderEmpty(
+          list,
           `${next === "history" ? "History" : "Bookmark"} access is off. Enable it in Settings to search this source.`,
         );
+        panel.appendChild(list);
+        selection.sync();
         popup.open();
+        announce?.(
+          `${next === "history" ? "History" : "Bookmark"} access is off. Enable it in Settings to search this source.`,
+        );
         return;
       }
       if (next === "bookmarks") {
@@ -289,17 +388,24 @@ export function createScopePopup(
     } catch {
       if (seq !== scopeSeq) return;
       panel.replaceChildren();
-      renderEmpty("Could not load");
+      const list = makeResultsList();
+      renderEmpty(list, "Could not load");
+      panel.appendChild(list);
+      selection.sync();
       popup.open();
+      announce?.(
+        `Could not load ${next === "history" ? "history" : "bookmark"} results.`,
+      );
       return;
     }
 
     if (seq !== scopeSeq) return;
-    popup.open();
     render();
+    popup.open();
   }
 
   async function setQuery(next) {
+    selection.reset();
     query = next || "";
     if (!isOpen()) return;
     if (scope === "history") {
@@ -311,6 +417,15 @@ export function createScopePopup(
   }
 
   panel.addEventListener("click", (event) => event.stopPropagation());
+  panel.appendChild(makeResultsList());
 
-  return { openScope, close, isOpen, setQuery };
+  return {
+    openScope,
+    close,
+    isOpen,
+    setQuery,
+    moveSelection: selection.move,
+    activateSelection: selection.activate,
+    resetSelection: selection.reset,
+  };
 }

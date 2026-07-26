@@ -10,8 +10,21 @@ import { mutateStorageValue } from "../utils/storageMutationQueue.js";
 
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
-// Tracks which tab is being dragged and from which lane, for same-lane reordering
-const dragState = { tabId: null, laneId: null };
+// Tracks which tab is being dragged and from which lane, for same-lane
+// reordering. Keeping the source element lets every drop path clean up even
+// when Chrome updates the tab model before the browser emits `dragend`.
+const dragState = { tabId: null, laneId: null, sourceCard: null };
+
+export function isTabDragActive() {
+  return dragState.tabId !== null;
+}
+
+export function finishTabDrag() {
+  dragState.sourceCard?.classList.remove("dragging");
+  dragState.tabId = null;
+  dragState.laneId = null;
+  dragState.sourceCard = null;
+}
 
 // refTabId: the tab that should follow the dragged tab in the new order (null = insert at end)
 async function reorderInChromeGroup(draggedTabId, refTabId, groupId) {
@@ -138,7 +151,10 @@ export function createWorkspaceLane(
     // Clickable color dot: opens a palette of the browser's group colors.
     const dot = document.createElement("button");
     dot.className = "lane-group-dot";
-    dot.style.background = GROUP_COLORS[chromeGroup.color] ?? "#9aa0a6";
+    dot.style.setProperty(
+      "--group-color",
+      GROUP_COLORS[chromeGroup.color] ?? "#9aa0a6",
+    );
     dot.setAttribute("aria-label", "Change group color");
     dot.title = "Change color";
     if (hasNativeGroups) {
@@ -246,39 +262,6 @@ export function createWorkspaceLane(
   let dropPlaceholder = null;
   let lastInsertRef = undefined;
 
-  function liveItems() {
-    return [...grid.children].filter(
-      (c) => c !== dropPlaceholder && !c.classList.contains("dragging"),
-    );
-  }
-
-  function applyFlip(items, first) {
-    const last = new Map(items.map((c) => [c, c.getBoundingClientRect()]));
-    for (const item of items) {
-      const f = first.get(item),
-        l = last.get(item);
-      if (!f || !l) continue;
-      const dx = f.left - l.left,
-        dy = f.top - l.top;
-      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue;
-      item.style.transition = "none";
-      item.style.transform = `translate(${dx}px,${dy}px)`;
-    }
-    grid.offsetHeight; // single forced reflow
-    for (const item of items) {
-      if (!item.style.transform) continue;
-      item.style.transition = "transform 150ms ease";
-      item.style.transform = "";
-      item.addEventListener(
-        "transitionend",
-        () => {
-          item.style.transition = "";
-        },
-        { once: true },
-      );
-    }
-  }
-
   function commitReorder(draggedTabId) {
     // Read where the placeholder sits to determine the new position
     let ref = dropPlaceholder?.nextElementSibling;
@@ -321,19 +304,13 @@ export function createWorkspaceLane(
     if (insertRef === lastInsertRef && dropPlaceholder.parentNode === grid)
       return;
     lastInsertRef = insertRef;
-    const items = liveItems();
-    const first = new Map(items.map((c) => [c, c.getBoundingClientRect()]));
     grid.insertBefore(dropPlaceholder, insertRef ?? null);
-    applyFlip(items, first);
   }
 
   function removePlaceholder() {
     if (!dropPlaceholder?.parentNode) return;
-    const items = liveItems();
-    const first = new Map(items.map((c) => [c, c.getBoundingClientRect()]));
     dropPlaceholder.remove();
     lastInsertRef = undefined;
-    applyFlip(items, first);
   }
 
   const tabIds = tabs.map((t) => t.id);
@@ -355,12 +332,12 @@ export function createWorkspaceLane(
       card.addEventListener("dragstart", () => {
         dragState.tabId = tab.id;
         dragState.laneId = workspace.id;
+        dragState.sourceCard = card;
       });
 
       card.addEventListener("dragend", () => {
         removePlaceholder();
-        dragState.tabId = null;
-        dragState.laneId = null;
+        finishTabDrag();
       });
 
       card.addEventListener("dragover", (e) => {
@@ -411,6 +388,7 @@ export function createWorkspaceLane(
       const draggedTabId = dragState.tabId;
       const reorderPromise = commitReorder(draggedTabId); // reads nextElementSibling synchronously
       removePlaceholder();
+      finishTabDrag();
       await reorderPromise;
       lane.dispatchEvent(
         new CustomEvent("workspace-reassigned", { bubbles: true }),
@@ -420,6 +398,7 @@ export function createWorkspaceLane(
 
     removePlaceholder();
     const tabId = parseInt(e.dataTransfer.getData("text/plain"), 10);
+    finishTabDrag();
     if (!tabId) return;
 
     if (chromeGroup) {
@@ -515,7 +494,7 @@ function openColorPicker(anchor, chromeGroup) {
     const sw = document.createElement("button");
     sw.className =
       "lane-color-swatch" + (name === chromeGroup.color ? " selected" : "");
-    sw.style.background = hex;
+    sw.style.setProperty("--group-color", hex);
     sw.title = name.charAt(0).toUpperCase() + name.slice(1);
     sw.setAttribute("aria-label", sw.title);
     sw.addEventListener("click", (e) => {
@@ -528,13 +507,17 @@ function openColorPicker(anchor, chromeGroup) {
 
   document.body.appendChild(pop);
   const r = anchor.getBoundingClientRect();
-  pop.style.left = `${r.left}px`;
-  pop.style.top = `${r.bottom + 6}px`;
+  pop.style.setProperty("--context-menu-left", `${r.left}px`);
+  pop.style.setProperty("--context-menu-top", `${r.bottom + 6}px`);
   // Nudge back on-screen if clipped at the right edge.
   requestAnimationFrame(() => {
     const pr = pop.getBoundingClientRect();
-    if (pr.right > window.innerWidth)
-      pop.style.left = `${window.innerWidth - pr.width - 8}px`;
+    if (pr.right > window.innerWidth) {
+      pop.style.setProperty(
+        "--context-menu-left",
+        `${window.innerWidth - pr.width - 8}px`,
+      );
+    }
   });
 
   activeColorPopover = pop;

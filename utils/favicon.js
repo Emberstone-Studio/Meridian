@@ -24,7 +24,6 @@ export function faviconFallbackLetter(pageUrl) {
 function makeFaviconPlaceholder(pageUrl, className) {
   const placeholder = document.createElement("span");
   placeholder.className = `${className} favicon-placeholder`;
-  placeholder.style.fontSize = "10px";
   placeholder.textContent = faviconFallbackLetter(pageUrl);
   placeholder.setAttribute("aria-hidden", "true");
   return placeholder;

@@ -157,6 +157,7 @@ body {
 }
 
 .group-dot {
+  background: var(--group-color, GrayText);
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -219,6 +220,7 @@ body {
   color: Canvas;
   font-weight: 700;
   flex-shrink: 0;
+  font-size: 10px;
   line-height: 1;
 }
 

@@ -1,6 +1,7 @@
 import { search, getPreviousTab } from '../utils/browserSearch.js';
 import { createFavicon } from '../utils/favicon.js';
 import { getEnabledLocalSearchSources } from '../utils/localSearch.js';
+import { watchToolbarIconTheme } from '../utils/toolbarIcon.js';
 
 const PROVIDER_URLS = {
   google: 'https://www.google.com/search?q=',
@@ -93,7 +94,7 @@ function makeSection(label, colorDot) {
     if (colorDot) {
       const dot = document.createElement('span');
       dot.className = 'group-dot';
-      dot.style.background = colorDot;
+      dot.style.setProperty('--group-color', colorDot);
       labelRow.appendChild(dot);
     }
 
@@ -497,46 +498,6 @@ function attachListeners() {
 // Toolbar icon — swap to white fill in dark mode
 // ---------------------------------------------------------------------------
 
-async function updateToolbarIcon(isDark) {
-  try {
-    const svgUrl = chrome.runtime.getURL('img/Meridian.svg');
-    let svgText = await fetch(svgUrl).then((r) => r.text());
-
-    if (isDark) {
-      svgText = svgText.replace('<svg ', '<svg fill="white" ');
-    }
-
-    const blob = new Blob([svgText], { type: 'image/svg+xml' });
-    const blobUrl = URL.createObjectURL(blob);
-
-    const imageData = Object.fromEntries(
-      await Promise.all(
-        [16, 32].map(
-          (size) =>
-            new Promise((resolve, reject) => {
-              const img = new Image();
-              img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, size, size);
-                resolve([size, ctx.getImageData(0, 0, size, size)]);
-              };
-              img.onerror = reject;
-              img.src = blobUrl;
-            }),
-        ),
-      ),
-    );
-
-    URL.revokeObjectURL(blobUrl);
-    await chrome.action.setIcon({ imageData });
-  } catch (_) {
-    // Falls back to the static PNG in manifest
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Narrow mode (icon-only when panel is very narrow)
 // ---------------------------------------------------------------------------
@@ -555,9 +516,7 @@ function setupResizeObserver() {
 async function init() {
   document.getElementById('sidebar-logo').src = chrome.runtime.getURL('img/icon32.png');
 
-  const scheme = window.matchMedia('(prefers-color-scheme: dark)');
-  updateToolbarIcon(scheme.matches);
-  scheme.addEventListener('change', (e) => updateToolbarIcon(e.matches));
+  watchToolbarIconTheme();
 
   const { [COLLAPSED_KEY]: saved } = await chrome.storage.local.get(COLLAPSED_KEY);
   if (Array.isArray(saved)) collapsedSections = new Set(saved);

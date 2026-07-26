@@ -1,5 +1,9 @@
 import { createSearchBar } from "./components/SearchBar.js";
-import { createWorkspaceLane } from "./components/WorkspaceLane.js";
+import {
+  createWorkspaceLane,
+  finishTabDrag,
+  isTabDragActive,
+} from "./components/WorkspaceLane.js";
 import { search } from "./utils/browserSearch.js";
 import {
   createSettingsPanel,
@@ -16,6 +20,9 @@ import {
   setLocalSearchSourceEnabled,
 } from "./utils/localSearch.js";
 import { normalizeHomepageUrl } from "./utils/homepageUrl.js";
+import { openUrlFromMeridian } from "./utils/tabNavigation.js";
+import { normalizeUrlInput } from "./utils/urlInput.js";
+import { watchToolbarIconTheme } from "./utils/toolbarIcon.js";
 import {
   getWorkspaceData,
   createWorkspace,
@@ -27,6 +34,7 @@ import {
 } from "./components/ContextMenu.js";
 import { createScopePopup } from "./components/BookmarksButton.js";
 import { createSearchPopup } from "./components/SearchPopup.js";
+import { createSearchSelection } from "./components/SearchSelection.js";
 
 const hasNativeGroups = typeof chrome.tabGroups !== "undefined";
 
@@ -98,10 +106,8 @@ function setupLightbox() {
 
     if (tab.favIconUrl) {
       faviconEl.src = tab.favIconUrl;
-      faviconEl.style.display = "";
-    } else {
-      faviconEl.style.display = "none";
     }
+    faviconEl.classList.toggle("hidden", !tab.favIconUrl);
 
     titleEl.textContent = tab.title || tab.url || "New Tab";
     urlEl.textContent = tab.url || "";
@@ -128,10 +134,10 @@ function setupLightbox() {
     const originY = Math.round(
       ((rect.top + rect.height / 2 - top) / approxH) * 100,
     );
-    lightbox.style.transformOrigin = `${originX}% ${originY}%`;
-
-    lightbox.style.left = `${left}px`;
-    lightbox.style.top = `${top}px`;
+    lightbox.style.setProperty("--lightbox-origin-x", `${originX}%`);
+    lightbox.style.setProperty("--lightbox-origin-y", `${originY}%`);
+    lightbox.style.setProperty("--lightbox-left", `${left}px`);
+    lightbox.style.setProperty("--lightbox-top", `${top}px`);
     lightbox.classList.remove("hidden");
   }
 
@@ -196,6 +202,7 @@ let searchBarApi = null;
 let browserSearchActive = false;
 let browserSearchSequence = 0;
 let resultsPopup = null; // shared shell for the "search everything" results
+let resultsSelection = null;
 let settingsPopup = null; // shared shell for the settings dropdown
 
 function setupKeyboardNav() {
@@ -286,17 +293,18 @@ function closeSettings() {
   settingsPopup?.close();
 }
 
+function openSettingsFromSearch() {
+  if (searchBarApi.getScope() !== "all") searchBarApi.setScope("all");
+
+  // Resetting a retained scoped query starts an asynchronous Anything search.
+  // Invalidate it before Settings opens so its eventual result popup cannot
+  // reclaim the shared popup slot and close Settings.
+  clearBrowserSearch();
+  openSettings();
+}
+
 async function openBookmark(url) {
-  const newTabBehavior = await getNewTabBehavior();
-  // location.assign() only works for web URLs; chrome://, file://, etc. are
-  // blocked as scripted navigations and would silently no-op in current-tab
-  // mode. Route non-web schemes through tabs.create so both modes behave.
-  const isWebUrl = /^https?:\/\//i.test(url);
-  if (newTabBehavior === "focus-pinned" || !isWebUrl) {
-    await chrome.tabs.create({ url });
-  } else {
-    window.location.assign(url);
-  }
+  await openUrlFromMeridian(url);
 }
 
 function colorLabel(color) {
@@ -305,10 +313,23 @@ function colorLabel(color) {
 
 let renderTimer = null;
 let renderRunning = false;
+let renderDeferredByDrag = false;
 
 function scheduleRender() {
+  // Replacing the lane DOM during a native drag removes the source element,
+  // which prevents `dragend` from firing and leaves Meridian stuck in its drag
+  // state. Hold browser/storage-driven renders until the gesture is finished.
+  if (isTabDragActive()) {
+    renderDeferredByDrag = true;
+    return;
+  }
+
   clearTimeout(renderTimer);
   renderTimer = setTimeout(async () => {
+    if (isTabDragActive()) {
+      renderDeferredByDrag = true;
+      return;
+    }
     if (renderRunning) {
       scheduleRender();
       return;
@@ -320,6 +341,12 @@ function scheduleRender() {
       renderRunning = false;
     }
   }, 50);
+}
+
+function flushDeferredDragRender() {
+  if (!renderDeferredByDrag) return;
+  renderDeferredByDrag = false;
+  scheduleRender();
 }
 
 function sortByTabOrder(tabs, order) {
@@ -463,19 +490,11 @@ async function render() {
   }
 }
 
-function resetGridFilter() {
-  document.querySelectorAll(".workspace-lane").forEach((lane) => {
-    lane.style.display = "";
-    lane.querySelectorAll(".tab-card").forEach((card) => {
-      card.style.display = "";
-    });
-  });
-}
-
 function clearBrowserSearch() {
   browserSearchActive = false;
-  resetGridFilter();
+  browserSearchSequence += 1;
 
+  resultsSelection?.reset();
   resultsPopup?.close();
   resultsPopup?.el.replaceChildren();
 }
@@ -495,7 +514,6 @@ function buildResultRow(item) {
     try { letter = new URL(item.url).hostname.replace(/^www\./, "").charAt(0).toUpperCase() || "?"; } catch (_) {}
     const ph = document.createElement("span");
     ph.className = "favicon-placeholder";
-    ph.style.cssText = "width:16px;height:16px;font-size:10px";
     ph.textContent = letter;
     favicon.replaceWith(ph);
   };
@@ -526,7 +544,7 @@ function buildResultRow(item) {
     if (item.tabId != null) {
       chrome.tabs.update(item.tabId, { active: true });
     } else {
-      chrome.tabs.create({ url: item.url });
+      openUrlFromMeridian(item.url);
     }
   });
 
@@ -540,6 +558,7 @@ function buildResultRow(item) {
 function renderSearchResults(results, query, scope = "all") {
   if (!resultsPopup) return;
   const container = resultsPopup.el;
+  resultsSelection?.reset();
   container.innerHTML = "";
 
   const sections = [
@@ -555,7 +574,10 @@ function renderSearchResults(results, query, scope = "all") {
 
     const heading = document.createElement("div");
     heading.className = "search-results-label";
+    heading.id = `search-results-${label.toLowerCase().replaceAll(" ", "-")}-label`;
     heading.textContent = label;
+    section.setAttribute("role", "group");
+    section.setAttribute("aria-labelledby", heading.id);
     section.appendChild(heading);
 
     for (const item of items.slice(0, 10)) {
@@ -577,6 +599,12 @@ function renderSearchResults(results, query, scope = "all") {
       container.appendChild(empty);
     }
     resultsPopup.open();
+    const count = resultsSelection?.sync?.() ?? 0;
+    searchBarApi?.announce?.(
+      count
+        ? `${count} result${count === 1 ? "" : "s"} available.`
+        : "No results found.",
+    );
     return;
   }
 
@@ -587,21 +615,35 @@ function renderSearchResults(results, query, scope = "all") {
   }
 
   // Show the dropdown only when it actually has something to show.
-  if (container.childElementCount > 0) resultsPopup.open();
-  else resultsPopup.close();
+  if (container.childElementCount > 0) {
+    resultsPopup.open();
+    const count = resultsSelection?.sync?.() ?? 0;
+    searchBarApi?.announce?.(
+      `${count} result${count === 1 ? "" : "s"} available.`,
+    );
+  } else {
+    resultsPopup.close();
+    searchBarApi?.announce?.("No results found.");
+  }
 }
 
 function buildWebSearchSection(query) {
   // The provider is chosen in Settings; this section just launches it.
   const provider =
     searchBarApi?.getProvider?.() ?? searchBarApi?.getProviders?.()?.[0];
+  const directUrl = normalizeUrlInput(query);
+  const targetUrl =
+    directUrl ?? (provider?.url ? provider.url + encodeURIComponent(query) : "");
 
   const section = document.createElement("div");
   section.className = "search-results-section search-web-section";
 
   const heading = document.createElement("div");
   heading.className = "search-results-label";
+  heading.id = "search-results-web-label";
   heading.textContent = "Web";
+  section.setAttribute("role", "group");
+  section.setAttribute("aria-labelledby", heading.id);
   section.appendChild(heading);
 
   const go = document.createElement("button");
@@ -613,7 +655,7 @@ function buildWebSearchSection(query) {
   fav.alt = "";
   fav.src = provider?.favicon ?? "";
   fav.onerror = () => {
-    fav.style.visibility = "hidden";
+    fav.classList.add("load-failed");
   };
 
   const body = document.createElement("span");
@@ -621,17 +663,19 @@ function buildWebSearchSection(query) {
 
   const title = document.createElement("span");
   title.className = "result-title";
-  title.textContent = `Search ${provider?.name ?? "the web"} for "${query}"`;
+  title.textContent = directUrl
+    ? `Go to ${query}`
+    : `Search ${provider?.name ?? "the web"} for "${query}"`;
 
   const meta = document.createElement("span");
   meta.className = "result-meta";
-  meta.textContent = "Web search";
+  meta.textContent = directUrl ? "Open URL" : "Web search";
 
   body.append(title, meta);
   go.append(fav, body);
   go.addEventListener("click", () => {
-    if (!provider) return;
-    chrome.tabs.create({ url: provider.url + encodeURIComponent(query) });
+    if (!targetUrl) return;
+    openUrlFromMeridian(targetUrl);
     // Launching the search is "done" — reset the field (and close this
     // dropdown) so returning to the tab starts fresh, not on the stale query.
     searchBarApi?.clearSearch?.();
@@ -644,10 +688,12 @@ function buildWebSearchSection(query) {
 async function handleBrowserQuery(query, scope = "all") {
   browserSearchActive = true;
   const searchSequence = ++browserSearchSequence;
+  if (!resultsPopup?.isOpen()) {
+    searchBarApi?.announce?.("Loading search results.");
+  }
 
   // Results live in the popup only; leave the board unfiltered in every
   // scope so search-everything behaves like the bookmarks/history popup.
-  resetGridFilter();
 
   const enabledSources = await getEnabledLocalSearchSources();
   if (!browserSearchActive || searchSequence !== browserSearchSequence) return;
@@ -658,72 +704,14 @@ async function handleBrowserQuery(query, scope = "all") {
 }
 
 async function init() {
-  // Inject styles for browser search results
-  const style = document.createElement("style");
-  style.textContent = `
-    /* Placement + chrome come from the shared .search-popup class; only the
-       results' own inner padding lives here. */
-    #browser-search-results { padding: 16px 20px 24px; }
-    .search-results-section { margin-bottom: 16px; }
-    .search-results-section:last-child { margin-bottom: 0; }
-    .search-results-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      padding: 8px 0 4px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 4px;
-    }
-    .result-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 4px;
-      cursor: pointer;
-      border-radius: var(--radius-sm);
-      transition: background var(--transition);
-    }
-    .result-row:hover, .result-row:focus {
-      background: var(--surface-hover);
-      outline: none;
-    }
-    .result-favicon { width: 16px; height: 16px; flex-shrink: 0; border-radius: 2px; }
-    .result-body { flex: 1; min-width: 0; }
-    .result-title { font-size: 14px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .result-meta { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-    .result-context { font-size: 12px; color: var(--text-secondary); text-align: right; white-space: nowrap; flex-shrink: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
-    .search-results-empty { padding: 16px 0; color: var(--text-secondary); font-size: 14px; text-align: center; }
-    .search-clear-btn {
-      background: none; border: none; cursor: pointer; color: var(--text-secondary);
-      width: 30px; height: 30px; padding: 0; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 20px; line-height: 1;
-      transition: background var(--transition), color var(--transition);
-    }
-    .search-clear-btn:hover {
-      background: var(--surface-hover); color: var(--text-primary);
-    }
-    .search-clear-btn.hidden { display: none; }
-    .search-web-go {
-      width: 100%;
-      background: none;
-      border: none;
-      font: inherit;
-      color: inherit;
-      text-align: left;
-    }
-    .search-web-go .result-body { display: flex; flex-direction: column; }
-  `;
-  document.head.appendChild(style);
-
+  watchToolbarIconTheme();
   await applyStoredAppearance();
   await handleNewTabBehavior();
 
   lightboxApi = setupLightbox();
 
   searchBarApi = createSearchBar(document.getElementById("search-bar"));
+  searchBarApi.onNavigate = openUrlFromMeridian;
 
   // Move the scope/settings icon cluster into the search pill itself.
   const searchContainer = document.querySelector("#search-bar .search-container");
@@ -741,6 +729,9 @@ async function init() {
   });
   const scopePopup = createScopePopup(scopeShell, {
     openItem: openBookmark,
+    announce: (message) => searchBarApi.announce(message),
+    onActiveDescendantChange: (id) =>
+      searchBarApi.setActiveDescendant(id),
     isSourceEnabled: async (source) =>
       (await getEnabledLocalSearchSources())[source],
     historyProvider: async (q) => {
@@ -754,7 +745,15 @@ async function init() {
     anchor: searchBarEl,
     id: "browser-search-results",
     ariaLabel: "Search results",
+    role: "listbox",
   });
+  resultsSelection = createSearchSelection(resultsPopup, {
+    idPrefix: "browser-search-result",
+    onActiveDescendantChange: (id) =>
+      searchBarApi.setActiveDescendant(id),
+  });
+  searchBarApi.bindPopup(scopeShell, "bookmarks-results-listbox");
+  searchBarApi.bindPopup(resultsPopup, "browser-search-results");
 
   const isPopupScope = (scope) => scope === "bookmarks" || scope === "history";
 
@@ -770,12 +769,21 @@ async function init() {
     }
   };
 
-  searchBarApi.onArrowDown = () => {
+  searchBarApi.onSelectionMove = (delta) => {
     if (isPopupScope(searchBarApi.getScope())) {
-      document.querySelector("#bookmarks-panel .bookmark-row")?.focus();
-      return;
+      return scopePopup.moveSelection(delta);
     }
-    document.querySelector("#browser-search-results .result-row")?.focus();
+    return resultsSelection.move(delta);
+  };
+  searchBarApi.onSelectionActivate = () => {
+    if (isPopupScope(searchBarApi.getScope())) {
+      return scopePopup.activateSelection();
+    }
+    return resultsSelection.activate();
+  };
+  searchBarApi.onSelectionReset = () => {
+    scopePopup.resetSelection();
+    resultsSelection.reset();
   };
   searchBarApi.onScopedSubmit = () => {
     if (isPopupScope(searchBarApi.getScope())) {
@@ -804,8 +812,7 @@ async function init() {
     if (settingsPopup.isOpen()) {
       closeSettings();
     } else {
-      if (searchBarApi.getScope() !== "all") searchBarApi.setScope("all");
-      openSettings();
+      openSettingsFromSearch();
     }
   });
 
@@ -875,7 +882,12 @@ async function init() {
   document.addEventListener("dragstart", () =>
     dropZone.classList.remove("hidden"),
   );
-  document.addEventListener("dragend", () => dropZone.classList.add("hidden"));
+  document.addEventListener("dragend", () => {
+    finishTabDrag();
+    dropZone.classList.add("hidden");
+    dropZone.classList.remove("drag-over");
+    flushDeferredDragRender();
+  });
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
     dropZone.classList.add("drag-over");
@@ -888,6 +900,9 @@ async function init() {
     e.preventDefault();
     dropZone.classList.remove("drag-over");
     const tabId = parseInt(e.dataTransfer.getData("text/plain"), 10);
+    finishTabDrag();
+    dropZone.classList.add("hidden");
+    flushDeferredDragRender();
     if (!tabId) return;
     const name = prompt("New group name:");
     if (!name?.trim()) return;
@@ -942,6 +957,7 @@ async function init() {
       scheduleRender();
     }
   });
+
 }
 
 init();

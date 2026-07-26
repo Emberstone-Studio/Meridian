@@ -6,6 +6,7 @@ import {
   flattenBookmarks,
   findBookmarksBar,
   allBookmarksRoot,
+  openBookmarkFolderInGroup,
 } from "../components/BookmarksButton.js";
 
 // Chrome's getTree() shape: root (id "0") → [Bookmarks Bar (id "1"),
@@ -43,6 +44,31 @@ function fixture() {
         ],
       },
     ],
+  };
+}
+
+function fakeElement() {
+  return {
+    className: "",
+    id: "",
+    textContent: "",
+    children: [],
+    attributes: new Map(),
+    classList: { add() {} },
+    setAttribute(name, value) {
+      this.attributes.set(name, String(value));
+    },
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
+    },
+    addEventListener() {},
+    appendChild(child) {
+      this.children.push(child);
+      return child;
+    },
+    append(...children) {
+      children.forEach((child) => this.appendChild(child));
+    },
   };
 }
 
@@ -96,25 +122,86 @@ test("allBookmarksRoot excludes the bookmarks bar subtree", () => {
   assert.ok(!ids.includes("10") && !ids.includes("11"));
 });
 
-test("a disabled popup source explains access without querying it", async () => {
-  let bookmarkQueries = 0;
-  let historyQueries = 0;
-  const messages = [];
-  const panel = {
-    addEventListener() {},
-    setAttribute() {},
-    replaceChildren() {
-      messages.length = 0;
+test("openBookmarkFolderInGroup opens nested bookmarks in one named group", async () => {
+  const folder = {
+    title: "Reading",
+    children: [
+      { title: "One", url: "https://one.example" },
+      {
+        title: "Nested",
+        children: [{ title: "Two", url: "https://two.example" }],
+      },
+    ],
+  };
+  const calls = [];
+  let nextTabId = 40;
+  const api = {
+    tabs: {
+      async create(options) {
+        calls.push(["create", options]);
+        return { id: nextTabId++ };
+      },
+      async group(options) {
+        calls.push(["group", options]);
+        return 7;
+      },
+      async update(tabId, options) {
+        calls.push(["update", tabId, options]);
+      },
     },
-    appendChild(node) {
-      messages.push(node.textContent);
+    tabGroups: {
+      async update(groupId, options) {
+        calls.push(["updateGroup", groupId, options]);
+      },
     },
   };
 
-  globalThis.document = {
-    createElement() {
-      return { className: "", textContent: "" };
+  const groupId = await openBookmarkFolderInGroup(folder, api);
+
+  assert.equal(groupId, 7);
+  assert.deepEqual(calls, [
+    ["create", { url: "https://one.example", active: false }],
+    ["create", { url: "https://two.example", active: false }],
+    ["group", { tabIds: [40, 41] }],
+    ["updateGroup", 7, { title: "Reading" }],
+    ["update", 40, { active: true }],
+  ]);
+});
+
+test("openBookmarkFolderInGroup does nothing for an empty folder", async () => {
+  const api = {
+    tabs: {
+      create() {
+        assert.fail("should not create a tab");
+      },
     },
+  };
+
+  assert.equal(
+    await openBookmarkFolderInGroup({ title: "Empty", children: [] }, api),
+    null,
+  );
+});
+
+test("a disabled popup source explains access without querying it", async () => {
+  let bookmarkQueries = 0;
+  let historyQueries = 0;
+  const announcements = [];
+  const panel = {
+    children: [],
+    addEventListener() {},
+    setAttribute() {},
+    replaceChildren(...children) {
+      this.children = [...children];
+    },
+    appendChild(node) {
+      this.children.push(node);
+    },
+    querySelectorAll: () => [],
+  };
+
+  globalThis.document = {
+    createElement: fakeElement,
   };
   globalThis.chrome = {
     bookmarks: {
@@ -133,6 +220,7 @@ test("a disabled popup source explains access without querying it", async () => 
   };
   const scopes = createScopePopup(popup, {
     openItem() {},
+    announce: (message) => announcements.push(message),
     isSourceEnabled: async () => false,
     historyProvider: async () => {
       historyQueries += 1;
@@ -145,23 +233,36 @@ test("a disabled popup source explains access without querying it", async () => 
 
   assert.equal(bookmarkQueries, 0);
   assert.equal(historyQueries, 0);
-  assert.match(messages[0], /access is off/i);
+  assert.match(panel.children[0].children[0].textContent, /access is off/i);
+  assert.ok(
+    announcements.some((message) =>
+      /Bookmarks search scope selected\. Loading bookmark results/.test(
+        message,
+      ),
+    ),
+  );
+  assert.match(announcements.at(-1), /History access is off/);
 });
 
 test("history scope opens with the retained search query", async () => {
   const requestedQueries = [];
+  const announcements = [];
   let open = false;
   const panel = {
+    children: [],
     addEventListener() {},
     setAttribute() {},
-    replaceChildren() {},
-    appendChild() {},
+    replaceChildren(...children) {
+      this.children = [...children];
+    },
+    appendChild(node) {
+      this.children.push(node);
+    },
+    querySelectorAll: () => [],
   };
 
   globalThis.document = {
-    createElement() {
-      return { className: "", textContent: "" };
-    },
+    createElement: fakeElement,
   };
 
   const popup = {
@@ -176,6 +277,7 @@ test("history scope opens with the retained search query", async () => {
   };
   const scopes = createScopePopup(popup, {
     openItem() {},
+    announce: (message) => announcements.push(message),
     isSourceEnabled: async () => true,
     historyProvider: async (query) => {
       requestedQueries.push(query);
@@ -187,4 +289,8 @@ test("history scope opens with the retained search query", async () => {
 
   assert.deepEqual(requestedQueries, ["retained query"]);
   assert.equal(open, true);
+  assert.deepEqual(announcements, [
+    "History search scope selected. Loading history results.",
+    "No history results found.",
+  ]);
 });

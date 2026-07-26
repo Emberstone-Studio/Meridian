@@ -111,6 +111,7 @@ export function createTabCard(tab, thumbnail) {
   card.addEventListener("dragstart", (e) => {
     clearTimeout(hoverTimer);
     hoverTimer = null;
+    e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", String(tab.id));
     card.classList.add("dragging");
   });
@@ -131,9 +132,8 @@ function makeFaviconPlaceholder(url, size) {
   } catch (_) {}
   const el = document.createElement("span");
   el.className = "favicon-placeholder";
-  el.style.width = size + "px";
-  el.style.height = size + "px";
-  el.style.fontSize = Math.round(size * 0.65) + "px";
+  el.style.setProperty("--favicon-size", `${size}px`);
+  el.style.setProperty("--favicon-font-size", `${Math.round(size * 0.65)}px`);
   el.textContent = letter;
   return el;
 }

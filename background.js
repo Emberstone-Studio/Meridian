@@ -108,14 +108,23 @@ chrome.permissions.onRemoved.addListener((removed) => {
   disableRemovedLocalSearchPermissions(removed);
 });
 
-chrome.tabs.onRemoved.addListener((tabId) => {
+async function handleTabRemoved(tabId) {
   evictThumbnail(tabId);
-  if (tabId === meridianTabId) {
-    meridianTabId = null;
-    chrome.storage.local.remove("meridianTabId");
-    setTimeout(ensureMeridianTab, 500);
+
+  let removedMeridian = tabId === meridianTabId;
+  if (!removedMeridian && meridianTabId === null) {
+    const { meridianTabId: storedId } =
+      await chrome.storage.local.get("meridianTabId");
+    removedMeridian = tabId === storedId;
   }
-});
+  if (!removedMeridian) return;
+
+  meridianTabId = null;
+  await chrome.storage.local.remove("meridianTabId");
+  setTimeout(ensureMeridianTab, 500);
+}
+
+chrome.tabs.onRemoved.addListener(handleTabRemoved);
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "focus-meridian") return;
@@ -238,11 +247,14 @@ initTabIndex();
 
 // Track previous tab for popup's "switch to previous tab" feature
 let _previousTabId = null;
-chrome.tabs.onActivated.addListener(async (activeInfo) => {
+async function trackPreviousTabActivation(activeInfo) {
+  if (isRefreshing) return;
   await resolveMeridianTabId();
   if (activeInfo.tabId === meridianTabId) return; // never track Meridian as current or previous
   if (_previousTabId !== null && _previousTabId !== activeInfo.tabId) {
     chrome.storage.local.set({ previousTabId: _previousTabId });
   }
   _previousTabId = activeInfo.tabId;
-});
+}
+
+chrome.tabs.onActivated.addListener(trackPreviousTabActivation);

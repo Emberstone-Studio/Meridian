@@ -1,3 +1,5 @@
+import { normalizeUrlInput } from "../utils/urlInput.js";
+
 export const PROVIDERS = [
   {
     id: "google",
@@ -39,6 +41,12 @@ const SCOPE_LABELS = {
   history: "Search history",
 };
 
+const SCOPE_CONTROLS = {
+  all: "browser-search-results",
+  bookmarks: "bookmarks-results-listbox",
+  history: "bookmarks-results-listbox",
+};
+
 export function createSearchBar(container) {
   let currentProvider = PROVIDERS[0];
   let scope = "all";
@@ -65,6 +73,11 @@ export function createSearchBar(container) {
   input.type = "text";
   input.placeholder = SCOPE_PLACEHOLDERS.all;
   input.setAttribute("aria-label", SCOPE_LABELS.all);
+  input.setAttribute("role", "combobox");
+  input.setAttribute("aria-autocomplete", "list");
+  input.setAttribute("aria-haspopup", "listbox");
+  input.setAttribute("aria-expanded", "false");
+  input.setAttribute("aria-controls", SCOPE_CONTROLS.all);
   input.autofocus = true;
 
   // Clear button (shown when input has text)
@@ -72,6 +85,12 @@ export function createSearchBar(container) {
   clearBtn.className = "search-clear-btn hidden";
   clearBtn.setAttribute("aria-label", "Clear search");
   clearBtn.textContent = "\xd7";
+
+  const status = document.createElement("div");
+  status.className = "sr-only";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  status.setAttribute("aria-atomic", "true");
 
   function updateClearBtn() {
     if (input.value.length > 0) {
@@ -88,6 +107,7 @@ export function createSearchBar(container) {
   }
 
   function notifyQuery() {
+    api.onSelectionReset?.();
     api.onBrowserQuery?.(input.value.trim() || null, scope);
   }
 
@@ -99,6 +119,15 @@ export function createSearchBar(container) {
     input.placeholder = SCOPE_PLACEHOLDERS[scope] ?? SCOPE_PLACEHOLDERS.all;
     const label = SCOPE_LABELS[scope] ?? SCOPE_LABELS.all;
     input.setAttribute("aria-label", label);
+    api.setComboboxPopup({
+      expanded: false,
+      controlsId: SCOPE_CONTROLS[scope] ?? SCOPE_CONTROLS.all,
+    });
+    api.announce(
+      scope === "all"
+        ? "All search sources selected."
+        : `${scope === "bookmarks" ? "Bookmarks" : "History"} search scope selected.`,
+    );
 
     // Keep the current query while switching between all, bookmarks, and
     // history so users can compare the same search across scopes.
@@ -114,13 +143,18 @@ export function createSearchBar(container) {
   }
 
   function doSearch() {
+    if (api.onSelectionActivate?.()) return;
     const q = input.value.trim();
     if (!q) return;
     if (scope !== "all") {
       api.onScopedSubmit?.();
       return;
     }
-    chrome.tabs.create({ url: currentProvider.url + encodeURIComponent(q) });
+    const url =
+      normalizeUrlInput(q) ??
+      currentProvider.url + encodeURIComponent(q);
+    if (api.onNavigate) api.onNavigate(url);
+    else chrome.tabs.create({ url });
     api.clearSearch();
   }
 
@@ -139,9 +173,13 @@ export function createSearchBar(container) {
     if (e.key === "Enter") {
       doSearch();
     }
-    if (e.key === "ArrowDown") {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
-      api.onArrowDown?.();
+      if (api.onSelectionMove) {
+        api.onSelectionMove(e.key === "ArrowDown" ? 1 : -1);
+      } else if (e.key === "ArrowDown") {
+        api.onArrowDown?.();
+      }
     }
     if (e.key === "Escape") {
       if (scope !== "all") {
@@ -177,6 +215,7 @@ export function createSearchBar(container) {
   wrapper.appendChild(logoBtn);
   wrapper.appendChild(input);
   wrapper.appendChild(clearBtn);
+  wrapper.appendChild(status);
 
   container.appendChild(wrapper);
 
@@ -190,9 +229,33 @@ export function createSearchBar(container) {
     focus: () => input.focus(),
     onBrowserQuery: null,
     onArrowDown: null,
+    onSelectionMove: null,
+    onSelectionActivate: null,
+    onSelectionReset: null,
     onScopedSubmit: null,
+    onNavigate: null,
     onScopeChange: null,
     onProviderChange: null,
+    setComboboxPopup: ({ expanded, controlsId } = {}) => {
+      if (controlsId) input.setAttribute("aria-controls", controlsId);
+      input.setAttribute("aria-expanded", String(Boolean(expanded)));
+      if (!expanded) input.removeAttribute("aria-activedescendant");
+    },
+    bindPopup: (popup, controlsId) =>
+      popup.addOpenChangeListener((expanded) => {
+        api.setComboboxPopup({
+          expanded,
+          ...(expanded ? { controlsId } : {}),
+        });
+      }),
+    setActiveDescendant: (id) => {
+      if (id) input.setAttribute("aria-activedescendant", id);
+      else input.removeAttribute("aria-activedescendant");
+    },
+    announce: (message) => {
+      const next = String(message || "").trim();
+      if (next && status.textContent !== next) status.textContent = next;
+    },
     setScope,
     getScope: () => scope,
     getQuery: () => input.value.trim(),

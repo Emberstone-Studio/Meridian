@@ -24,6 +24,7 @@ globalThis.chrome = {
     getURL: (path) => `chrome-extension://test${path}`,
   },
   storage: {
+    onChanged: event("storageChanged"),
     local: {
       async get(key) {
         return { [key]: structuredClone(storage[key]) };
@@ -68,4 +69,21 @@ test("completed tabs are indexed with page metadata", async () => {
     "Launch checklist",
   );
   assert.equal(storage.tabSearchIndex[tab.id].headings, "Release readiness");
+});
+
+test("workspace assignment and rename refresh indexed workspace names", async () => {
+  storage.workspaces = {
+    workspaces: [{ id: "work", name: "Renamed workspace" }],
+    assignments: { [tab.id]: "work" },
+  };
+
+  await listeners.storageChanged(
+    { workspaces: { newValue: structuredClone(storage.workspaces) } },
+    "local",
+  );
+
+  assert.equal(
+    storage.tabSearchIndex[tab.id].workspaceName,
+    "Renamed workspace",
+  );
 });

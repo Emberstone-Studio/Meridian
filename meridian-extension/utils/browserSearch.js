@@ -78,6 +78,14 @@ function fuzzyScore(query, text) {
 const INDEX_KEY = "tabSearchIndex";
 const WORKSPACE_KEY = "workspaces";
 
+function workspaceNameFromData(tabId, data) {
+  const wsId = data?.assignments?.[String(tabId)];
+  if (!wsId) return "";
+
+  const workspace = data.workspaces?.find((item) => item.id === wsId);
+  return workspace?.name ?? "";
+}
+
 /**
  * Resolve the workspace name for a given tabId using the stored workspace data.
  * Returns "" if the tab has no assignment or if workspace data is unavailable.
@@ -86,13 +94,7 @@ async function resolveWorkspaceName(tabId) {
   try {
     const result = await chrome.storage.local.get(WORKSPACE_KEY);
     const data = result[WORKSPACE_KEY];
-    if (!data) return "";
-
-    const wsId = data.assignments?.[String(tabId)];
-    if (!wsId) return "";
-
-    const ws = data.workspaces?.find((w) => w.id === wsId);
-    return ws?.name ?? "";
+    return workspaceNameFromData(tabId, data);
   } catch (_) {
     return "";
   }
@@ -164,6 +166,21 @@ async function injectMetaExtractor(tabId) {
  * Call once from background.js at startup.
  */
 export function initTabIndex() {
+  chrome.storage.onChanged.addListener(async (changes, areaName) => {
+    if (areaName !== "local" || !changes[WORKSPACE_KEY]) return;
+    const workspaceData = changes[WORKSPACE_KEY].newValue;
+    try {
+      await mutateStorageValue(INDEX_KEY, {}, (index) => {
+        for (const entry of Object.values(index)) {
+          entry.workspaceName = workspaceNameFromData(
+            entry.tabId,
+            workspaceData,
+          );
+        }
+      });
+    } catch (_) {}
+  });
+
   // New tab created
   chrome.tabs.onCreated.addListener(async (tab) => {
     try {

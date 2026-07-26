@@ -131,14 +131,18 @@ export async function show(tab, x, y) {
   }
 
   // Position
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
+  menu.style.setProperty("--context-menu-left", `${x}px`);
+  menu.style.setProperty("--context-menu-top", `${y}px`);
   menu.classList.remove("hidden");
 
   // Nudge back on-screen if clipped
   requestAnimationFrame(() => {
     const r = menu.getBoundingClientRect();
-    if (r.right > window.innerWidth) menu.style.left = `${x - r.width}px`;
-    if (r.bottom > window.innerHeight) menu.style.top = `${y - r.height}px`;
+    if (r.right > window.innerWidth) {
+      menu.style.setProperty("--context-menu-left", `${x - r.width}px`);
+    }
+    if (r.bottom > window.innerHeight) {
+      menu.style.setProperty("--context-menu-top", `${y - r.height}px`);
+    }
   });
 }

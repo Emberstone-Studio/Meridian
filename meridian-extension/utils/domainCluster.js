@@ -1,3 +1,5 @@
+import { getDomain } from "./vendor/tldts.esm.min.js";
+
 const KNOWN_NAMES = {
   "youtube.com": "YouTube",
   "duckduckgo.com": "DuckDuckGo",
@@ -28,8 +30,12 @@ export function getRootDomain(url) {
   try {
     const u = new URL(url);
     if (SYSTEM_PROTOCOLS.includes(u.protocol)) return null;
-    const parts = u.hostname.split(".");
-    return parts.length >= 2 ? parts.slice(-2).join(".") : u.hostname;
+    return (
+      getDomain(u.hostname, {
+        allowPrivateDomains: true,
+        extractHostname: false,
+      }) || u.hostname
+    );
   } catch {
     return null;
   }

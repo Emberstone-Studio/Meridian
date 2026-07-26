@@ -156,7 +156,11 @@ class FakeElement {
     this.classes = new Set();
     this.classList = new FakeClassList(this);
     this.listeners = new Map();
-    this.style = {};
+    this.style = {
+      setProperty(name, value) {
+        this[name] = value;
+      },
+    };
     this.textContent = "";
   }
 

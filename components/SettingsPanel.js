@@ -264,8 +264,10 @@ export function createSettingsPanel(container) {
   function syncNewTab() {
     renderNewTabCards();
     homepageInput.value = homepageUrl;
-    homepageField.style.display =
-      newTabBehavior === "open-homepage" ? "" : "none";
+    homepageField.classList.toggle(
+      "hidden",
+      newTabBehavior !== "open-homepage",
+    );
   }
 
   tabsSection.appendChild(newTabGroup);
@@ -422,7 +424,7 @@ export function createSettingsPanel(container) {
       icon.loading = "lazy";
       // If a favicon fails to load, hide the broken-image glyph gracefully.
       icon.addEventListener("error", () => {
-        icon.style.visibility = "hidden";
+        icon.classList.add("load-failed");
       });
       card.appendChild(icon);
 
@@ -540,7 +542,9 @@ export function createSettingsPanel(container) {
       "settings-bg-swatch" +
       (opts.isNone ? " settings-bg-swatch--none" : "") +
       (opts.selected ? " selected" : "");
-    if (opts.style) Object.assign(btn.style, opts.style);
+    if (opts.background) {
+      btn.style.setProperty("--swatch-background", opts.background);
+    }
     if (opts.label) btn.setAttribute("aria-label", opts.label);
     if (opts.label) btn.title = opts.label;
     if (opts.text) btn.textContent = opts.text;
@@ -550,7 +554,7 @@ export function createSettingsPanel(container) {
       img.alt = "";
       img.loading = "lazy";
       img.onerror = () => {
-        btn.style.background = "var(--surface-hover)";
+        btn.classList.add("load-failed");
       };
       btn.appendChild(img);
     }
@@ -593,7 +597,7 @@ export function createSettingsPanel(container) {
       combinedGrid.appendChild(
         makeSwatch({
           selected: isSelected("solid", c.value),
-          style: { background: c.value },
+          background: c.value,
           label: c.label,
           onClick: () => selectBg("solid", c.value),
         }),
@@ -605,7 +609,7 @@ export function createSettingsPanel(container) {
       combinedGrid.appendChild(
         makeSwatch({
           selected: isSelected("gradient", g.value),
-          style: { background: g.value },
+          background: g.value,
           label: g.label,
           onClick: () => selectBg("gradient", g.value),
         }),
@@ -667,7 +671,6 @@ export function createSettingsPanel(container) {
     fileInput.type = "file";
     fileInput.accept = "image/*";
     fileInput.className = "settings-bg-file-input";
-    fileInput.style.display = "none";
     async function processCustomImage(file) {
       if (!file) return;
       uploadBtn.classList.remove("drag-over", "upload-error");

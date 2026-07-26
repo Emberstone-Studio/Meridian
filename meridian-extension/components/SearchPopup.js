@@ -6,30 +6,46 @@
 
 const registry = new Set();
 
-export function createSearchPopup({ anchor, id, ariaLabel, onOpenChange } = {}) {
+export function createSearchPopup({
+  anchor,
+  id,
+  ariaLabel,
+  role = "dialog",
+  onOpenChange,
+} = {}) {
+  const openChangeListeners = new Set();
   const el = document.createElement("div");
   el.className = "search-popup hidden";
   if (id) el.id = id;
-  el.setAttribute("role", "dialog");
+  el.setAttribute("role", role);
   if (ariaLabel) el.setAttribute("aria-label", ariaLabel);
   (anchor || document.body).appendChild(el);
 
   const api = {
     el,
     isOpen: () => !el.classList.contains("hidden"),
+    addOpenChangeListener(listener) {
+      openChangeListeners.add(listener);
+      return () => openChangeListeners.delete(listener);
+    },
     open() {
-      if (api.isOpen()) return;
+      if (api.isOpen()) {
+        for (const listener of openChangeListeners) listener(true);
+        return;
+      }
       // Only one dropdown may sit under the pill at a time.
       for (const other of registry) {
         if (other !== api && other.isOpen()) other.close();
       }
       el.classList.remove("hidden");
       onOpenChange?.(true);
+      for (const listener of openChangeListeners) listener(true);
     },
     close() {
       if (!api.isOpen()) return;
       el.classList.add("hidden");
       onOpenChange?.(false);
+      for (const listener of openChangeListeners) listener(false);
     },
   };
 
