@@ -1,3 +1,5 @@
+import { activateTab } from "../utils/tabActivation.js";
+
 export function createTabCard(tab, thumbnail) {
   const card = document.createElement("div");
   card.className = "tab-card";
@@ -6,17 +8,43 @@ export function createTabCard(tab, thumbnail) {
   card.dataset.tabUrl = tab.url || "";
   card.draggable = true;
 
-  if (thumbnail) {
+  let activeThumbnail = thumbnail;
+  if (activeThumbnail) {
     const img = document.createElement("img");
     img.className = "card-thumbnail";
-    img.src = thumbnail;
+    img.src = activeThumbnail;
     img.alt = "";
+    let loadRetries = 0;
+    img.onerror = () => {
+      if (loadRetries === 0) {
+        loadRetries += 1;
+        const retrySource = img.src;
+        img.removeAttribute("src");
+        setTimeout(() => {
+          img.src = retrySource;
+        }, 150);
+        return;
+      }
+
+      img.onerror = null;
+      activeThumbnail = null;
+      console.warn("[Meridian] Cached thumbnail failed to load", {
+        tabId: tab.id,
+      });
+      img.replaceWith(makeThumbnailPlaceholder(tab));
+      chrome.runtime.sendMessage({
+        type: "MARK_THUMBNAIL_REFRESH_NEEDED",
+        tabId: tab.id,
+      }).catch((error) => {
+        console.warn(
+          "[Meridian] Failed to mark thumbnail for refresh:",
+          error.message,
+        );
+      });
+    };
     card.appendChild(img);
   } else {
-    const placeholder = document.createElement("div");
-    placeholder.className = "card-thumbnail-placeholder";
-    placeholder.textContent = getInitial(tab.title);
-    card.appendChild(placeholder);
+    card.appendChild(makeThumbnailPlaceholder(tab));
   }
 
   const info = document.createElement("div");
@@ -54,11 +82,11 @@ export function createTabCard(tab, thumbnail) {
   card.appendChild(closeBtn);
 
   card.addEventListener("click", () => {
-    chrome.tabs.update(tab.id, { active: true });
+    activateTab(tab.id);
   });
 
   card.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") chrome.tabs.update(tab.id, { active: true });
+    if (e.key === "Enter") activateTab(tab.id);
     if (e.key === "w" || e.key === "W") {
       card.dispatchEvent(
         new CustomEvent("close-tab", {
@@ -87,7 +115,11 @@ export function createTabCard(tab, thumbnail) {
       card.dispatchEvent(
         new CustomEvent("tab-lightbox-show", {
           bubbles: true,
-          detail: { tab, thumbnail, rect: card.getBoundingClientRect() },
+          detail: {
+            tab,
+            thumbnail: activeThumbnail,
+            rect: card.getBoundingClientRect(),
+          },
         }),
       );
     }, 1000);
@@ -118,6 +150,13 @@ export function createTabCard(tab, thumbnail) {
   card.addEventListener("dragend", () => card.classList.remove("dragging"));
 
   return card;
+}
+
+function makeThumbnailPlaceholder(tab) {
+  const placeholder = document.createElement("div");
+  placeholder.className = "card-thumbnail-placeholder";
+  placeholder.textContent = getInitial(tab.title);
+  return placeholder;
 }
 
 function getInitial(title) {

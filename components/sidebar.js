@@ -1,6 +1,7 @@
 import { search, getPreviousTab } from '../utils/browserSearch.js';
 import { createFavicon } from '../utils/favicon.js';
 import { getEnabledLocalSearchSources } from '../utils/localSearch.js';
+import { activateTab } from '../utils/tabActivation.js';
 import { watchToolbarIconTheme } from '../utils/toolbarIcon.js';
 
 const PROVIDER_URLS = {
@@ -34,6 +35,7 @@ let chromeGroups = [];
 let isSearching = false;
 let searchGeneration = 0;
 let meridianTabId = null;
+let currentWindowId = null;
 let draggedTabId = null;
 let collapsedSections = new Set();
 
@@ -50,11 +52,20 @@ async function loadAll() {
     chrome.tabs.query({ currentWindow: true }),
     hasNativeGroups ? chrome.tabGroups.query({ windowId: chrome.windows.WINDOW_ID_CURRENT }) : Promise.resolve([]),
     chrome.storage.local.get('workspaces'),
-    chrome.storage.local.get('meridianTabId'),
+    chrome.storage.local.get(['meridianTabIds', 'meridianTabId']),
     getPreviousTab().catch(() => null),
   ]);
 
-  meridianTabId = localStore.meridianTabId ?? null;
+  currentWindowId = tabs[0]?.windowId ?? null;
+  meridianTabId =
+    localStore.meridianTabIds?.[String(currentWindowId)] ??
+    tabs.find(
+      (tab) =>
+        tab.pinned &&
+        (tab.url === chrome.runtime.getURL('meridian.html') ||
+          tab.pendingUrl === chrome.runtime.getURL('meridian.html')),
+    )?.id ??
+    null;
   allTabs = tabs.filter((t) => t.id !== meridianTabId);
   chromeGroups = groups;
   workspaceData = wsStore.workspaces ?? null;
@@ -199,7 +210,7 @@ function buildTabRow(tab) {
   makeRowInteractive(
     row,
     `Switch to tab: ${tab.title || tab.url || 'Untitled'}`,
-    () => chrome.tabs.update(tab.id, { active: true }),
+    () => activateTab(tab.id),
   );
 
   attachDragEvents(row, tab);
@@ -240,7 +251,7 @@ function renderTabList() {
     makeRowInteractive(
       row,
       `Switch to previous tab: ${previousTab.title || previousTab.url || 'Untitled'}`,
-      () => chrome.tabs.update(previousTab.id, { active: true }),
+      () => activateTab(previousTab.id),
     );
     section.appendChild(row);
     container.appendChild(section);
@@ -353,7 +364,7 @@ function buildResultRow(item) {
     `Open ${item.title || item.url || 'result'}`,
     async () => {
       if (item.tabId != null) {
-        await chrome.tabs.update(item.tabId, { active: true });
+        await activateTab(item.tabId);
       } else {
         await chrome.tabs.create({ url: item.url });
       }
@@ -488,8 +499,14 @@ function attachListeners() {
   });
 
   document.getElementById('meridian-btn').addEventListener('click', async () => {
-    const { meridianTabId: id } = await chrome.storage.local.get('meridianTabId');
-    if (id) chrome.tabs.update(id, { active: true });
+    if (currentWindowId == null) {
+      const window = await chrome.windows.getCurrent();
+      currentWindowId = window.id;
+    }
+    await chrome.runtime.sendMessage({
+      type: 'FOCUS_MERIDIAN',
+      windowId: currentWindowId,
+    });
   });
 
 }
@@ -514,8 +531,6 @@ function setupResizeObserver() {
 // ---------------------------------------------------------------------------
 
 async function init() {
-  document.getElementById('sidebar-logo').src = chrome.runtime.getURL('img/icon32.png');
-
   watchToolbarIconTheme();
 
   const { [COLLAPSED_KEY]: saved } = await chrome.storage.local.get(COLLAPSED_KEY);

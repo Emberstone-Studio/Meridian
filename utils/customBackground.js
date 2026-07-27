@@ -5,8 +5,9 @@
 // `unlimitedStorage`) and render it via a short-lived `blob:` object URL.
 
 const DB_NAME = "meridian";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE = "backgrounds";
+const THUMBNAIL_STORE = "thumbnails";
 const KEY = "custom";
 const LEGACY_KEY = "meridian_bg_custom";
 
@@ -18,6 +19,9 @@ function openDb() {
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+      if (!db.objectStoreNames.contains(THUMBNAIL_STORE)) {
+        db.createObjectStore(THUMBNAIL_STORE);
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);

@@ -21,6 +21,7 @@ import {
 } from "./utils/localSearch.js";
 import { normalizeHomepageUrl } from "./utils/homepageUrl.js";
 import { openUrlFromMeridian } from "./utils/tabNavigation.js";
+import { activateTab } from "./utils/tabActivation.js";
 import { normalizeUrlInput } from "./utils/urlInput.js";
 import { watchToolbarIconTheme } from "./utils/toolbarIcon.js";
 import {
@@ -85,7 +86,7 @@ function setupLightbox() {
   let closeTimer = null;
 
   function navigate() {
-    if (currentTab) chrome.tabs.update(currentTab.id, { active: true });
+    if (currentTab) activateTab(currentTab.id);
     hideLightbox();
   }
 
@@ -167,28 +168,60 @@ function setupLightbox() {
   };
 }
 
+async function getWindowMeridianTabId(currentTab) {
+  if (!currentTab) return null;
+  const stored = await chrome.storage.local.get([
+    "meridianTabIds",
+    "meridianTabId",
+  ]);
+  const candidates = [
+    stored.meridianTabIds?.[String(currentTab.windowId)],
+    stored.meridianTabId,
+  ].filter((id) => Number.isInteger(id));
+
+  for (const id of candidates) {
+    try {
+      const tab = await chrome.tabs.get(id);
+      if (tab.windowId === currentTab.windowId) return id;
+    } catch (_) {
+      /* stale stored id */
+    }
+  }
+
+  const pinnedTabs = await chrome.tabs.query({
+    pinned: true,
+    windowId: currentTab.windowId,
+  });
+  const meridianUrl = chrome.runtime.getURL("meridian.html");
+  return (
+    pinnedTabs.find(
+      (tab) =>
+        tab.url === meridianUrl ||
+        tab.pendingUrl === meridianUrl ||
+        tab.url === "chrome://newtab/" ||
+        tab.pendingUrl === "chrome://newtab/",
+    )?.id ?? null
+  );
+}
+
 async function handleNewTabBehavior() {
   const [newTabBehavior, { homepageUrl }] = await Promise.all([
     getNewTabBehavior(),
     chrome.storage.sync.get("homepageUrl"),
   ]);
   if (newTabBehavior === "focus-pinned") {
-    const [currentTab, { meridianTabId }] = await Promise.all([
-      chrome.tabs.getCurrent(),
-      chrome.storage.local.get("meridianTabId"),
-    ]);
+    const currentTab = await chrome.tabs.getCurrent();
+    const meridianTabId = await getWindowMeridianTabId(currentTab);
     if (meridianTabId && currentTab && meridianTabId !== currentTab.id) {
-      await chrome.tabs.update(meridianTabId, { active: true });
+      await activateTab(meridianTabId);
       window.close();
     }
   } else if (newTabBehavior === "open-homepage") {
     const normalizedHomepage = normalizeHomepageUrl(homepageUrl ?? "");
     if (!normalizedHomepage) return;
 
-    const [currentTab, { meridianTabId }] = await Promise.all([
-      chrome.tabs.getCurrent(),
-      chrome.storage.local.get("meridianTabId"),
-    ]);
+    const currentTab = await chrome.tabs.getCurrent();
+    const meridianTabId = await getWindowMeridianTabId(currentTab);
     if (!currentTab || currentTab.id === meridianTabId) return;
     try {
       await chrome.tabs.update(currentTab.id, { url: normalizedHomepage });
@@ -542,7 +575,7 @@ function buildResultRow(item) {
 
   row.addEventListener("click", () => {
     if (item.tabId != null) {
-      chrome.tabs.update(item.tabId, { active: true });
+      activateTab(item.tabId);
     } else {
       openUrlFromMeridian(item.url);
     }
@@ -951,7 +984,11 @@ async function init() {
     const keys = Object.keys(changes);
     if (
       keys.some(
-        (k) => k.startsWith("thumb_") || k === "workspaces" || k === "tabOrder",
+        (k) =>
+          k.startsWith("thumb_") ||
+          k === "thumbnailCacheRevision" ||
+          k === "workspaces" ||
+          k === "tabOrder",
       )
     ) {
       scheduleRender();

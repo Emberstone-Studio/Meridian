@@ -57,15 +57,8 @@ body {
   opacity: 1;
 }
 
-#meridian-btn img {
-  border-radius: 3px;
+#sidebar-logo {
   display: block;
-}
-
-@media (prefers-color-scheme: dark) {
-  #meridian-btn img {
-    filter: brightness(0) invert(1);
-  }
 }
 
 #search-input {

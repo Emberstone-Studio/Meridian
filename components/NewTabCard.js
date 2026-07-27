@@ -1,3 +1,5 @@
+import { activateTab } from "../utils/tabActivation.js";
+
 // existingTabId: when set, the card navigates that tab instead of creating a new one.
 // Used for the about:blank placeholder tab created when a new Chrome group is opened.
 export function createNewTabCard(groupId = null, existingTabId = null) {
@@ -74,7 +76,7 @@ export function createNewTabCard(groupId = null, existingTabId = null) {
     }
 
     if (existingTabId !== null) {
-      await chrome.tabs.update(existingTabId, { url, active: true });
+      await activateTab(existingTabId, { url });
     } else {
       const tab = await chrome.tabs.create({ url });
       if (groupId !== null) {

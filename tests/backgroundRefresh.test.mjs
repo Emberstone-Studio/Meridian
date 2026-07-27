@@ -22,6 +22,7 @@ async function loadRefreshAllThumbnails(dependencies) {
   return Function(
     "chrome",
     "resolveMeridianTabId",
+    "isManagedMeridianTabId",
     "sleep",
     "captureTab",
     "console",
@@ -32,6 +33,7 @@ async function loadRefreshAllThumbnails(dependencies) {
   )(
     dependencies.chrome,
     async () => {},
+    () => false,
     async () => {},
     dependencies.captureTab,
     dependencies.console,

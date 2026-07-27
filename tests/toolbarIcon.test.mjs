@@ -23,6 +23,36 @@ test("Meridian and the side panel both initialize adaptive toolbar icons", async
   }
 });
 
+test("the side panel uses a dashboard grid icon for the full Meridian view", async () => {
+  for (const directory of ["..", "../meridian-extension"]) {
+    const [html, css, script] = await Promise.all([
+      readFile(
+        new URL(`${directory}/components/sidebar.html`, import.meta.url),
+        "utf8",
+      ),
+      readFile(
+        new URL(`${directory}/components/sidebar.css`, import.meta.url),
+        "utf8",
+      ),
+      readFile(
+        new URL(`${directory}/components/sidebar.js`, import.meta.url),
+        "utf8",
+      ),
+    ]);
+
+    assert.match(html, /aria-label="Open Meridian dashboard"/);
+    assert.match(html, /<svg[\s\S]*id="sidebar-logo"/);
+    assert.equal(
+      (html.match(/<rect /g) ?? []).length,
+      4,
+      `${directory} should render a four-box grid`,
+    );
+    assert.match(css, /#sidebar-logo\s*{/);
+    assert.doesNotMatch(css, /#sidebar-logo[\s\S]{0,120}filter:/);
+    assert.doesNotMatch(script, /sidebar-logo['"]\)\.src/);
+  }
+});
+
 test("static manifest icons use a dual-contrast source and match the package", async () => {
   const sourceSvg = await readFile(
     new URL("../img/icon-source.svg", import.meta.url),
