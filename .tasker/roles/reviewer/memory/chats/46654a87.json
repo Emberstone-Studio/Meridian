@@ -1,0 +1,11 @@
+{
+  "chatId": "46654a87",
+  "title": "Re: \"Review entire Meridian codebase for errors\"",
+  "summary": "Meridian codebase review (task: review-entire-meridian-codebase-for-errors-184a) found no critical code-execution vulnerabilities, but 1 high, 6 medium, 3 low issues. Highest priority: sidebar favicon fallbacks leak visited domains to Google (components/sidebar.js) — a Chrome Web Store privacy blocker; recommend switching to Chrome's local /_favicon/ endpoint and adding privacy disclosures. Medium issues include broken lane rename keyboard handling, stale async sidebar search results, stale accent-color analysis, stale workspace assignment after native tab grouping, disabled search sources still being queried, and possibly over-broad manifest permissions. Low issues: stale web-search popup results, unvalidated homepage URLs, non-focusable sidebar rows. Review excluded background.js, utils/*, and meridian-extension/, and no tests were run, so it's incomplete. User asked for recommendations (ordered fix plan) and had 8 dependency-linked tasks created, with a recommended run order (#1–#4 parallel, then #5/#6, #7, #8). User also requested \"Search anything\" input font size changed from 16px to 15px (done, both root and packaged CSS). Later, user's PC slept, stalling the in-progress audit task; Tasker's watchdog auto-restarted it at 8:36 PM — now 3 of 5 steps done, no intervention needed.",
+  "agents": [
+    "reviewer"
+  ],
+  "threadPath": ".tasker/chats/46654a87",
+  "createdAt": "2026-07-25T23:30:24.218Z",
+  "updatedAt": "2026-07-26T00:46:35.418Z"
+}

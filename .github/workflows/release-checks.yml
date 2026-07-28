@@ -1,0 +1,100 @@
+name: Release checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Run tests, including runtime mirror parity
+        run: node --test tests/*.test.mjs
+
+      - name: Check runtime JavaScript syntax
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            echo "Checking $file"
+            if ! node --check "$file"; then
+              echo "::error file=$file::JavaScript syntax check failed"
+              exit 1
+            fi
+          done < <(git ls-files -z -- '*.js')
+
+      - name: Parse extension manifests
+        run: |
+          node <<'NODE'
+          const { readFileSync } = require("node:fs");
+          const manifests = [
+            "manifest.json",
+            "meridian-extension/manifest.json",
+          ];
+
+          for (const file of manifests) {
+            try {
+              JSON.parse(readFileSync(file, "utf8"));
+              console.log(`Parsed ${file}`);
+            } catch (error) {
+              console.error(
+                `::error file=${file}::Manifest JSON parse failed: ${error.message}`,
+              );
+              process.exitCode = 1;
+            }
+          }
+          NODE
+
+      - name: Check committed changes for whitespace errors
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_AFTER_SHA: ${{ github.event.after }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          zero_sha=0000000000000000000000000000000000000000
+
+          case "$EVENT_NAME" in
+            pull_request)
+              echo "Checking pull request changes: $PR_BASE_SHA...$PR_HEAD_SHA"
+              git diff --check "$PR_BASE_SHA...$PR_HEAD_SHA"
+              ;;
+            push)
+              if [[ "$PUSH_AFTER_SHA" == "$zero_sha" ]]; then
+                echo "Branch deletion has no new content to check."
+                exit 0
+              fi
+
+              before="$PUSH_BEFORE_SHA"
+              if [[ "$before" == "$zero_sha" ]]; then
+                default_branch="origin/$DEFAULT_BRANCH"
+                echo "Checking new branch changes: $default_branch...$PUSH_AFTER_SHA"
+                git diff --check "$default_branch...$PUSH_AFTER_SHA"
+                exit 0
+              fi
+
+              echo "Checking pushed changes: $before..$PUSH_AFTER_SHA"
+              git diff --check "$before" "$PUSH_AFTER_SHA"
+              ;;
+            workflow_dispatch)
+              echo "Checking the latest commit at HEAD."
+              git diff --check HEAD^ HEAD
+              ;;
+          esac

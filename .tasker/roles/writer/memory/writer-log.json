@@ -1,12 +1,67 @@
 {
   "status": "idle",
-  "task_id": null,
-  "task_title": null,
-  "started_at": null,
-  "updated_at": null,
-  "completed_at": null,
-  "last_output": null,
-  "timeline": [],
-  "history": [],
+  "task_id": "add-in-product-disclosure-for-automatic-thumbnai-f891",
+  "task_title": "Add in-product disclosure for automatic thumbnails and metadata indexing",
+  "started_at": "2026-07-27T00:12:04.840Z",
+  "updated_at": "2026-07-27T00:12:44.357Z",
+  "completed_at": "2026-07-27T00:05:52.384Z",
+  "last_output": "Implemented the requested Settings placement change in both source and the running `meridian-extension/` mirror.\n\n- Moved Privacy & Data after Appearance, Search, and Tabs so it is the final Settings section.\n- Replaced the always-visible section with a native collapsed `<details>` / `<summary>` control.\n- Added expansion-chevron and keyboard focus styling.\n- Kept the complete disclosure and policy link inside the expandable content.\n- Updated regression coverage for native semantics, collapsed default, and bottom placement.\n- Validation: all 113 Node tests pass; source/package parity and JavaScript syntax checks pass.\n\nFinal approval still requires the published privacy-policy URL to return successfully.",
+  "timeline": [
+    {
+      "timestamp": "2026-07-26T18:00:44.441Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:03:27.651Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:48:25.050Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T18:53:55.120Z",
+      "type": "output",
+      "content": "## Summary\n\nAdded an always-visible, accessible \"Privacy & Data\" disclosure to Meridian's Settings panel that explains the automatic data handling behind live thumbnails and open-tab search, matching PRIVACY.md's plain-language framing.\n\n## Changes\n\n- **`components/SettingsPanel.js`** (+ synced copy in `meridian-extension/components/SettingsPanel.js`):\n  - Added a new `Privacy & Data` section, rendered **first** in the Settings panel (before Appearance/Search/Tabs) so it's visible without any extra click or onboarding flow, and without blocking core workflows (Settings is opt-in UI, not a modal/interstitial).\n  - Three plain-language paragraphs:\n    1. States that Meridian automatically captures a screenshot of the active tab for live thumbnails, and automatically reads each loaded page's meta description and H1/H2 heading text for local open-tab search — both without a separate prompt.\n    2. States the data is stored locally in the Chrome profile, that Meridian has no server and never uploads it, and points to the existing **Local Search** and **Thumbnails** controls below as the relevant feature controls.\n    3. Explicitly states bookmark/history access is **never automatic** — Chrome permission is only requested when the user turns on Bookmarks or History under Local Search — preserving the existing optional-permission flow untouched.\n  - A real `<a href>` link (`target=\"_blank\" rel=\"noopener noreferrer\"`) reading \"Read Meridian's full privacy policy\", pointing at the repo's `PRIVACY.md` (exported as `PRIVACY_POLICY_URL` for testability).\n  - Uses only semantic `<p>`/`<a>` elements in normal document flow — no `aria-hidden`, no `display:none`, no interactive widget needed — so it's reachable by keyboard Tab order and read by assistive-technology virtual cursors like any other panel text; the link itself is natively focusable.\n\n- **`meridian.css`** (+ synced copy in `meridian-extension/meridian.css`): added `.settings-privacy-group`, `.settings-privacy-text`, and `.settings-privacy-link` rules consistent with existing settings typography, including a `:focus-visible` outline on the link.\n\n- **`tests/settingsPrivacyDisclosure.test.mjs`** (new): 5 tests extracting and rendering the disclosure block against a minimal fake DOM (same technique as `tests/settingsPopupRace.test.mjs`), verifying: thumbnail/metadata wording, local-storage + feature-control wording, that bookmark/history access is described as never-automatic, that the policy link is a real focusable `<a>` with correct `href`/`target`/`rel`, and that the section is registered first in the panel.\n\n## Verification\n\n- `node --test tests/*.test.mjs` → **95/95 passing** (all pre-existing tests plus the 5 new ones), including `packagedParity.test.mjs` (root vs. `meridian-extension` stay byte-identical) and `manifestPermissions.test.mjs`.\n- `node --check` passed on all modified/added `.js` files; `meridian.css` brace-balance verified (not JS, so `node --check` doesn't apply to it).\n- No changes to `manifest.json` or the optional-permission flow in `utils/localSearch.js` — bookmarks/history remain gated behind the existing `chrome.permissions.request` flow, untouched by this change."
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.923Z",
+      "type": "review",
+      "content": "Reviewer decision: Implementation is conditionally acceptable, but the hard-coded privacy-policy URL currently returns 404. Keep this task in review until PRIVACY.md is published at that exact URL and the link returns successfully."
+    },
+    {
+      "timestamp": "2026-07-27T00:00:34.545Z",
+      "type": "review",
+      "content": "Reviewer rework requested by product owner: Move Privacy & Data to the bottom of Settings and make it an accessible expandable section. Preserve the disclosure and policy link inside it, update tests, and verify the published policy URL works before final approval."
+    },
+    {
+      "timestamp": "2026-07-27T00:12:04.011Z",
+      "type": "comment",
+      "content": "Implementing the requested UI rework directly: move Privacy & Data to the bottom of Settings and convert it to an accessible collapsed details/summary section in both root and running extension copies."
+    }
+  ],
+  "history": [
+    {
+      "task_id": "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+      "task_title": "Prepare Chrome Web Store privacy policy and publisher disclosures",
+      "status": "in_review",
+      "started_at": "2026-07-27T00:00:39.038Z",
+      "completed_at": "2026-07-27T00:05:52.384Z",
+      "last_output": "# Chrome Web Store privacy disclosures & publisher copy — rework complete\n\nThis was a **rework pass** on prior work in `PRIVACY.md` and `STORE_LISTING.md` (the Chrome Web Store Limited Use statement, permission justifications, and disclosure copy already existed). The reviewer flagged three accuracy gaps against the actual runtime; this pass fixes all three and re-verifies the rest of the acceptance criteria.\n\n## Reviewer feedback addressed\n\n1. **Thumbnail cache limits were described as a strict cap.** Read `utils/thumbnailCache.js`: pruning only ever removes entries for tabs that are *no longer open* (`entry.live` check). If every cached thumbnail belongs to a currently-open tab, nothing is evicted even past ~200 entries / ~50 MB — confirmed by the existing test `live thumbnails remain deterministic soft-cap entries under entry pressure`. Both docs now describe this as a **soft target that live (open-tab) thumbnails are exempt from**, not a hard cap, in: the Screenshots/thumbnails data-table row, the `unlimitedStorage` permission justification, and the reconciliation notes (both files).\n\n2. **`chrome.storage.sync` was implied to stay on one device.** `STORE_LISTING.md` §3's intro said data is processed \"entirely on your device\"; the Local & sync storage bullet now explicitly states that if the user has Chrome Sync on, preference data syncs through the user's own Google/Chrome account to their other signed-in devices (not Meridian-operated syncing). PRIVACY.md's preferences row already had this caveat and needed no change. Swept the whole repo for `entirely on your device` / `single device` / `never leaves` phrasing — only the one instance existed and is now fixed.\n\n3. **Automatic capture has no restricted-URL filter.** Read `background.js`: `handleActivatedCapture` and `handleUpdatedCapture` (the automatic paths, triggered on tab activation / page load) call `captureTab` → `chrome.tabs.captureVisibleTab` with **no URL check**. Only `refreshAllThumbnails` (the user-requested full refresh) explicitly filters `chrome://`, `chrome-extension://`, and `about:` before switching tabs. I chose **disclosure over a code change**: this task is documentation-scoped, and privileged pages are already excluded from automatic capture by Chrome's own `captureVisibleTab`/`scripting` API restrictions (verified against the existing try/catch handling in `captureTab`), so no user-visible risk exists — the gap was purely that the docs implied Meridian itself filters. Both docs now state plainly that automatic capture/extraction do not filter by URL in Meridian's code, that Chrome's own APIs reject privileged pages, and that only the full refresh has an explicit in-code skip list. **Flagging this as a product decision for the owner to consider**: if reviewers expect an explicit allowlist/denylist in code (belt-and-suspenders beyond relying on Chrome's API behavior), that would be a follow-up code task, not a docs task.\n\n## Also fixed while reconciling runtime vs. copy\n- `STORE_LISTING.md`'s reconciliation notes cited `captureVisibleTab` **quality 60**; the actual value in `background.js` is **quality 72**. Corrected.\n\n## Files changed\n- `PRIVACY.md` — screenshots/thumbnails table row, `unlimitedStorage`/`<all_urls>` permission bullets.\n- `STORE_LISTING.md` — §3 data-handling intro + Screenshots/Local & sync storage bullets, `unlimitedStorage`/`<all_urls>` justifications (§4), reconciliation notes (§6).\n- No changes needed to `README.md` or `manifest.json` — re-checked against the new wording; both were already consistent (README already links to PRIVACY.md/STORE_LISTING.md and makes no cap or single-device claims; manifests unchanged, root and `meridian-extension/` still identical).\n- No runtime code changed — this is a docs-only fix, consistent with the task's scope.\n\n## Verification\n- `node --test tests/*.test.mjs` → **112/112 pass**, including the thumbnail-cache soft-cap/live-protection tests that back the new PRIVACY.md/STORE_LISTING.md wording.\n- `node -e \"JSON.parse(...)\"` on both manifests → valid.\n- `git diff --check` → clean (no whitespace errors).\n- Grepped the repo for `entirely on your device`, `single device`, `never leaves`, `capped at 200`, `LRU eviction` post-edit → no stale claims remain.\n\n## Owner-only follow-ups — explicitly NOT done (unchanged from prior pass)\nStill marked **[OWNER-ONLY — NOT DONE]** in `STORE_LISTING.md` §5, because they require the publisher's Chrome Web Store dashboard, hosting, and operational access that this repository-scoped pass cannot perform:\n- Publishing `PRIVACY.md` at a public HTTPS URL and entering it in the dashboard.\n- Submitting the single-purpose description, data-type selections, and data-use certifications in the dashboard.\n- Confirming each permission justification against the exact uploaded archive.\n- Verifying prominent-disclosure/affirmative-consent requirements are met in the live listing and in-product UX.\n- A manual network audit of the packed release archive.\n- Reviewing current third-party (Picsum, search-provider icon, Chrome favicon) policy terms.\n- Reconciling support-contact details and operational practice with the store-form answers.\n\nNone of these were marked complete.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "add-in-product-disclosure-for-automatic-thumbnai-f891",
+      "task_title": "Add in-product disclosure for automatic thumbnails and metadata indexing",
+      "status": "in_review",
+      "started_at": "2026-07-27T00:12:04.840Z",
+      "completed_at": "2026-07-27T00:05:52.384Z",
+      "last_output": "Implemented the requested Settings placement change in both source and the running `meridian-extension/` mirror.\n\n- Moved Privacy & Data after Appearance, Search, and Tabs so it is the final Settings section.\n- Replaced the always-visible section with a native collapsed `<details>` / `<summary>` control.\n- Added expansion-chevron and keyboard focus styling.\n- Kept the complete disclosure and policy link inside the expandable content.\n- Updated regression coverage for native semantics, collapsed default, and bottom placement.\n- Validation: all 113 Node tests pass; source/package parity and JavaScript syntax checks pass.\n\nFinal approval still requires the published privacy-policy URL to return successfully.",
+      "pipeline_agents": []
+    }
+  ],
   "entries": []
 }

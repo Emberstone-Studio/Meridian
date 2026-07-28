@@ -1,0 +1,119 @@
+{
+  "id": "search-command-center-scoped-omni-search-bookmar-6909",
+  "title": "Search command center: scoped omni-search (Bookmarks/History) + relocate New Group",
+  "description": "Evolve the search bar into a scoped \"command center.\" One primary field searches everything (tabs/bookmarks/history/web); chips narrow the scope to Bookmarks or History and swap the left glyph + placeholder to signal the mode. Empty omni shows nothing; empty scoped mode lists that source. Move \"New Group\" out of the top row to a workspace-bottom \"Add a new group\" affordance mirroring the add-card. Full interaction spec in the attached design doc (spec.md). Two build increments: (1) scope engine + chips, (2) New Group relocation.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T18:13:19.587Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T18:13:19.587Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T18:13:19.587Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34",
+        "task_id": null
+      },
+      "task_id": "search-command-center-scoped-omni-search-bookmar-6909",
+      "content": "chat chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T18:14:04.268Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_doc_write",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34",
+        "task_id": null
+      },
+      "task_id": "search-command-center-scoped-omni-search-bookmar-6909",
+      "content": "chat chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34 called mcp__tasker__task_doc_write"
+    },
+    {
+      "timestamp": "2026-07-25T18:14:29.277Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-25T18:14:30.457Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-07-25T18:15:31.091Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T18:20:28.199Z",
+      "type": "output",
+      "content": "Implemented the scoped search command center and New Group relocation.\n\n- Added toggleable Bookmarks and History scope chips with mode-specific glyphs and placeholders.\n- Preserved empty omni behavior while empty scoped modes list bookmarks or recent history.\n- Restricted scoped queries/results to their selected source and made Enter open the first scoped result.\n- Moved New Group from the top actions to a workspace-bottom **Add a new group** affordance.\n- Kept the root extension and `meridian-extension` mirror synchronized.\n- Added scoped search tests; all 16 tests pass.\n- Commit: `b6c0ef4 Add scoped search command center`",
+      "attachment": "active/search-command-center-scoped-omni-search-bookmar-6909/search-command-center-scoped-omni-search-bookmarks.md"
+    },
+    {
+      "timestamp": "2026-07-25T22:45:10.944Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "role_docs": [
+    {
+      "role_slug": "designer",
+      "doc_path": "roles/designer/memory/tasks/search-command-center-scoped-omni-search-bookmar-6909.md",
+      "direction": "out",
+      "at": "2026-07-25T18:14:29.593Z"
+    },
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/search-command-center-scoped-omni-search-bookmar-6909.md",
+      "direction": "in",
+      "at": "2026-07-25T18:14:29.593Z"
+    }
+  ],
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Feature",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-25T18:14:53.301Z",
+    "auto_router_mode": null,
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    }
+  },
+  "agent_attempt_id": "attempt-c187ba3f82dd4c536981",
+  "agent_startup_started_at": "2026-07-25T18:15:31.070Z",
+  "agent_session_confirmed_run_id": "agent-search-command-center-scoped-omni-search-bookmar-6909",
+  "agent_session_confirmed_at": "2026-07-25T18:15:32.398Z",
+  "epic": "epic-search-command-center"
+}

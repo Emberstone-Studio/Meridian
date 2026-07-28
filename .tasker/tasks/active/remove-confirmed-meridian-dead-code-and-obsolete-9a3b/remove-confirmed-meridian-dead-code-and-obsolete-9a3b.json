@@ -1,0 +1,54 @@
+{
+  "description": "After functional fixes settle, remove the refactor leftovers confirmed by the root review without changing behavior:\n- `meridian.js`: unused `bookmarksApi`, unread `browserSearchResults`, unreachable non-empty `filterGrid()` branch, and orphan `.search-web-fallback` styling.\n- `components/SearchBar.js`: unreachable bookmark/history glyph constants.\n- `components/SearchPopup.js`: unused `setContent` / `setLabel` if still unreferenced.\n- `components/SettingsPanel.js`: unused `onClose` if still unreferenced.\n- `meridian.css`: obsolete old engine/scope/bookmark/new-group/select selectors listed in the review.\n- `components/sidebar.css`: nonexistent `.sidebar-title` and `#sidebar-header` selectors.\n\nReconfirm every symbol/selector is unused after preceding tasks; do not remove compatibility hooks or dynamically referenced selectors without evidence.\n\nAcceptance criteria:\n- Confirmed dead code is removed or retained with a documented live caller.\n- Static checks/tests pass and UI behavior is unchanged.\n- No unrelated reformatting or broad CSS churn.",
+  "label": "Maintenance",
+  "agent_id": "coder",
+  "deps": [
+    "eliminate-google-favicon-domain-leakage-and-add-1f75",
+    "prevent-stale-sidebar-search-and-auto-accent-asy-c041",
+    "fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+    "gate-local-search-data-access-and-minimize-exten-e0ab",
+    "fix-web-search-clearing-homepage-url-validation-be7f"
+  ],
+  "priority": "low",
+  "title": "Remove confirmed Meridian dead code and obsolete CSS",
+  "status": "done",
+  "id": "remove-confirmed-meridian-dead-code-and-obsolete-9a3b",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:30.315Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:30.315Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T01:47:45.736Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:53:03.338Z",
+      "type": "output",
+      "content": "## Completed\n\nRemoved the confirmed Meridian dead code from both the root source tree and the mirrored `meridian-extension` tree:\n\n- Removed unused search state/API remnants, unreachable non-empty grid filtering, and orphaned injected search styling from `meridian.js`.\n- Removed unreachable search glyph constants, unused popup methods, and the unused settings callback parameter.\n- Removed obsolete engine/scope, bookmark-button, new-group-button, native-select, and sidebar selectors.\n- Retained live hooks including `.scope-chip`, `#bookmarks-panel`, and `#new-group-drop-zone` after confirming their runtime callers.\n- Preserved the reachable board-reset behavior in `resetGridFilter()`.\n\n## Verification\n\n- `node --check` passed for all 40 JavaScript files.\n- Full test suite passed: 40 tests, 0 failures.\n- `git diff --check` passed.\n- Root and packaged mirror files remain synchronized.\n- Final static audit found none of the removed identifiers/selectors and no unrelated files were changed.",
+      "attachment": "active/remove-confirmed-meridian-dead-code-and-obsolete-9a3b/remove-confirmed-meridian-dead-code-and-obsolete-c.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.490Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T01:47:44.917Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-f30862ec6d1d89dad32c",
+  "agent_startup_started_at": "2026-07-26T01:47:45.705Z",
+  "agent_session_confirmed_run_id": "agent-remove-confirmed-meridian-dead-code-and-obsolete-9a3b",
+  "agent_session_confirmed_at": "2026-07-26T01:47:46.515Z"
+}

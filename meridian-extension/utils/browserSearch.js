@@ -234,6 +234,9 @@ export function initTabIndex() {
  */
 export async function rebuildIndex() {
   const tabs = await chrome.tabs.query({});
+  // Set of tab IDs that currently exist, keyed by the same string form used
+  // by the stored index object.
+  const liveTabIds = new Set(tabs.map((tab) => String(tab.id)));
   // Seed from the existing index so entries written by the event listeners
   // (registered synchronously before this runs) — plus already-extracted
   // metadata and lastActive values — are preserved rather than overwritten.
@@ -243,6 +246,13 @@ export async function rebuildIndex() {
     );
     for (const [tabId, entry] of rebuiltEntries) {
       index[tabId] = entry;
+    }
+    // Drop entries for tabs that no longer exist so a cold rebuild cannot
+    // retain stale closed tabs.
+    for (const tabId of Object.keys(index)) {
+      if (!liveTabIds.has(tabId)) {
+        delete index[tabId];
+      }
     }
   });
 

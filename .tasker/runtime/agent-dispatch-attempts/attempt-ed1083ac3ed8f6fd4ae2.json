@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "attemptId": "attempt-ed1083ac3ed8f6fd4ae2",
+  "status": "failed",
+  "spawnRequestedAt": "2026-07-26T22:55:15.436Z",
+  "updatedAt": "2026-07-26T23:01:07.031Z",
+  "taskId": "run-final-chrome-validation-against-the-release-9f59",
+  "runId": "agent-run-final-chrome-validation-against-the-release-9f59",
+  "kind": "peer",
+  "roleSlug": "reviewer",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": "session_handshake",
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 44692,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 10432,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "failed",
+    "sessionId": "019fa05d-5424-7532-8ea4-b1998f49ed46",
+    "establishedAt": "2026-07-26T22:55:15.469Z",
+    "waitingSince": "2026-07-26T22:55:15.521Z",
+    "failure": "process_completed_without_session"
+  },
+  "stderrTail": "\n tests/thumbnailCaptureRace.test.mjs                |  336 ++++\n tests/thumbnailImage.test.mjs                      |   78 +\n utils/browserSearch.js                             |   10 +\n utils/storageMutationQueue.js                      |   30 +-\n utils/thumbnailCache.js                            |  118 +-\n utils/thumbnailImage.js                            |   37 +\n 140 files changed, 2352 insertions(+), 7878 deletions(-)\nFILES\r\nbackground.js\r\ncomponents\\BookmarksButton.js\r\ncomponents\\ContextMenu.js\r\ncomponents\\NewTabCard.js\r\ncomponents\\SearchBar.js\r\ncomponents\\SearchPopup.js\r\ncomponents\\SearchSelection.js\r\ncomponents\\SettingsPanel.js\r\ncomponents\\sidebar.css\r\ncomponents\\sidebar.html\r\ncomponents\\sidebar.js\r\ncomponents\\TabCard.js\r\ncomponents\\WorkspaceLane.js\r\nimg\\chrome.svg\r\nimg\\edge.svg\r\nimg\\favicon.svg\r\nimg\\icon128.png\r\nimg\\icon16.png\r\nimg\\icon32.png\r\nimg\\icon48.png\r\nimg\\icon-source.svg\r\nimg\\Meridian.ai\r\nimg\\Meridian.svg\r\nimg\\meridian-screen1.png\r\nimg\\meridian-screen2.png\r\nimg\\meridian-screen3.png\r\nimg\\meridian-screen4.png\r\nimg\\meridian-screen5.png\r\nmanifest.json\r\nmeridian.css\r\nmeridian.html\r\nmeridian.js\r\nmeridian-extension\\background.js\r\nmeridian-extension\\components\\BookmarksButton.js\r\nmeridian-extension\\components\\ContextMenu.js\r\nmeridian-extension\\components\\NewTabCard.js\r\nmeridian-extension\\components\\SearchBar.js\r\nmeridian-extension\\components\\SearchPopup.js\r\nmeridian-extension\\components\\SearchSelection.js\r\nmeridian-extension\\components\\SettingsPanel.js\r\nmeridian-extension\\components\\sidebar.css\r\nmeridian-extension\\components\\sidebar.html\r\nmeridian-extension\\components\\sidebar.js\r\nmeridian-extension\\components\\TabCard.js\r\nmeridian-extension\\components\\WorkspaceLane.js\r\nmeridian-extension\\img\\chrome.svg\r\nmeridian-extension\\img\\edge.svg\r\nmeridian-extension\\img\\favicon.svg\r\nmeridian-extension\\img\\icon128.png\r\nmeridian-extension\\img\\icon16.png\r\nmeridian-extension\\img\\icon32.png\r\nmeridian-extension\\img\\icon48.png\r\nmeridian-extension\\img\\icon-source.svg\r\nmeridian-extension\\img\\Meridian.ai\r\nmeridian-extension\\img\\Meridian.svg\r\nmeridian-extension\\img\\meridian-screen1.png\r\nmeridian-extension\\img\\meridian-screen2.png\r\nmeridian-extension\\img\\meridian-screen3.png\r\nmeridian-extension\\img\\meridian-screen4.png\r\nmeridian-extension\\manifest.json\r\nmeridian-extension\\meridian.css\r\nmeridian-extension\\meridian.html\r\nmeridian-extension\\meridian.js\r\nmeridian-extension\\utils\\browserSearch.js\r\nmeridian-extension\\utils\\customBackground.js\r\nmeridian-extension\\utils\\domainCluster.js\r\nmeridian-extension\\utils\\favicon.js\r\nmeridian-extension\\utils\\homepageUrl.js\r\nmeridian-extension\\utils\\localSearch.js\r\nmeridian-extension\\utils\\storageMutationQueue.js\r\nmeridian-extension\\utils\\tabNavigation.js\r\nmeridian-extension\\utils\\thumbnailCache.js\r\nmeridian-extension\\utils\\thumbnailImage.js\r\nmeridian-extension\\utils\\toolbarIcon.js\r\nmeridian-extension\\utils\\urlInput.js\r\nmeridian-extension\\utils\\vendor\\README.md\r\nmeridian-extension\\utils\\vendor\\tldts.esm.min.js\r\nmeridian-extension\\utils\\vendor\\tldts.LICENSE\r\nmeridian-extension\\utils\\workspaceManager.js\r\nPRIVACY.md\r\nREADME.md\r\nRELEASE_VALIDATION.md\r\nSTORE_LISTING.md\r\nstore-assets\\promo-tile-440x280.png\r\nstore-assets\\README.md\r\nstore-assets\\src\\promo-tile-440x280.html\r\ntests\\asyncLatestWins.test.mjs\r\ntests\\backgroundLifecycle.test.mjs\r\ntests\\backgroundRefresh.test.mjs\r\ntests\\bookmarksButton.test.mjs\r\ntests\\browserSearchMetadata.test.mjs\r\ntests\\browserSearchRebuild.test.mjs\r\ntests\\browserSearchScopes.test.mjs\r\ntests\\cssSeparation.test.mjs\r\ntests\\customBackground.test.mjs\r\ntests\\domainCluster.test.mjs\r\ntests\\dragAndDrop.test.mjs\r\ntests\\favicon.test.mjs\r\ntests\\interactionDefects.test.mjs\r\ntests\\laneRenameAndContextMenu.test.mjs\r\ntests\\localSearchPermissions.test.mjs\r\ntests\\manifestPermissions.test.mjs\r\ntests\\packagedParity.test.mjs\r\ntests\\searchSelection.test.mjs\r\ntests\\settingsPopupRace.test.mjs\r\ntests\\settingsPrivacyDisclosure.test.mjs\r\ntests\\storageMutationQueue.test.mjs\r\ntests\\tabCardThumbnailError.test.mjs\r\ntests\\tabNavigation.test.mjs\r\ntests\\thumbnailCache.test.mjs\r\ntests\\thumbnailCaptureRace.test.mjs\r\ntests\\thumbnailImage.test.mjs\r\ntests\\toolbarIcon.test.mjs\r\ntests\\urlInput.test.mjs\r\nutils\\browserSearch.js\r\nutils\\customBackground.js\r\nutils\\domainCluster.js\r\nutils\\favicon.js\r\nutils\\homepageUrl.js\r\nutils\\localSearch.js\r\nutils\\storageMutationQueue.js\r\nutils\\tabNavigation.js\r\nutils\\thumbnailCache.js\r\nutils\\thumbnailImage.js\r\nutils\\toolbarIcon.js\r\nutils\\urlInput.js\r\nutils\\vendor\\README.md\r\nutils\\vendor\\tldts.esm.min.js\r\nutils\\vendor\\tldts.LICENSE\r\nutils\\workspaceManager.js\r\nPACKAGE\r\nGet-Content : Cannot find path 'package.json' because it does not exist.\r\nAt line:9 char:1\r\n+ Get-Content -LiteralPath 'package.json' -Raw\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : ObjectNotFound: (package.json:String) [Get-Content], ItemNotFoundException\r\n    + FullyQualifiedErrorId : PathNotFound,Microsoft.PowerShell.Commands.GetContentCommand\r\n \r\n\n2026-07-26T22:56:36.914120Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T22:56:44.274976Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T22:56:55.832463Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T22:57:09.043523Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T22:57:28.957791Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.3 seconds\nOutput:\nForEach-Object : The regular expression pattern \\ is not valid.\r\nAt line:28 char:76\r\n+ ... rse -File | ForEach-Object { $_.FullName.Substring($candidate.Length) ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : InvalidOperation: (\\:String) [ForEach-Object], RuntimeException\r\n    + FullyQualifiedErrorId : InvalidRegularExpression,Microsoft.PowerShell.Commands.ForEachObjectCommand\r\n \r\n\n2026-07-26T22:57:48.034050Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 1.2 seconds\nOutput:\nMethod invocation failed because [System.Convert] does not contain a method named 'ToHexString'.\r\nAt line:26 char:18\r\n+ ... ry { return [Convert]::ToHexString($hash.ComputeHash($stream)).ToLowe ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : InvalidOperation: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : MethodNotFound\r\n \r\n\n2026-07-26T22:59:39.073003Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T22:59:48.715858Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T22:59:57.021667Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T23:00:13.990351Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.4 seconds\nOutput:\nInvoke-RestMethod : The remote server returned an error: (409) Conflict.\r\nAt line:22 char:1\r\n+ Invoke-RestMethod -Headers $headers -Uri 'http://localhost:9807/agent ...\r\n+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : InvalidOperation: (System.Net.HttpWebRequest:HttpWebRequest) [Invoke-RestMethod], WebExc \r\n   eption\r\n    + FullyQualifiedErrorId : WebCmdletWebResponseException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand\r\n \r\n\n2026-07-26T23:00:14.112003Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T23:00:25.109869Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T23:00:41.571541Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.3 seconds\nOutput:\n\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T22:55:15.436Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T22:55:15.446Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T22:55:15.460Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 44692
+    },
+    {
+      "at": "2026-07-26T22:55:15.470Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T22:55:15.502Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 44692
+    },
+    {
+      "at": "2026-07-26T22:55:15.522Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 10432
+    },
+    {
+      "at": "2026-07-26T22:55:15.527Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T23:01:07.016Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-26T23:01:07.031Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

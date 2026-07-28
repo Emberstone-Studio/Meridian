@@ -1,0 +1,82 @@
+{
+  "agent": "designer",
+  "description": "Create Meridian's small Chrome Web Store promotional tile. This is a marketing graphic used in store discovery surfaces, not a product screenshot.\n\nAcceptance criteria:\n- Deliver a 440x280 PNG or JPEG suitable for the Chrome Web Store small promo tile field.\n- Use Meridian's current icon, colors, and visual language; keep the design full-bleed, legible when reduced, and visually distinct from a raw screenshot.\n- Keep text minimal and avoid rankings, awards, unsupported performance claims, browser endorsement, or misleading UI.\n- Save the editable source separately from the final export and document the final asset path.\n- Visually inspect the export at native size and half size for clipping, contrast, and legibility.",
+  "label": "Release",
+  "priority": "medium",
+  "title": "Design the 440x280 Chrome Web Store promotional tile",
+  "status": "done",
+  "id": "design-the-440x280-chrome-web-store-promotional-4340",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:00:11.761Z",
+  "updated_at": "2026-07-26T23:58:18.840Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:00:11.761Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:05:21.383Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:05:44.325Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:14:38.725Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T18:19:18.509Z",
+      "type": "output",
+      "content": "## Meridian — 440×280 Chrome Web Store promotional tile\n\nDelivered a full-bleed, on-brand small promo tile suitable for the Chrome Web Store \"small promotional tile\" field.\n\n### Deliverables\n| Asset | Path |\n|---|---|\n| **Final export** | `store-assets/promo-tile-440x280.png` — 440×280 PNG, 8-bit RGB (~80 KB) |\n| **Editable source** | `store-assets/src/promo-tile-440x280.html` |\n| **Docs** | `store-assets/README.md` — design notes + regeneration command |\n\nMarketing assets live in a new top-level `store-assets/` directory, kept **separate** from the shipped extension (`meridian-extension/`) since Web Store promo art is uploaded via the developer dashboard, not in the package.\n\n### Design\n- **Background** — Meridian's signature *Ocean* gradient `linear-gradient(135deg,#0f2027,#203a43,#2c5364)` (the app's default background / accent source in `components/SettingsPanel.js`), with a soft teal glow and a faint abstract \"workspace lanes\" texture so the tile reads as branded art rather than a raw screenshot.\n- **Mark** — the ring + calligraphic flame strokes from `img/Meridian.svg`; strokes in `#f5f5f7`, ring in the teal accent `hsl(197 100% 55%)` (`meridian.css --accent`).\n- **Type** — `system-ui` stack (matches `meridian.css`): \"Meridian\" wordmark, teal accent rule, and the product's own tagline \"Spatial tab command center\".\n\n### Policy compliance\nText is minimal and factual — **no** rankings, awards, performance claims, browser endorsement, or simulated/misleading UI. Full-bleed with no transparent corners.\n\n### Verification\n- File confirmed as exactly **440×280 PNG, RGB** (`file` check).\n- Visually inspected at **native 440×280** and **half size 220×140**: wordmark stays crisp and legible, mark reads clearly, tagline remains readable, strong contrast (white/teal on deep teal-slate), and no clipping at any edge.\n- Rendered with Chrome headless at native resolution (no external image tooling needed); regeneration command documented in `store-assets/README.md`.",
+      "attachment": "active/design-the-440x280-chrome-web-store-promotional-4340/design-the-440x280-chrome-web-store-promotional-ti.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.840Z",
+      "type": "review",
+      "content": "Reviewer decision: Approved. The delivered promotional tile is the required 440x280 dimensions and is visually suitable for the store listing."
+    }
+  ],
+  "epic": "epic-chrome-web-store-release",
+  "agent_id": null,
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Release",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T18:14:07.107Z",
+    "auto_router_mode": "models",
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": true,
+      "toolCallingFloor": "model_dependent",
+      "category": "architecture_review"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "claude",
+      "tier": "first_party_cli",
+      "systemPromptMode": "native_flag",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    }
+  },
+  "agent_attempt_id": "attempt-57553b162c1d9193daef",
+  "agent_startup_started_at": "2026-07-26T18:14:38.689Z",
+  "agent_session_confirmed_run_id": "agent-design-the-440x280-chrome-web-store-promotional-4340",
+  "agent_session_confirmed_at": "2026-07-26T18:14:41.407Z"
+}

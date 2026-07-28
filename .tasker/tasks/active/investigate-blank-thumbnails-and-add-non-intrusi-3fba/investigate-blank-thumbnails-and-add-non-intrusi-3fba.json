@@ -1,0 +1,135 @@
+{
+  "agent": "coder",
+  "description": "Investigate why previously valid Meridian thumbnails disappear and regress to letter placeholders while Chrome remains open continuously and the affected tabs remain open, then fix the loss and add non-intrusive recovery. This is confirmed in-session thumbnail loss, not tabs that were never captured and not browser-restart tab-ID churn. The reported state is visible in .tasker/chats/e123bfc1/attachments/Screenshot_2026-07-26_135726.png: many cards that previously showed screenshots lost them, while a newer-looking thumbnail remained.\n\nPrimary hypotheses to test:\n- thumbnailCache pruning crosses MAX_BYTES/MAX_ENTRIES and evicts thumbnails belonging to still-open tabs; the pattern of many old placeholders plus a surviving recent capture is consistent with LRU eviction.\n- thumbnailCacheAccess metadata diverges from actual thumb_* keys or accumulates stale/orphaned entries, producing incorrect byte totals and removals.\n- Concurrent save/evict/render operations expose or persist a partially-mutated cache.\n- Storage writes fail under size/quota pressure despite unlimitedStorage, or oversized full-window JPEG data URLs cause excessive turnover.\n- A data URL remains present but fails to decode/load; TabCard currently has no thumbnail image-error recovery.\n- A tab lifecycle event incorrectly calls evictThumbnail for a tab that still exists.\n\nConstraints:\n- chrome.tabs.captureVisibleTab can capture only the currently active tab in a specified window. Do not silently activate background tabs.\n- Do not add debugger, tabCapture, desktopCapture, offscreen-page, sessions, or remote page-fetching permissions.\n- Never delete or replace a valid cached thumbnail merely because a refresh attempt failed.\n\nAcceptance criteria:\n- Reproduce the in-session transition from visible thumbnails to placeholders under repeated automatic captures, long-running sessions, many tabs, byte-limit pressure, entry-limit pressure, tab close/reopen, discarded/frozen tabs, navigation, storage failures, and image decode/load failures.\n- Capture before/after evidence for current live tab IDs, thumb_* keys, thumbnailCacheAccess metadata, stored byte counts, pruning decisions, and relevant tab lifecycle events so the actual deletion path is proven.\n- Fix the confirmed loss path. Pruning must delete orphaned/closed-tab thumbnails before entries for live tabs, keep access metadata consistent with stored keys, and avoid leaving partial mutations visible after concurrent operations.\n- If full-resolution capture size is causing turnover, resize captures to an appropriate thumbnail resolution before storage and use accurate stored-byte accounting. Preserve sufficient quality for cards/lightbox without retaining full-window images unnecessarily.\n- Define deterministic behavior if live-tab thumbnails alone exceed the configured cap; do not silently collapse most of the board to placeholders after each new capture.\n- Add thumbnail <img> error handling so a corrupt/undecodable entry is diagnosed, removed safely, and rendered as an honest placeholder without breaking the card.\n- Opportunistically recapture missing thumbnails when affected tabs naturally become active or complete loading while still active, with per-window deduplication and bounded retry/backoff. Do not claim inactive tabs can be captured without activation.\n- Preserve a valid previous thumbnail after every failed refresh.\n- Add regression tests for the diagnosed in-session loss path, live-tab protection, metadata reconciliation, byte accounting, image failure, retry limits, and no-focus-change behavior.\n- Run the full Node suite and JavaScript syntax checks.",
+  "label": "Bug",
+  "deps": [
+    "prevent-automatic-thumbnail-capture-from-saving-5df5"
+  ],
+  "priority": "high",
+  "title": "Investigate blank thumbnails and add non-intrusive lazy refresh",
+  "status": "in_review",
+  "id": "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:03:18.280Z",
+  "updated_at": "2026-07-27T03:44:01.553Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:03:18.280Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:03:54.793Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:04:07.093Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:48:26.149Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T19:01:50.311Z",
+      "type": "output",
+      "content": "## Result\n\nConfirmed the in-session loss path: the cache pruned a metadata-only global LRU without checking current Chrome tab IDs. Crossing 200 entries or 50 MB therefore deleted older thumbnails for still-open tabs, matching the observed old placeholders/new survivor pattern. It also removed prior entries before the incoming storage write, so a quota/write failure could leave a partially deleted cache. Full-window JPEG storage accelerated byte pressure.\n\n## Fix\n\n- Reconciled `thumb_*` values and `thumbnailCacheAccess` on every save, recalculating actual UTF-8 stored bytes and serializing the complete cache mutation.\n- Protected all live-tab thumbnails. Closed/orphaned entries are pruned first; if live entries alone exceed a limit, the limit is a deterministic soft cap rather than silently deleting live screenshots.\n- Made the incoming thumbnail plus reconciled metadata write succeed before orphan cleanup. Failed refresh, resize, focus guard, or storage writes preserve the prior valid thumbnail.\n- Resized captures to a maximum 960�600 JPEG before storage and rechecked the active tab after processing.\n- Added per-window deduplicated lazy recovery when a missing tab naturally becomes active or completes loading while active. It never activates a tab and is bounded to three attempts with 750/1500 ms backoff. Existing thumbnails are not recaptured merely on activation; completed navigation refreshes once.\n- Added card image-error handling that immediately renders an honest letter placeholder and compare-and-removes only the exact corrupt cached value, protecting a newer concurrent replacement.\n- Added structured cache/lifecycle diagnostics covering live tab IDs, stored keys, metadata keys, byte totals, prune decisions, and removal/load events.\n- Mirrored every runtime change into `meridian-extension`; no permissions were added.\n\n## Regression coverage\n\nAdded deterministic coverage for entry and byte pressure, live soft-cap behavior, orphan-first pruning, metadata reconciliation, accurate byte accounting, concurrent saves, incoming write/removal failures, close/removal lifecycle, discarded/frozen/navigation events, focus races, capture resizing and decode failures, image load errors, compare-and-remove safety, retry bounds, and no-focus-change behavior.\n\n## Validation\n\n- `node --test tests/*.test.mjs`: **107 passed, 0 failed**\n- `node --check` for every JavaScript file: **passed**\n- Packaged source parity: **passed**\n- `git diff --check`: **passed**\n- Commit: `8c97ad0 Protect live thumbnails and add lazy recovery`",
+      "attachment": "active/investigate-blank-thumbnails-and-add-non-intrusi-3fba/investigate-blank-thumbnails-and-add-non-intrusive.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.884Z",
+      "type": "review",
+      "content": "Reviewer rework required: Eliminate the cross-context removal race. TabCard currently performs a read/compare/remove in the page context while background capture writes through a different module-local queue, so a new thumbnail can be deleted between the comparison and removal. Route conditional removal through the background worker so thumbnail mutations share one serialized context. Also gate/remove the per-save diagnostic dumps and log counts only when debugging. Add a regression for a save racing a failed-image cleanup."
+    },
+    {
+      "timestamp": "2026-07-27T00:00:35.689Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:02:31.829Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:04:04.391Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:07:55.291Z",
+      "type": "output",
+      "content": "## Result\n\nCompleted the reviewer-requested hardening for the thumbnail-loss fix.\n\n- Routed corrupt-image conditional cleanup from `TabCard` to the background service worker via `REMOVE_THUMBNAIL_IF_MATCHES`. Capture saves and failed-image cleanup now use the same background `thumbnailCacheAccess` mutation queue, eliminating the cross-context read/compare/remove race that could delete a newly saved replacement.\n- Kept compare-and-remove semantics: cleanup removes only the exact failed data URL and leaves a newer thumbnail intact.\n- Gated cache-decision diagnostics behind explicit `DEBUG_THUMBNAILS` mode and reduced debug payloads to counts and byte totals instead of tab IDs, storage keys, and removal key lists.\n- Mirrored runtime changes into `meridian-extension`.\n- Updated the card error regression to verify background routing and added a save-versus-failed-image-cleanup race regression.\n\n## Validation\n\n- `node --test tests/*.test.mjs`: **113 passed, 0 failed**\n- `node --check` across all 52 tracked JavaScript files: **passed**\n- Packaged runtime parity test: **passed**\n- Manifest parsing: **passed**\n- `git diff --check`: **passed**\n- Worktree: **clean**\n- Commit: `ce680d7 Serialize corrupt thumbnail cleanup`",
+      "attachment": "active/investigate-blank-thumbnails-and-add-non-intrusi-3fba/investigate-blank-thumbnails-and-add-non-intrusive-2.md"
+    },
+    {
+      "timestamp": "2026-07-27T03:38:12.009Z",
+      "type": "review",
+      "content": "Additional rework after live testing: thumbnails still disappear. Implement durable IndexedDB blob storage/migration, preserve cached data on render errors, retry display before showing a placeholder, and mark failed thumbnails for replacement on natural activation rather than deleting them."
+    },
+    {
+      "timestamp": "2026-07-27T03:44:01.553Z",
+      "type": "output",
+      "content": "Implemented a durable, non-destructive thumbnail cache rework in both source and the running `meridian-extension/` mirror.\n\n- Added IndexedDB-backed JPEG blob storage with reusable `blob:` display URLs; `unlimitedStorage` applies to the extension-local database.\n- Migrates existing `chrome.storage.local` thumbnail data URLs into IndexedDB instead of dropping them.\n- Preserves the last-known-good blob when an image fails to render.\n- Retries a failed image once, then shows a placeholder and marks the thumbnail for replacement on the tab's next natural activation; it no longer deletes the stored thumbnail.\n- New captures are decoded/validated before replacing the durable record.\n- Cache pruning still protects live tabs and removes both image data and metadata when a tab closes.\n- Updated the custom-background IndexedDB schema version, runtime render notifications, privacy/store documentation, runtime mirror, and regressions.\n\nValidation: 117/117 Node tests pass; all runtime JavaScript syntax checks pass; source/runtime parity passes; non-Tasker diff check is clean."
+    }
+  ],
+  "agent_id": "coder",
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "alternates": [],
+    "shape": "Bug",
+    "decided_by": "run-queue",
+    "decided_at": "2026-07-27T00:04:03.080Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": true,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=true,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "agent_attempt_id": "attempt-e03da4125b0bb3934935",
+  "agent_startup_started_at": "2026-07-27T00:04:04.349Z",
+  "agent_session_confirmed_run_id": "agent-investigate-blank-thumbnails-and-add-non-intrusi-3fba",
+  "agent_session_confirmed_at": "2026-07-27T00:04:04.386Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/investigate-blank-thumbnails-and-add-non-intrusi-3fba.md",
+      "direction": "self",
+      "at": "2026-07-27T00:07:55.291Z"
+    }
+  ]
+}

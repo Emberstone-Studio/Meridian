@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "attemptId": "attempt-cdd00d91f1ec46a8c0cf",
+  "status": "failed",
+  "spawnRequestedAt": "2026-07-25T23:37:30.651Z",
+  "updatedAt": "2026-07-26T00:36:13.734Z",
+  "taskId": "audit-background-worker-utilities-packaged-exten-ca38",
+  "runId": "agent-audit-background-worker-utilities-packaged-exten-ca38",
+  "kind": "peer",
+  "roleSlug": "reviewer",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": "agent",
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 7480,
+    "status": "running"
+  },
+  "agent": {
+    "pid": 43084,
+    "status": "failed",
+    "exitCode": 1,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019f9ba4-1a4b-7932-8028-f8841ea97a47",
+    "waitingSince": "2026-07-25T23:37:30.730Z",
+    "establishedAt": "2026-07-25T23:37:31.188Z"
+  },
+  "stderrTail": "Reading additional input from stdin...\n2026-07-25T23:38:45.688267Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-25T23:38:51.027938Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-25T23:38:57.875223Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-25T23:39:04.277225Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.5 seconds\nOutput:\n\r\nFullName                                              Version       \r\n--------                                              -------       \r\nC:\\Program Files\\Google\\Chrome\\Application\\chrome.exe 150.0.7871.182\r\n\r\n\r\n\n2026-07-25T23:39:04.366544Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-25T23:40:21.200251Z ERROR codex_core::tools::router: error=Exit code: 124\nWall time: 30 seconds\nOutput:\ncommand timed out after 30022 milliseconds\nC:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\r\n\n2026-07-25T23:40:49.943495Z ERROR codex_core::tools::router: error=`\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command '$pidToStop = 38436; $profile = '\"'C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\meridian-audit-95f89974157941669318a2891ffbe0d3'; Get-Process -Id \"'$pidToStop -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep -Milliseconds 500; $resolved = [IO.Path]::GetFullPath($profile); $tempRoot = [IO.Path]::GetFullPath($env:TEMP).TrimEnd('\"'\\\\') + '\\\\'; if(-not \"'$resolved.StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase) -or -not ([IO.Path]::GetFileName($resolved)).StartsWith('\"'meridian-audit-')){ throw \\\"Unsafe cleanup target: \"'$resolved\" }; if(Test-Path -LiteralPath $resolved){ Remove-Item -LiteralPath $resolved -Recurse -Force }; \"cleaned isolated Chrome probe profile\"'` rejected: blocked by policy\n2026-07-25T23:41:16.452707Z ERROR codex_core::tools::router: error=`\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command '$url='\"'https://storage.googleapis.com/chrome-for-testing-public/151.0.7922.47/win64/chrome-win64.zip'; \"'$zip=Join-Path $env:TEMP '\"'chrome-for-testing-151.0.7922.47-win64.zip'; if(Test-Path -LiteralPath \"'$zip){ $existing=(Get-Item -LiteralPath $zip).Length } else { $existing=0 }; $proc=Start-Process -FilePath '\"'curl.exe' -ArgumentList @('-L','--fail','--silent','--show-error','-o',\"'$zip,$url) -PassThru -WindowStyle Hidden; [pscustomobject]@{Pid=$proc.Id;Zip=$zip;ExistingBytes=$existing} | ConvertTo-Json'` rejected: blocked by policy\n2026-07-25T23:43:21.588187Z ERROR codex_core::tools::router: error=Exit code: 124\nWall time: 120 seconds\nOutput:\ncommand timed out after 120030 milliseconds\n\n2026-07-25T23:43:32.979586Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.5 seconds\nOutput:\nInvoke-WebRequest : Object reference not set to an instance of an object.\r\nAt line:2 char:104\r\n+ ... /chrome-win64.zip'; (Invoke-WebRequest -Method Head -Uri $url).Header ...\r\n+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Invoke-WebRequest], NullReferenceException\r\n    + FullyQualifiedErrorId : System.NullReferenceException,Microsoft.PowerShell.Commands.InvokeWebRequestCommand\r\n \r\n\n2026-07-25T23:45:40.861630Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.3 seconds\nOutput:\nfile:///C:/Users/russp/AppData/Local/Temp/tasker-task-worktrees/2b13ff41ffe7/audit-background-worker-utilities-packaged-exten-74c6a2984c3fc672/.audit-smoke.mjs:99\r\n    throw new Error(\"Meridian page or service worker target was not loaded\");\r\n          ^\r\n\r\nError: Meridian page or service worker target was not loaded\r\n    at file:///C:/Users/russp/AppData/Local/Temp/tasker-task-worktrees/2b13ff41ffe7/audit-background-worker-utilities-packaged-exten-74c6a2984c3fc672/.audit-smoke.mjs:99:11\r\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\r\n\r\nNode.js v24.12.0\r\n\n2026-07-25T23:48:03.078188Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-25T23:50:25.812666Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.2 seconds\nOutput:\nAt line:2 char:763\r\n+ ... ralPath $resolved -PathType Leaf){'File'}else{'Missing'}} } | Format- ...\r\n+                                                                 ~\r\nAn empty pipe element is not allowed.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : EmptyPipeElement\r\n \r\n\n2026-07-25T23:50:44.678082Z ERROR codex_core::tools::router: error=`\"C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe\" -Command \"Remove-Item -LiteralPath 'C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\meridian-audit-95f89974157941669318a2891ffbe0d3' -Recurse -Force; Remove-Item -LiteralPath 'C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\meridian-cft-audit-69229b16c68f46a6a427f0baa35652bf' -Recurse -Force; Remove-Item -LiteralPath 'C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\chrome-for-testing-151.0.7922.47' -Recurse -Force; Remove-Item -LiteralPath 'C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\chrome-for-testing-151.0.7922.47-win64.zip' -Force; 'removed isolated browser test artifacts'\"` rejected: blocked by policy\n2026-07-25T23:50:44.791015Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-25T23:51:07.134384Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n",
+  "transitions": [
+    {
+      "at": "2026-07-25T23:37:30.651Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-25T23:37:30.657Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-25T23:37:30.670Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 7480
+    },
+    {
+      "at": "2026-07-25T23:37:30.711Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 7480
+    },
+    {
+      "at": "2026-07-25T23:37:30.732Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 43084
+    },
+    {
+      "at": "2026-07-25T23:37:30.736Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-25T23:37:31.190Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T00:36:10.866Z",
+      "component": "agent",
+      "state": "stopped",
+      "signal": "user_stop"
+    },
+    {
+      "at": "2026-07-26T00:36:13.734Z",
+      "component": "agent",
+      "state": "failed",
+      "exitCode": 1,
+      "signal": null
+    }
+  ]
+}

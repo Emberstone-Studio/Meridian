@@ -9,7 +9,7 @@
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-25T04:31:13.334Z",
-  "updated_at": "2026-07-25T05:10:33.758Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
   "activity": [
     {
       "timestamp": "2026-07-25T04:31:13.334Z",
@@ -73,12 +73,12 @@
     }
   ],
   "routing": {
-    "chosen_model": "codex-gpt-5-6-sol",
-    "rationale": "Direct approved queue dispatch to assigned role",
-    "decided_by": "run-queue",
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
     "decided_at": "2026-07-25T04:48:54.396Z",
     "auto_router_mode": null
   },
   "agent_attempt_id": "attempt-05304437a0e3d25486c7",
-  "agent_startup_started_at": "2026-07-25T04:48:55.085Z"
+  "agent_startup_started_at": "2026-07-25T04:48:55.085Z",
+  "epic": "epic-thumbnails"
 }

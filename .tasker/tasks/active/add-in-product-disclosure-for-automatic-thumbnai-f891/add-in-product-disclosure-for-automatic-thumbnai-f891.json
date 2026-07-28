@@ -1,0 +1,73 @@
+{
+  "agent": "coder",
+  "description": "Add concise, accessible disclosure in Meridian's UI for the automatic data handling behind live thumbnails and open-tab search.\n\nAcceptance criteria:\n- In Settings or an appropriate onboarding surface, explain that Meridian automatically captures the visible active tab for thumbnails and reads meta descriptions plus H1/H2 text after page loads for local open-tab search.\n- State that the data is stored locally, identify the relevant feature controls, and link or point users to the full privacy policy without disrupting core workflows.\n- Ensure the disclosure is visible to keyboard and assistive-technology users and uses plain language consistent with PRIVACY.md.\n- Do not imply bookmark/history access is automatic; preserve the existing optional-permission flow.\n- Add or update tests for the rendered disclosure where practical and run the full Node suite and syntax checks.\n\n## Reviewer rework requirements (July 26, 2026)\n- Move Privacy & Data from the top of Settings to the bottom of the settings menu.\n- Present it as an expandable/collapsible section rather than always displaying all disclosure text.\n- Use an accessible native details/summary pattern or an equivalent control with correct keyboard behavior, focus treatment, and expanded-state semantics.\n- Keep the full disclosure and privacy-policy link inside the expanded content.\n- Update regression tests to verify placement at the bottom, collapsed/expanded behavior, accessibility semantics, and policy link attributes.\n- The task cannot be finally approved until the published privacy-policy URL returns successfully rather than 404.",
+  "label": "Release",
+  "priority": "high",
+  "title": "Add in-product disclosure for automatic thumbnails and metadata indexing",
+  "status": "in_review",
+  "id": "add-in-product-disclosure-for-automatic-thumbnai-f891",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:00:44.441Z",
+  "updated_at": "2026-07-27T00:12:44.027Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:00:44.441Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:03:27.651Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:48:25.050Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T18:53:55.120Z",
+      "type": "output",
+      "content": "## Summary\n\nAdded an always-visible, accessible \"Privacy & Data\" disclosure to Meridian's Settings panel that explains the automatic data handling behind live thumbnails and open-tab search, matching PRIVACY.md's plain-language framing.\n\n## Changes\n\n- **`components/SettingsPanel.js`** (+ synced copy in `meridian-extension/components/SettingsPanel.js`):\n  - Added a new `Privacy & Data` section, rendered **first** in the Settings panel (before Appearance/Search/Tabs) so it's visible without any extra click or onboarding flow, and without blocking core workflows (Settings is opt-in UI, not a modal/interstitial).\n  - Three plain-language paragraphs:\n    1. States that Meridian automatically captures a screenshot of the active tab for live thumbnails, and automatically reads each loaded page's meta description and H1/H2 heading text for local open-tab search — both without a separate prompt.\n    2. States the data is stored locally in the Chrome profile, that Meridian has no server and never uploads it, and points to the existing **Local Search** and **Thumbnails** controls below as the relevant feature controls.\n    3. Explicitly states bookmark/history access is **never automatic** — Chrome permission is only requested when the user turns on Bookmarks or History under Local Search — preserving the existing optional-permission flow untouched.\n  - A real `<a href>` link (`target=\"_blank\" rel=\"noopener noreferrer\"`) reading \"Read Meridian's full privacy policy\", pointing at the repo's `PRIVACY.md` (exported as `PRIVACY_POLICY_URL` for testability).\n  - Uses only semantic `<p>`/`<a>` elements in normal document flow — no `aria-hidden`, no `display:none`, no interactive widget needed — so it's reachable by keyboard Tab order and read by assistive-technology virtual cursors like any other panel text; the link itself is natively focusable.\n\n- **`meridian.css`** (+ synced copy in `meridian-extension/meridian.css`): added `.settings-privacy-group`, `.settings-privacy-text`, and `.settings-privacy-link` rules consistent with existing settings typography, including a `:focus-visible` outline on the link.\n\n- **`tests/settingsPrivacyDisclosure.test.mjs`** (new): 5 tests extracting and rendering the disclosure block against a minimal fake DOM (same technique as `tests/settingsPopupRace.test.mjs`), verifying: thumbnail/metadata wording, local-storage + feature-control wording, that bookmark/history access is described as never-automatic, that the policy link is a real focusable `<a>` with correct `href`/`target`/`rel`, and that the section is registered first in the panel.\n\n## Verification\n\n- `node --test tests/*.test.mjs` → **95/95 passing** (all pre-existing tests plus the 5 new ones), including `packagedParity.test.mjs` (root vs. `meridian-extension` stay byte-identical) and `manifestPermissions.test.mjs`.\n- `node --check` passed on all modified/added `.js` files; `meridian.css` brace-balance verified (not JS, so `node --check` doesn't apply to it).\n- No changes to `manifest.json` or the optional-permission flow in `utils/localSearch.js` — bookmarks/history remain gated behind the existing `chrome.permissions.request` flow, untouched by this change.",
+      "attachment": "active/add-in-product-disclosure-for-automatic-thumbnai-f891/add-in-product-disclosure-for-automatic-thumbnails.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.923Z",
+      "type": "review",
+      "content": "Reviewer decision: Implementation is conditionally acceptable, but the hard-coded privacy-policy URL currently returns 404. Keep this task in review until PRIVACY.md is published at that exact URL and the link returns successfully."
+    },
+    {
+      "timestamp": "2026-07-27T00:00:34.545Z",
+      "type": "review",
+      "content": "Reviewer rework requested by product owner: Move Privacy & Data to the bottom of Settings and make it an accessible expandable section. Preserve the disclosure and policy link inside it, update tests, and verify the published policy URL works before final approval."
+    },
+    {
+      "timestamp": "2026-07-27T00:12:04.011Z",
+      "type": "comment",
+      "content": "Implementing the requested UI rework directly: move Privacy & Data to the bottom of Settings and convert it to an accessible collapsed details/summary section in both root and running extension copies."
+    },
+    {
+      "timestamp": "2026-07-27T00:12:44.027Z",
+      "type": "output",
+      "content": "Implemented the requested Settings placement change in both source and the running `meridian-extension/` mirror.\n\n- Moved Privacy & Data after Appearance, Search, and Tabs so it is the final Settings section.\n- Replaced the always-visible section with a native collapsed `<details>` / `<summary>` control.\n- Added expansion-chevron and keyboard focus styling.\n- Kept the complete disclosure and policy link inside the expandable content.\n- Updated regression coverage for native semantics, collapsed default, and bottom placement.\n- Validation: all 113 Node tests pass; source/package parity and JavaScript syntax checks pass.\n\nFinal approval still requires the published privacy-policy URL to return successfully."
+    }
+  ],
+  "agent_id": "writer",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T18:48:24.125Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-e0915dbb5bf10e06615a",
+  "agent_startup_started_at": "2026-07-26T18:48:25.025Z",
+  "role_docs": [
+    {
+      "role_slug": "writer",
+      "doc_path": "roles/writer/memory/tasks/add-in-product-disclosure-for-automatic-thumbnai-f891.md",
+      "direction": "self",
+      "at": "2026-07-27T00:12:44.027Z"
+    }
+  ]
+}

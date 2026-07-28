@@ -1,0 +1,112 @@
+{
+  "description": "Complete the portions intentionally excluded from the root static review. Review `background.js`, `utils/*`, and `meridian-extension/`; compare packaged/running extension code with the root source and flag drift. Run the repository test suite, load the extension unpacked in Chrome, inspect service-worker errors, and exercise startup, storage migration, search, thumbnail capture/refresh, permissions, side panel, and tab-group flows.\n\nReport confirmed findings ranked by severity with exact file/line locations and concrete fixes. Verify whether `scripting` and `<all_urls>` are actually used before the permissions-remediation task changes the manifest. Do not make product fixes in this task.\n\nAcceptance criteria:\n- All previously excluded source is inspected.\n- Automated tests and an unpacked-extension smoke test are executed with results recorded.\n- Permission use, background-worker behavior, and root/packaged-source drift are explicitly documented.\n- Any newly discovered blocker is filed or clearly identified for follow-up.",
+  "label": "Maintenance",
+  "agent_id": "reviewer",
+  "priority": "high",
+  "title": "Audit background worker, utilities, packaged extension, and runtime behavior",
+  "status": "done",
+  "id": "audit-background-worker-utilities-packaged-exten-ca38",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:29.424Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:29.424Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T23:37:30.673Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T00:36:09.561Z",
+      "type": "watchdog_redispatch",
+      "content": "Agent was alive but made no progress for ~45m (stalled, likely a transient API error) — killed and re-queued for dispatch."
+    },
+    {
+      "timestamp": "2026-07-26T00:36:13.694Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T00:39:13.788Z",
+      "type": "moved",
+      "content": "Agent session startup timed out after 180s (no confirmed agent session; launcher PID 36896 alive; agent PID 41384 alive; agent status running; attempt status waiting_for_session) after watchdog retry — left in Ready for review."
+    },
+    {
+      "timestamp": "2026-07-26T00:39:15.526Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T00:42:15.618Z",
+      "type": "moved",
+      "content": "Agent session startup timed out after 180s (no confirmed agent session; launcher PID 36052 alive; agent PID 45144 alive; agent status running; attempt status waiting_for_session) after watchdog retry — left in Ready for review."
+    },
+    {
+      "timestamp": "2026-07-26T00:42:16.769Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:00:51.414Z",
+      "type": "output",
+      "content": "## Confirmed findings\n\n### High - Pinned Meridian tab does not respawn after a cold service-worker start\n- Location: `background.js:4`, `background.js:106-112` (same packaged lines).\n- `meridianTabId` is volatile module state. `tabs.onRemoved` compares only that variable and never resolves the persisted ID. When MV3 starts a cold worker for the removal event, the comparison fails and the stored ID/tab are not repaired.\n- Runtime proof: closing stored Meridian tab `990283226` after a worker restart left zero pinned Meridian tabs after 1.5s and storage still held `990283226`.\n- Fix: in the removal handler compare the removed ID with persisted state when memory is empty, then clear it and schedule/await `ensureMeridianTab()`; add a cold-worker test.\n- Follow-up blocker: this core auto-respawn failure should block release until fixed.\n\n### Medium - Thumbnail refresh corrupts previous-tab state\n- Location: `background.js:179-204`, `background.js:234-242` (same packaged lines).\n- Refresh activates every capturable tab while `isRefreshing`; the capture listener honors that guard, but the listener writing `previousTabId` does not.\n- Runtime proof: a known `previousTabId` pointing at `about:blank` changed to the traversed IANA tab after refresh, although the original active Example tab was restored.\n- Fix: return early from the previous-tab listener while `isRefreshing` remains true; test preservation of active and previous IDs.\n\n### Medium - Workspace search index is stale after assignment/rename\n- Location: `utils/browserSearch.js:98-140` (snapshot at line 138) and `utils/browserSearch.js:179-225` (same packaged lines).\n- Workspace names enter the index only on tab create/update/rebuild. Workspace mutations never update the index.\n- Runtime proof: after assigning Example to `Migrated Audit Workspace`, its index still contained `workspaceName: \"\"`; searches for that and renamed `Renamed Workspace` returned no tabs.\n- Fix: update/rebuild affected index entries on `chrome.storage.onChanged` for `workspaces`, or join current workspace data during search; test assign/rename.\n\n### Medium - Domain clustering merges unrelated public-suffix sites\n- Location: `utils/domainCluster.js:27-33` (same packaged lines).\n- Last-two-label parsing maps both `news.bbc.co.uk` and `shop.example.co.uk` to `co.uk`, producing one workspace named `Co`.\n- Fix: use a maintained Public Suffix List implementation and cover `co.uk`, `com.au`, and private suffixes.\n\nNo style-only nits are included.\n\n## Permission-use verdict\n- `scripting` is actively used at `utils/browserSearch.js:150-159` for metadata/headings extraction. Runtime injection on `https://example.com/` returned its title and H1.\n- `<all_urls>` authorizes that arbitrary-page injection and unattended `captureVisibleTab` calls at `background.js:70-73`; automatic captures cannot rely on transient `activeTab`.\n- Do not remove either permission unless those features are redesigned. Host patterns could be narrowed to supported web schemes, but broad host access is required by current behavior.\n\n## Packaged-source drift\n- SHA-256 compared all 36 root/package pairs by relative path, including code, manifests, HTML/CSS, and assets.\n- Every pair is byte-identical; there are no missing or packaged-only files and no running/package drift.\n\n## Verification\n- `node --test tests/*.test.mjs`, Node `v24.12.0`: 16 passed, 0 failed.\n- `node --check` across 34 JavaScript files: 0 failures.\n- Unpacked smoke: Chrome for Testing `151.0.7922.47`, isolated profile, loaded from `meridian-extension/`. Installed branded Chrome 150 ignored command-line unpacked loading, so the official testing build was used.\n- Startup created one pinned Meridian tab, persisted its ID, and configured action-click side-panel behavior.\n- Search returned 2 tab, 1 bookmark, and 2 history results for Example.\n- Activation capture produced JPEG data. Refresh returned `{done:true}`, captured both HTTPS tabs, and restored the active tab.\n- Legacy custom-background fallback worked; saving a Blob moved data to IndexedDB, returned `blob:`, and removed the legacy key. Workspace v1 normalizes in memory and is replaced by v2 defaults plus the first mutation, matching intentional reset logic.\n- Runtime permissions matched the manifest; script and host access both succeeded.\n- Direct-gesture `sidePanel.open()` succeeded; sidebar rendered current tabs/group.\n- Created, titled, colored, queried, and rendered a two-tab native group.\n- No uncaught extension exceptions or extension error-level logs. Handled warnings occurred for empty/about activation capture; later HTTPS captures succeeded. Browser sandbox/network diagnostics were environment-only.\n- Main and sidebar UIs visually rendered lanes, thumbnails, grouping, search, and navigation without load failures.\n\nNo product files changed; worktree clean.",
+      "attachment": "active/audit-background-worker-utilities-packaged-exten-ca38/audit-background-worker-utilities-packaged-extensi.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.419Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Maintenance",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T00:42:16.039Z",
+    "auto_router_mode": null,
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    }
+  },
+  "last_agent_attempt_id": "attempt-d0af801ca2e6d0f5ed4b",
+  "watchdog_redispatch_count": 1,
+  "last_agent_startup_timeout_reason": "Agent session startup timed out after 180s (no confirmed agent session; launcher PID 36052 alive; agent PID 45144 alive; agent status running; attempt status waiting_for_session)",
+  "agent_attempt_id": "attempt-e3e9e4e359af3afdedd5",
+  "agent_startup_started_at": "2026-07-26T00:42:16.745Z",
+  "agent_session_confirmed_run_id": "agent-audit-background-worker-utilities-packaged-exten-ca38",
+  "agent_session_confirmed_at": "2026-07-26T00:42:16.766Z",
+  "role_docs": [
+    {
+      "role_slug": "reviewer",
+      "doc_path": "roles/reviewer/memory/tasks/audit-background-worker-utilities-packaged-exten-ca38.md",
+      "direction": "self",
+      "at": "2026-07-26T01:00:51.414Z"
+    }
+  ]
+}

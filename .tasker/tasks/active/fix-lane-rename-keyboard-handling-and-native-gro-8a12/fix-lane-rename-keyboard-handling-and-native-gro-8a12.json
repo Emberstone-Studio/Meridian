@@ -1,0 +1,47 @@
+{
+  "description": "Correct two state/interaction defects:\n- `components/WorkspaceLane.js:409-437`: remove the `{ once: true }` keydown behavior that drops Enter/Escape after the first typed character. Use one cleanup path across Enter, Escape, and blur; Escape must restore the original title.\n- `components/ContextMenu.js:67-88`: after successful \"Move to new group\", call `unassignTab(tab.id)` before dispatching the rename event, matching the existing-group path.\n\nAcceptance criteria:\n- Rename supports arbitrary typing followed by Enter, Escape, or blur without duplicate commits.\n- Escape restores the pre-edit title.\n- Moving to a new native group removes the old Meridian assignment and does not resurrect it after ungrouping.\n- Focused regression coverage is added.",
+  "label": "Bug",
+  "agent_id": "coder",
+  "priority": "medium",
+  "title": "Fix lane rename keyboard handling and native group assignment cleanup",
+  "status": "done",
+  "id": "fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:29.820Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:29.820Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T01:25:36.737Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:29:13.779Z",
+      "type": "output",
+      "content": "## Completed\n\n- Reworked lane rename handling so ordinary keystrokes no longer remove the Enter/Escape listener.\n- Unified Enter, Escape, and blur finalization with listener cleanup, single-commit behavior, and exact original-title restoration on Escape.\n- Cleared the old Meridian workspace assignment after a native group is created and before the lane rename event is dispatched.\n- Added focused regressions covering Enter after typing, Escape restoration, blur deduplication, and native-group assignment cleanup/order.\n\n## Verification\n\n- `node --test tests/laneRenameAndContextMenu.test.mjs` - 4 passed.\n- `node --test` - 27 passed.\n- `node --check components/WorkspaceLane.js` and `node --check components/ContextMenu.js` - passed.\n- `git diff --check` - passed.",
+      "attachment": "active/fix-lane-rename-keyboard-handling-and-native-gro-8a12/fix-lane-rename-keyboard-handling-and-native-group.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.462Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T01:25:35.895Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-a638f105875469bb767c",
+  "agent_startup_started_at": "2026-07-26T01:25:36.710Z",
+  "agent_session_confirmed_run_id": "agent-fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+  "agent_session_confirmed_at": "2026-07-26T01:25:37.254Z"
+}

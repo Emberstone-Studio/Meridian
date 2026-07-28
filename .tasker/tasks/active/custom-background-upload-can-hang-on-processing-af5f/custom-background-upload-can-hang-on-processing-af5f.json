@@ -9,7 +9,7 @@
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-25T04:35:20.819Z",
-  "updated_at": "2026-07-25T05:10:36.464Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
   "activity": [
     {
       "timestamp": "2026-07-25T04:35:20.819Z",
@@ -84,22 +84,11 @@
     }
   ],
   "routing": {
-    "chosen_model": "codex-gpt-5-6-sol",
-    "rationale": "Direct approved queue dispatch to assigned role",
-    "alternates": [],
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
     "shape": "Bug",
-    "decided_by": "run-queue",
+    "decided_by": "free-execution-driver",
     "decided_at": "2026-07-25T04:47:09.444Z",
     "auto_router_mode": null,
-    "provider": "codex",
-    "provider_source": "derived",
-    "model_source": "role",
-    "route_chain": [
-      {
-        "provider": "codex",
-        "model": "codex-gpt-5-6-sol"
-      }
-    ],
     "floors": {
       "minContextWindow": 0,
       "requireVision": true,
@@ -122,9 +111,9 @@
       "resumeSupported": true,
       "multimodal": true,
       "notes": null
-    },
-    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=true,tools>=model_dependent}; chain=1 link(s)"
+    }
   },
   "agent_attempt_id": "attempt-f5fec96c0fcd35bcc286",
-  "agent_startup_started_at": "2026-07-25T04:49:33.591Z"
+  "agent_startup_started_at": "2026-07-25T04:49:33.591Z",
+  "epic": "epic-code-review-follow-ups"
 }

@@ -10,6 +10,12 @@ import {
 import { normalizeHomepageUrl } from "../utils/homepageUrl.js";
 import { PROVIDERS } from "./SearchBar.js";
 
+// Full data-handling details (Chrome Web Store Limited Use adherence, storage
+// locations, network behavior) live in the repository's privacy policy. The
+// in-panel disclosure below summarizes it in plain language and links here.
+export const PRIVACY_POLICY_URL =
+  "https://github.com/Emberstone-Studio/Meridian/blob/main/PRIVACY.md";
+
 const NEW_TAB_OPTIONS = [
   { id: "meridian-view", label: "Open a new Meridian tab" },
   { id: "focus-pinned", label: "Return to the pinned Meridian tab" },
@@ -150,6 +156,59 @@ export function createSettingsPanel(container) {
   const appearanceSection = makeSection("Appearance");
   const searchSection = makeSection("Search");
   const tabsSection = makeSection("Tabs");
+
+  // --- Privacy & Data disclosure ---
+  // Native details/summary keeps the disclosure keyboard-accessible while
+  // allowing it to remain collapsed at the bottom of Settings by default.
+  const privacySection = document.createElement("details");
+  privacySection.className = "settings-section settings-privacy-section";
+
+  const privacySummary = document.createElement("summary");
+  privacySummary.className = "settings-privacy-summary";
+  privacySummary.textContent = "Privacy & Data";
+  privacySection.appendChild(privacySummary);
+
+  const privacyGroup = document.createElement("div");
+  privacyGroup.className = "settings-group settings-privacy-group";
+
+  const privacyIntro = document.createElement("p");
+  privacyIntro.className = "settings-privacy-text";
+  privacyIntro.textContent =
+    "Meridian automatically captures a screenshot of your active tab to " +
+    "show live thumbnails, and after an open tab finishes loading, reads " +
+    "that page's meta description and heading (H1/H2) text to power local " +
+    "open-tab search. Both happen automatically, without a separate " +
+    "prompt, as part of the Tabs and Search features below.";
+
+  const privacyStorage = document.createElement("p");
+  privacyStorage.className = "settings-privacy-text";
+  privacyStorage.textContent =
+    "This data is stored locally in your Chrome profile. Meridian has no " +
+    "server and never uploads it. Local Search below controls which " +
+    "sources are searchable, and Thumbnails below lets you trigger a " +
+    "manual refresh.";
+
+  const privacyOptional = document.createElement("p");
+  privacyOptional.className = "settings-privacy-text";
+  privacyOptional.textContent =
+    "Bookmark and history access is never automatic — Meridian only asks " +
+    "Chrome for that permission when you turn on Bookmarks or History " +
+    "under Local Search.";
+
+  const privacyLink = document.createElement("a");
+  privacyLink.className = "settings-privacy-link";
+  privacyLink.href = PRIVACY_POLICY_URL;
+  privacyLink.target = "_blank";
+  privacyLink.rel = "noopener noreferrer";
+  privacyLink.textContent = "Read Meridian's full privacy policy";
+
+  privacyGroup.append(
+    privacyIntro,
+    privacyStorage,
+    privacyOptional,
+    privacyLink,
+  );
+  privacySection.appendChild(privacyGroup);
 
   // --- New tab behavior ---
   const newTabGroup = document.createElement("div");
@@ -756,8 +815,9 @@ export function createSettingsPanel(container) {
   refreshGroup.appendChild(refreshBtn);
   tabsSection.appendChild(refreshGroup);
 
-  // Order the sections: Appearance, Search, Tabs.
-  panel.append(appearanceSection, searchSection, tabsSection);
+  // Keep the optional Privacy & Data disclosure last so primary settings
+  // remain immediately available.
+  panel.append(appearanceSection, searchSection, tabsSection, privacySection);
 
   container.appendChild(panel);
 

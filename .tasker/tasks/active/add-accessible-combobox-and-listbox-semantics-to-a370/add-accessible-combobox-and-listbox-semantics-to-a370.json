@@ -1,0 +1,71 @@
+{
+  "description": "Make Meridian search conform to accessible combobox/listbox interaction semantics after keyboard result navigation is implemented.\n\nRequirements:\n- Give the search input an appropriate combobox role and maintain aria-expanded, aria-controls, aria-autocomplete, and aria-activedescendant.\n- Give each results popup/list and actionable result the correct listbox/option semantics without breaking buttons, bookmark folders, or existing keyboard activation.\n- Assign stable unique option ids and keep active-descendant state synchronized with keyboard selection and asynchronous rerenders.\n- Announce result counts, loading, empty, permission-denied, and scope changes through a polite live region without excessive chatter.\n- Preserve visible focus indication, direct URL recognition, Web fallback behavior, and pinned/unpinned navigation.\n- Validate keyboard-only and screen-reader-oriented behavior in root and packaged extension copies.\n- Add regression coverage for ARIA state transitions, active option changes, popup closing, and result announcements.\n## Reviewer rework requirements (July 26, 2026)\n\n1. Fix direct switching between already-open Bookmark and History scopes. The scoped listbox remains visible and selectable, but `components/SearchBar.js:applyScope()` sets `aria-expanded=\"false\"`; `components/SearchPopup.js:open()` then returns early because the shared shell is already visible and never restores the open state. Assistive technology receives a collapsed combobox with a live `aria-activedescendant`.\n2. Add regressions for Bookmarks ? History and History ? Bookmarks that assert the listbox remains visible, `aria-expanded=\"true\"`, `aria-controls` still targets the scoped listbox, and `aria-activedescendant` remains absent until a new option is selected.\n3. Repeat the focused keyboard/ARIA smoke check after the fix and keep root/package parity.",
+  "label": "Feature",
+  "deps": [
+    "add-keyboard-selection-navigation-to-search-resu-0fce"
+  ],
+  "priority": "high",
+  "title": "Add accessible combobox and listbox semantics to search",
+  "status": "done",
+  "id": "add-accessible-combobox-and-listbox-semantics-to-a370",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T05:45:48.076Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T05:45:48.076Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T05:48:28.375Z",
+      "type": "moved",
+      "content": "Moved from ready to in_progress"
+    },
+    {
+      "timestamp": "2026-07-26T05:48:34.014Z",
+      "type": "moved",
+      "content": "Moved from in_progress to ready"
+    },
+    {
+      "timestamp": "2026-07-26T05:57:07.051Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T06:08:05.522Z",
+      "type": "output",
+      "content": "Implemented accessible combobox/listbox behavior for Meridian search in both root and packaged extension sources.\n\n- Added combobox state to the search input with synchronized `aria-expanded`, `aria-controls`, `aria-autocomplete`, and `aria-activedescendant`.\n- Added listbox/group/option semantics, stable unique option IDs, `aria-selected`, and popup-close/asynchronous-rerender cleanup while preserving existing button, folder, pointer, Enter, Arrow key, Web fallback, direct URL, and navigation behavior.\n- Added a deduplicated polite live region for loading, scope changes, result counts, empty results, permission-disabled sources, and load failures.\n- Added regression tests for popup roles, combobox state transitions, active option movement/replacement/closing, scope announcements, permission announcements, empty announcements, and result counts.\n- Mirrored all runtime changes to `meridian-extension/`.\n\nValidation: `node --test tests/*.test.mjs` - 74 passed, 0 failed. `git diff --check` passed. Packaged runtime parity passed.",
+      "attachment": "active/add-accessible-combobox-and-listbox-semantics-to-a370/add-accessible-combobox-and-listbox-semantics-to-s.md"
+    },
+    {
+      "timestamp": "2026-07-26T15:26:30.549Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-26T15:27:46.352Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T15:30:31.244Z",
+      "type": "output",
+      "content": "Implemented the reviewer rework for direct Bookmark/History scope switching.\n\n- Updated the shared popup so an idempotent `open()` call re-notifies combobox bindings, restoring `aria-expanded=\"true\"` when the scope shell is already visible.\n- Kept the root and packaged extension `SearchPopup.js` copies identical.\n- Added a bidirectional regression covering Bookmarks ? History and History ? Bookmarks. It verifies the scoped listbox stays visible, `aria-controls` remains correct, `aria-expanded` stays true, and the prior `aria-activedescendant` is cleared until a new option is selected.\n- Focused keyboard/ARIA smoke suite: 25/25 passing.\n- Full repository suite: 77/77 passing.\n- `git diff --check`: clean.",
+      "attachment": "active/add-accessible-combobox-and-listbox-semantics-to-a370/add-accessible-combobox-and-listbox-semantics-to-s-2.md"
+    }
+  ],
+  "epic": "epic-search-command-center",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Feature",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T15:27:45.125Z",
+    "auto_router_mode": "roles",
+    "chosen_role": "coder"
+  },
+  "agent_attempt_id": "attempt-3f6988b7f496dcfac475",
+  "agent_startup_started_at": "2026-07-26T15:27:46.214Z",
+  "agent_id": null
+}

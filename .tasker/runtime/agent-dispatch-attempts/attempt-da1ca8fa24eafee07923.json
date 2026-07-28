@@ -1,0 +1,92 @@
+{
+  "version": 1,
+  "attemptId": "attempt-da1ca8fa24eafee07923",
+  "status": "failed",
+  "spawnRequestedAt": "2026-07-27T00:00:37.060Z",
+  "updatedAt": "2026-07-27T00:05:51.487Z",
+  "taskId": "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+  "runId": "agent-prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+  "kind": "peer",
+  "roleSlug": "writer",
+  "resolvedDriver": "claude",
+  "requestedModel": "claude-sonnet-5",
+  "policyModel": "claude-sonnet-5",
+  "resolvedModel": "claude-sonnet-5",
+  "failureStage": "session_handshake",
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 22768,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 41092,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "failed",
+    "sessionId": "2559a793-f5f0-4f40-b30c-47de875f367e",
+    "establishedAt": "2026-07-27T00:00:37.085Z",
+    "waitingSince": "2026-07-27T00:00:37.147Z",
+    "failure": "process_completed_without_session"
+  },
+  "stderrTail": "",
+  "transitions": [
+    {
+      "at": "2026-07-27T00:00:37.060Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-27T00:00:37.067Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-27T00:00:37.079Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 22768
+    },
+    {
+      "at": "2026-07-27T00:00:37.086Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-27T00:00:37.125Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 22768
+    },
+    {
+      "at": "2026-07-27T00:00:37.149Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 41092
+    },
+    {
+      "at": "2026-07-27T00:00:37.153Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-27T00:05:51.419Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-27T00:05:51.487Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

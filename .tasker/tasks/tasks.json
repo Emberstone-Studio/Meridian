@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 130,
+  "state_version": 592,
   "features": {
     "chat_pro": true
   },
@@ -196,6 +196,78 @@
       },
       "task_id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
       "content": "chat chat-e29dbc37-00d9-4498-b8b0-778dab2f68ff-97a17bb6 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T18:13:19.587Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34",
+        "task_id": null
+      },
+      "task_id": "search-command-center-scoped-omni-search-bookmar-6909",
+      "content": "chat chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T18:14:04.268Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_doc_write",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34",
+        "task_id": null
+      },
+      "task_id": "search-command-center-scoped-omni-search-bookmar-6909",
+      "content": "chat chat-8ef67e5e3758e9b6009bc5437015f704-cd055b34 called mcp__tasker__task_doc_write"
+    },
+    {
+      "timestamp": "2026-07-25T22:41:45.033Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T22:42:32.419Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T22:43:23.884Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T22:44:02.570Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
     }
   ],
   "execution_policy": {
@@ -207,26 +279,147 @@
   },
   "run_queue": {
     "sequence": [
-      "add-bookmarks-button-dropdown-panel-to-top-bar-082d"
+      "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
+      "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+      "add-automated-release-checks-in-ci-2918"
     ],
     "conflicts": [],
     "rationale": "Built from your Ready tasks — toggle which ones to run.",
     "decided_by": "tasker",
-    "decided_at": "2026-07-25T05:59:03.202Z",
+    "decided_at": "2026-07-26T23:59:12.542Z",
     "approved_order": true,
-    "validated_at": "2026-07-25T05:59:23.353Z"
+    "validated_at": "2026-07-27T00:00:25.067Z"
   },
   "run_queue_active": false,
+  "epics": [
+    {
+      "id": "epic-review-fixes-qa",
+      "name": "Review Fixes QA",
+      "order": 2
+    },
+    {
+      "id": "epic-custom-background",
+      "name": "Custom Background",
+      "order": 7
+    },
+    {
+      "id": "epic-search-command-center",
+      "name": "Search Command Center",
+      "order": 8
+    },
+    {
+      "id": "epic-code-review-follow-ups",
+      "name": "Code Review Follow-ups",
+      "order": 10
+    },
+    {
+      "id": "epic-bookmarks",
+      "name": "Bookmarks",
+      "order": 11
+    },
+    {
+      "id": "epic-thumbnails",
+      "name": "Thumbnails",
+      "order": 12
+    },
+    {
+      "id": "epic-release-prep",
+      "name": "Release Prep",
+      "order": 7
+    },
+    {
+      "id": "epic-chrome-web-store-release",
+      "name": "Chrome Web Store Release",
+      "order": 8
+    }
+  ],
   "tasks": [
     {
-      "id": "add-bookmarks-button-dropdown-panel-to-top-bar-082d",
-      "title": "Add bookmarks button + dropdown panel to top bar",
+      "id": "add-accessible-combobox-and-listbox-semantics-to-a370",
+      "title": "Add accessible combobox and listbox semantics to search",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "deps": [
+        "add-keyboard-selection-navigation-to-search-resu-0fce"
+      ],
+      "agent_id": null,
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/add-accessible-combobox-and-listbox-semantics-to-a370/add-accessible-combobox-and-listbox-semantics-to-a370.json"
+    },
+    {
+      "id": "add-automated-release-checks-in-ci-2918",
+      "title": "Add automated release checks in CI",
       "status": "in_review",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
-      "updated_at": "2026-07-25T06:03:07.196Z",
+      "agent_id": "coder",
+      "updated_at": "2026-07-27T00:05:59.908Z",
+      "file": "active/add-automated-release-checks-in-ci-2918/add-automated-release-checks-in-ci-2918.json"
+    },
+    {
+      "id": "add-bookmarks-button-dropdown-panel-to-top-bar-082d",
+      "title": "Add bookmarks button + dropdown panel to top bar",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "updated_at": "2026-07-26T21:37:31.097Z",
       "file": "active/add-bookmarks-button-dropdown-panel-to-top-bar-082d/add-bookmarks-button-dropdown-panel-to-top-bar-082d.json"
+    },
+    {
+      "id": "add-in-product-disclosure-for-automatic-thumbnai-f891",
+      "title": "Add in-product disclosure for automatic thumbnails and metadata indexing",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "writer",
+      "updated_at": "2026-07-27T00:12:44.027Z",
+      "file": "active/add-in-product-disclosure-for-automatic-thumbnai-f891/add-in-product-disclosure-for-automatic-thumbnai-f891.json"
+    },
+    {
+      "id": "add-keyboard-selection-navigation-to-search-resu-0fce",
+      "title": "Add keyboard selection navigation to search results",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/add-keyboard-selection-navigation-to-search-resu-0fce/add-keyboard-selection-navigation-to-search-resu-0fce.json"
+    },
+    {
+      "id": "add-regression-coverage-and-run-final-chrome-rel-cd5c",
+      "title": "Add regression coverage and run final Chrome release validation",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "deps": [
+        "audit-background-worker-utilities-packaged-exten-ca38",
+        "eliminate-google-favicon-domain-leakage-and-add-1f75",
+        "prevent-stale-sidebar-search-and-auto-accent-asy-c041",
+        "fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+        "gate-local-search-data-access-and-minimize-exten-e0ab",
+        "fix-web-search-clearing-homepage-url-validation-be7f",
+        "remove-confirmed-meridian-dead-code-and-obsolete-9a3b"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/add-regression-coverage-and-run-final-chrome-rel-cd5c/add-regression-coverage-and-run-final-chrome-rel-cd5c.json"
+    },
+    {
+      "id": "audit-background-worker-utilities-packaged-exten-ca38",
+      "title": "Audit background worker, utilities, packaged extension, and runtime behavior",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "reviewer",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/audit-background-worker-utilities-packaged-exten-ca38/audit-background-worker-utilities-packaged-exten-ca38.json"
     },
     {
       "id": "contextmenu-js-use-static-import-for-getworkspac-fabf",
@@ -236,7 +429,7 @@
       "trashed_at": null,
       "priority": "low",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:38.145Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/contextmenu-js-use-static-import-for-getworkspac-fabf/contextmenu-js-use-static-import-for-getworkspac-fabf.json"
     },
     {
@@ -247,8 +440,41 @@
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:36.464Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/custom-background-upload-can-hang-on-processing-af5f/custom-background-upload-can-hang-on-processing-af5f.json"
+    },
+    {
+      "id": "design-the-440x280-chrome-web-store-promotional-4340",
+      "title": "Design the 440x280 Chrome Web Store promotional tile",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": null,
+      "updated_at": "2026-07-26T23:58:18.840Z",
+      "file": "active/design-the-440x280-chrome-web-store-promotional-4340/design-the-440x280-chrome-web-store-promotional-4340.json"
+    },
+    {
+      "id": "eliminate-google-favicon-domain-leakage-and-add-1f75",
+      "title": "Eliminate Google favicon domain leakage and add privacy disclosures",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/eliminate-google-favicon-domain-leakage-and-add-1f75/eliminate-google-favicon-domain-leakage-and-add-1f75.json"
+    },
+    {
+      "id": "fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+      "title": "Fix lane rename keyboard handling and native group assignment cleanup",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/fix-lane-rename-keyboard-handling-and-native-gro-8a12/fix-lane-rename-keyboard-handling-and-native-gro-8a12.json"
     },
     {
       "id": "fix-stale-search-results-race-in-handlebrowserqu-c50b",
@@ -258,8 +484,36 @@
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:34.687Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/fix-stale-search-results-race-in-handlebrowserqu-c50b/fix-stale-search-results-race-in-handlebrowserqu-c50b.json"
+    },
+    {
+      "id": "fix-web-search-clearing-homepage-url-validation-be7f",
+      "title": "Fix web-search clearing, homepage URL validation, and sidebar keyboard access",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "deps": [
+        "prevent-stale-sidebar-search-and-auto-accent-asy-c041"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/fix-web-search-clearing-homepage-url-validation-be7f/fix-web-search-clearing-homepage-url-validation-be7f.json"
+    },
+    {
+      "id": "gate-local-search-data-access-and-minimize-exten-e0ab",
+      "title": "Gate local search data access and minimize extension permissions",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "deps": [
+        "audit-background-worker-utilities-packaged-exten-ca38"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/gate-local-search-data-access-and-minimize-exten-e0ab/gate-local-search-data-access-and-minimize-exten-e0ab.json"
     },
     {
       "id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
@@ -269,8 +523,55 @@
       "trashed_at": null,
       "priority": "high",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:14:00.370Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/harden-thumbnail-cache-serialize-pruning-fix-byt-4568/harden-thumbnail-cache-serialize-pruning-fix-byt-4568.json"
+    },
+    {
+      "id": "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
+      "title": "Investigate blank thumbnails and add non-intrusive lazy refresh",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "deps": [
+        "prevent-automatic-thumbnail-capture-from-saving-5df5"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-07-27T03:44:01.553Z",
+      "file": "active/investigate-blank-thumbnails-and-add-non-intrusi-3fba/investigate-blank-thumbnails-and-add-non-intrusi-3fba.json"
+    },
+    {
+      "id": "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+      "title": "Prepare Chrome Web Store privacy policy and publisher disclosures",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "writer",
+      "updated_at": "2026-07-27T00:05:52.387Z",
+      "file": "active/prepare-chrome-web-store-privacy-disclosures-and-0fe7/prepare-chrome-web-store-privacy-disclosures-and-0fe7.json"
+    },
+    {
+      "id": "prevent-automatic-thumbnail-capture-from-saving-5df5",
+      "title": "Prevent automatic thumbnail capture from saving the wrong active tab",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T23:58:18.794Z",
+      "file": "active/prevent-automatic-thumbnail-capture-from-saving-5df5/prevent-automatic-thumbnail-capture-from-saving-5df5.json"
+    },
+    {
+      "id": "prevent-stale-sidebar-search-and-auto-accent-asy-c041",
+      "title": "Prevent stale sidebar search and auto-accent async results",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/prevent-stale-sidebar-search-and-auto-accent-asy-c041/prevent-stale-sidebar-search-and-auto-accent-asy-c041.json"
     },
     {
       "id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
@@ -280,8 +581,91 @@
       "trashed_at": null,
       "priority": "low",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:37.320Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/refreshallthumbnails-restore-active-tab-even-if-23bb/refreshallthumbnails-restore-active-tab-even-if-23bb.json"
+    },
+    {
+      "id": "remove-confirmed-meridian-dead-code-and-obsolete-9a3b",
+      "title": "Remove confirmed Meridian dead code and obsolete CSS",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "low",
+      "deps": [
+        "eliminate-google-favicon-domain-leakage-and-add-1f75",
+        "prevent-stale-sidebar-search-and-auto-accent-asy-c041",
+        "fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+        "gate-local-search-data-access-and-minimize-exten-e0ab",
+        "fix-web-search-clearing-homepage-url-validation-be7f"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/remove-confirmed-meridian-dead-code-and-obsolete-9a3b/remove-confirmed-meridian-dead-code-and-obsolete-9a3b.json"
+    },
+    {
+      "id": "remove-stale-closed-tabs-during-browser-search-i-d232",
+      "title": "Remove stale closed tabs during browser search index rebuild",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T23:58:18.821Z",
+      "file": "active/remove-stale-closed-tabs-during-browser-search-i-d232/remove-stale-closed-tabs-during-browser-search-i-d232.json"
+    },
+    {
+      "id": "review-entire-meridian-codebase-for-errors-184a",
+      "title": "Review entire Meridian codebase for errors",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "reviewer",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/review-entire-meridian-codebase-for-errors-184a/review-entire-meridian-codebase-for-errors-184a.json"
+    },
+    {
+      "id": "run-final-chrome-validation-against-the-release-9f59",
+      "title": "Run final Chrome validation against the release candidate and update the release record",
+      "status": "ready",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "deps": [
+        "prevent-automatic-thumbnail-capture-from-saving-5df5",
+        "remove-stale-closed-tabs-during-browser-search-i-d232",
+        "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+        "add-in-product-disclosure-for-automatic-thumbnai-f891",
+        "investigate-blank-thumbnails-and-add-non-intrusi-3fba"
+      ],
+      "agent_id": "reviewer",
+      "updated_at": "2026-07-27T21:57:35.051Z",
+      "file": "active/run-final-chrome-validation-against-the-release-9f59/run-final-chrome-validation-against-the-release-9f59.json"
+    },
+    {
+      "id": "run-real-chrome-smoke-test-for-search-and-new-ta-569e",
+      "title": "Run real Chrome smoke test for search and New Tab behavior",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "deps": [
+        "add-keyboard-selection-navigation-to-search-resu-0fce",
+        "add-accessible-combobox-and-listbox-semantics-to-a370"
+      ],
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/run-real-chrome-smoke-test-for-search-and-new-ta-569e/run-real-chrome-smoke-test-for-search-and-new-ta-569e.json"
+    },
+    {
+      "id": "search-command-center-scoped-omni-search-bookmar-6909",
+      "title": "Search command center: scoped omni-search (Bookmarks/History) + relocate New Group",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-26T21:37:31.098Z",
+      "file": "active/search-command-center-scoped-omni-search-bookmar-6909/search-command-center-scoped-omni-search-bookmar-6909.json"
     },
     {
       "id": "serialize-chrome-storage-read-modify-write-to-fi-0606",
@@ -291,7 +675,7 @@
       "trashed_at": null,
       "priority": "high",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:32.729Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/serialize-chrome-storage-read-modify-write-to-fi-0606/serialize-chrome-storage-read-modify-write-to-fi-0606.json"
     },
     {
@@ -302,7 +686,7 @@
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:35.587Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/sync-custom-background-across-devices-with-per-d-cae5/sync-custom-background-across-devices-with-per-d-cae5.json"
     },
     {
@@ -313,7 +697,7 @@
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-07-25T05:10:33.758Z",
+      "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/thumbnails-add-unlimitedstorage-switch-capture-t-ec14/thumbnails-add-unlimitedstorage-switch-capture-t-ec14.json"
     }
   ]

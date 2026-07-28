@@ -1,0 +1,108 @@
+{
+  "agent": "coder",
+  "description": "Add a lightweight CI workflow so every release candidate receives the same repository checks before manual Chrome validation.\n\nAcceptance criteria:\n- Add a GitHub Actions workflow for supported Node that runs node --test tests/*.test.mjs.\n- Run node --check over runtime JavaScript, parse the manifest, run git diff --check, and verify the repository's runtime mirror/parity invariant where applicable.\n- Fail clearly on any mismatch or test/syntax error.\n- Document the local equivalent commands in README.md or a dedicated contributor/release section.\n- Do not add a build system or third-party runtime dependencies solely for CI.",
+  "label": "Maintenance",
+  "priority": "medium",
+  "title": "Add automated release checks in CI",
+  "status": "in_review",
+  "id": "add-automated-release-checks-in-ci-2918",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:00:11.979Z",
+  "updated_at": "2026-07-27T00:05:59.908Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:00:11.979Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:06:00.931Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:48:27.389Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T18:52:11.248Z",
+      "type": "output",
+      "content": "## Completed\n\nAdded `.github/workflows/release-checks.yml` with a Node.js 24 GitHub Actions job that runs on pushes, pull requests, and manual dispatch. It runs the complete `node --test tests/*.test.mjs` suite (including the packaged runtime parity invariant), checks every tracked runtime JavaScript file with `node --check`, parses both extension manifests, and runs `git diff --check`. Syntax and manifest failures emit file-specific GitHub error annotations.\n\nAdded a `Release checks` section to `README.md` documenting the matching local PowerShell commands and explaining the packaged parity coverage. No build system or third-party runtime dependency was added.\n\nValidation completed successfully:\n\n- Node.js `v24.12.0`\n- 90 tests passed, 0 failed\n- 50 JavaScript files passed `node --check`\n- Both manifests parsed successfully\n- `git diff --check` passed\n- Final trailing-whitespace and diff review passed",
+      "attachment": "active/add-automated-release-checks-in-ci-2918/add-automated-release-checks-in-ci.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.904Z",
+      "type": "review",
+      "content": "Reviewer rework required: The current git diff --check runs against a clean checkout and therefore cannot detect whitespace introduced by committed changes. Check the pull-request base-to-HEAD range and an appropriate before-to-after range for pushes. Also describe meridian-extension as the runtime mirror, not the packaged release copy. Preserve the existing test, syntax, manifest, and parity checks."
+    },
+    {
+      "timestamp": "2026-07-27T00:00:38.676Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:05:59.905Z",
+      "type": "output",
+      "content": "## Completed\n\nUpdated `.github/workflows/release-checks.yml` so the Node.js 24 release-check job preserves the test, JavaScript syntax, manifest parsing, and runtime mirror parity checks while validating committed whitespace over meaningful Git ranges:\n\n- pull requests: base merge-base through pull-request head\n- ordinary pushes: event `before` through `after`\n- new branches: default-branch merge-base through pushed head\n- manual dispatch: the latest commit\n- branch deletion: explicitly skipped because it adds no content\n\nCheckout now fetches full history so all referenced commits are available. Failures retain command output and file-specific GitHub annotations for clear diagnostics.\n\nUpdated `README.md` with matching working-tree, staged, and committed-branch local commands and corrected `meridian-extension/` terminology to describe it as the runtime mirror.\n\nValidation completed successfully:\n\n- Node.js `v24.12.0`\n- 112 tests passed, 0 failed, including runtime mirror parity\n- 52 tracked JavaScript files passed `node --check`\n- both manifests parsed successfully\n- PR, ordinary push, new-branch, and manual-dispatch `git diff --check` ranges passed\n- working-tree, staged, and `main...HEAD` whitespace checks passed\n- final diff contains only `.github/workflows/release-checks.yml` and `README.md`\n\nNo build system or third-party runtime dependency was added.",
+      "attachment": "active/add-automated-release-checks-in-ci-2918/add-automated-release-checks-in-ci-2.md"
+    }
+  ],
+  "epic": "epic-release-prep",
+  "agent_id": "coder",
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "alternates": [],
+    "shape": "Maintenance",
+    "decided_by": "run-queue",
+    "decided_at": "2026-07-27T00:00:37.115Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=false,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "agent_attempt_id": "attempt-6afe6370181d8b469604",
+  "agent_startup_started_at": "2026-07-27T00:00:38.644Z",
+  "agent_session_confirmed_run_id": "agent-add-automated-release-checks-in-ci-2918",
+  "agent_session_confirmed_at": "2026-07-27T00:00:38.673Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/add-automated-release-checks-in-ci-2918.md",
+      "direction": "self",
+      "at": "2026-07-27T00:05:59.905Z"
+    }
+  ]
+}

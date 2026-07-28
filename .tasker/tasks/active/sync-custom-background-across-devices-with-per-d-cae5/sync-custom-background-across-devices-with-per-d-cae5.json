@@ -9,7 +9,7 @@
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-25T04:35:16.307Z",
-  "updated_at": "2026-07-25T05:10:35.587Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
   "activity": [
     {
       "timestamp": "2026-07-25T04:35:16.307Z",
@@ -73,14 +73,14 @@
     }
   ],
   "routing": {
-    "chosen_model": "codex-gpt-5-6-sol",
-    "rationale": "Direct approved queue dispatch to assigned role",
-    "decided_by": "run-queue",
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
     "decided_at": "2026-07-25T04:51:07.559Z",
     "auto_router_mode": null
   },
   "agent_attempt_id": "attempt-db43cca0c586d8fa8b26",
   "agent_startup_started_at": "2026-07-25T04:51:08.274Z",
   "agent_session_confirmed_run_id": "agent-sync-custom-background-across-devices-with-per-d-cae5",
-  "agent_session_confirmed_at": "2026-07-25T04:51:08.814Z"
+  "agent_session_confirmed_at": "2026-07-25T04:51:08.814Z",
+  "epic": "epic-custom-background"
 }

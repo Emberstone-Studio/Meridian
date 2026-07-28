@@ -1,0 +1,50 @@
+{
+  "description": "Resolve the remaining user-facing interaction defects:\n- `components/SearchBar.js:125-135` / `meridian.js:627-633`: route Enter-launched web search through the public clear path so the query handler and popup cannot retain stale results.\n- `components/SettingsPanel.js:217-227` / `meridian.js:149-170`: parse and normalize homepage URLs, allow only supported `http:`/`https:` schemes, show validation feedback, and catch navigation failures.\n- `components/sidebar.js:179-209,324-358,456-459`: replace non-focusable result/tab divs with semantic controls or add correct focusability, accessible role/name, and Enter/Space activation.\n\nAcceptance criteria:\n- Enter web search leaves an empty field and cleared popup state.\n- Invalid, relative, and unsupported-scheme homepage values are rejected; valid URLs are normalized.\n- Sidebar rows are reachable and operable by keyboard with visible focus.\n- Regression tests cover all three behaviors.",
+  "label": "Bug",
+  "agent_id": "coder",
+  "deps": [
+    "prevent-stale-sidebar-search-and-auto-accent-asy-c041"
+  ],
+  "priority": "medium",
+  "title": "Fix web-search clearing, homepage URL validation, and sidebar keyboard access",
+  "status": "done",
+  "id": "fix-web-search-clearing-homepage-url-validation-be7f",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:30.132Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:30.132Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T01:42:24.829Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:47:44.892Z",
+      "type": "output",
+      "content": "Implemented all three interaction fixes:\n\n- Web searches submitted with Enter now use `clearSearch()`, clearing both the field and popup/query state.\n- Homepage settings now accept only absolute HTTP(S) URLs, normalize valid values, expose inline accessible validation feedback, and guard startup navigation failures.\n- Sidebar tab, previous-tab, and search-result rows now have focusability, accessible button names, Enter/Space activation, and visible focus styling.\n- Kept the root and packaged extension sources synchronized.\n\nValidation: `node --test tests/*.test.mjs` - 40 tests passed; affected JavaScript files also passed `node --check`, and `git diff --check` passed.",
+      "attachment": "active/fix-web-search-clearing-homepage-url-validation-be7f/fix-web-search-clearing-homepage-url-validation-an.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.476Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T01:42:24.021Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-23990609b69d0442cb1d",
+  "agent_startup_started_at": "2026-07-26T01:42:24.799Z",
+  "agent_session_confirmed_run_id": "agent-fix-web-search-clearing-homepage-url-validation-be7f",
+  "agent_session_confirmed_at": "2026-07-26T01:42:25.350Z"
+}

@@ -18,11 +18,43 @@ Meridian is a local extension with no build step required.
 
 ---
 
+## Release checks
+
+The automated release checks use Node.js 24 and Git. Run the local equivalents
+from the repository root before manual Chrome validation:
+
+```powershell
+node --test tests/*.test.mjs
+
+git ls-files '*.js' | ForEach-Object {
+  node --check $_
+  if ($LASTEXITCODE -ne 0) { throw "Syntax check failed: $_" }
+}
+
+node -e "for (const file of ['manifest.json', 'meridian-extension/manifest.json']) { JSON.parse(require('node:fs').readFileSync(file, 'utf8')); console.log('Parsed ' + file); }"
+
+git diff --check
+git diff --cached --check
+git diff --check main...HEAD
+```
+
+The full test command includes `tests/packagedParity.test.mjs`, which fails
+when the runtime mirror under `meridian-extension/` differs from the matching
+root, `components/`, or `utils/` runtime source. The three Git commands check
+unstaged changes, staged changes, and committed branch changes relative to
+`main`, respectively.
+
+---
+
 ## Privacy
 
 See [PRIVACY.md](PRIVACY.md) for the extension's data handling, local and sync
-storage, thumbnail capture, network behavior, permissions, and Chrome Web Store
-disclosure checklist.
+storage, thumbnail capture, network behavior, permissions, the Chrome Web Store
+Limited Use adherence statement, and the disclosure checklist.
+
+Publisher-facing Chrome Web Store submission copy — the listing description,
+Privacy Practices answers, per-permission justifications, and owner-only
+follow-ups — lives in [STORE_LISTING.md](STORE_LISTING.md).
 
 ---
 

@@ -1,0 +1,93 @@
+{
+  "description": "Implement data minimization for local search and narrow install-time permissions using the completed background/runtime audit as evidence.\n\n- In `meridian.js:647-654` and `components/sidebar.js:367-374`, load enabled `localSearch` sources before querying and invoke only enabled tab/bookmark/history searches; do not query then filter.\n- Audit `manifest.json:13-14` against actual background and UI API use. Remove unused `scripting`. Where technically viable, move `<all_urls>`, bookmarks, and history to optional permission flows tied to explicit user actions/settings. If a persistent permission is essential, document the exact user-facing justification.\n- Preserve clear behavior for denied/revoked optional permissions.\n\nAcceptance criteria:\n- Disabled sources trigger no underlying API query.\n- Manifest permissions are the minimum demonstrated by shipped behavior.\n- Optional-permission enable, denial, and revocation paths are tested where introduced.\n- README/privacy/listing guidance matches the resulting permissions.\n## Reviewer rework requirements (July 26, 2026)\n\n1. `utils/localSearch.js:getEnabledLocalSearchSources()` must require both the saved toggle and the optional permission. The current `if (stored[source] === false) return` logic enables bookmarks/history when the saved value is absent but an old grant remains, contradicting the disabled-by-default policy. Add a regression for an absent preference plus a present grant.\n2. Do not silently delete shipped page-metadata search to remove `scripting`. The audit confirmed `chrome.scripting` was actively extracting meta descriptions/headings. Restore that behavior and permission, or implement an explicitly optional content-indexing design that preserves informed user choice and equivalent documented behavior. Update tests and privacy/README claims to match the chosen behavior.",
+  "label": "Maintenance",
+  "agent_id": "coder",
+  "deps": [
+    "audit-background-worker-utilities-packaged-exten-ca38"
+  ],
+  "priority": "high",
+  "title": "Gate local search data access and minimize extension permissions",
+  "status": "done",
+  "id": "gate-local-search-data-access-and-minimize-exten-e0ab",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:29.961Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:29.961Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T01:29:14.613Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:42:24.002Z",
+      "type": "output",
+      "content": "## Completed\n\n- Local-search callers now resolve effective source settings and optional grants before search, and the shared search engine invokes only enabled tab, bookmark, or history providers.\n- Bookmark/history access moved from install-time permissions to explicit optional permission requests in Settings and the scoped-search buttons. Denials remain off, disabling removes grants, and browser-side revocation updates saved state and active results.\n- Removed `scripting` plus DOM metadata/headings extraction. Existing indexes are rebuilt without those fields.\n- Retained `<all_urls>` only for automatic visible-tab thumbnail capture, with the exact `activeTab` limitation documented in README and privacy/store-listing guidance.\n- Mirrored every runtime/manifest change into `meridian-extension/`.\n\n## Verification\n\n- `node --test --test-concurrency=1 tests/*.test.mjs` - 36 passed, 0 failed.\n- `node --check` - every shipped JavaScript file parses.\n- `git diff --check` - clean.\n- Source/package SHA-256 parity - all changed mirrored files match.",
+      "attachment": "active/gate-local-search-data-access-and-minimize-exten-e0ab/gate-local-search-data-access-and-minimize-extensi.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.514Z",
+      "type": "review_failed",
+      "content": "Changes requested: optional sources can become enabled with no saved opt-in when an old permission grant exists; the task also removed active page-metadata search without product approval. See appended rework requirements."
+    },
+    {
+      "timestamp": "2026-07-26T04:34:14.788Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T04:40:12.689Z",
+      "type": "output",
+      "content": "## Completed\n\n- Optional bookmark/history search now requires both an explicit saved `true` preference and the corresponding Chrome permission. Missing preferences remain disabled even if an old grant exists, and no permission inspection or underlying search occurs for those sources.\n- Restored the shipped one-shot page metadata extractor for completed tabs in both source and packaged trees. Meta descriptions and H1/H2 headings are retained in the local tab index and contribute to search scoring.\n- Restored the required installed `scripting` permission while keeping `bookmarks` and `history` optional. Persistent `<all_urls>` and `scripting` are documented with the exact automatic thumbnail/metadata-indexing justification.\n- Updated README, privacy/store-listing guidance, release validation notes, manifest assertions, optional-permission regression coverage, and metadata-extraction coverage.\n\n## Verification\n\n- `node --test --test-concurrency=1 tests/*.test.mjs` - 43 passed, 0 failed.\n- `node --check` - all 40 shipped JavaScript files parsed.\n- Source/package SHA-256 parity - all changed mirrored files match.\n- `git diff --check` - clean.",
+      "attachment": "active/gate-local-search-data-access-and-minimize-exten-e0ab/gate-local-search-data-access-and-minimize-extensi-2.md"
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Maintenance",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T04:33:41.562Z",
+    "auto_router_mode": null,
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    }
+  },
+  "agent_attempt_id": "attempt-dfbec4e81847398ed395",
+  "agent_startup_started_at": "2026-07-26T04:34:14.756Z",
+  "agent_session_confirmed_run_id": "agent-gate-local-search-data-access-and-minimize-exten-e0ab",
+  "agent_session_confirmed_at": "2026-07-26T04:34:14.783Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/gate-local-search-data-access-and-minimize-exten-e0ab.md",
+      "direction": "self",
+      "at": "2026-07-26T04:40:12.689Z"
+    }
+  ]
+}

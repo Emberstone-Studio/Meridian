@@ -1,0 +1,59 @@
+{
+  "description": "Remove the sidebar's Google S2 favicon fallback that can transmit tab, bookmark, and history domains (`components/sidebar.js:64-77,324-329`). Reuse Chrome's packaged `/_favicon/` endpoint pattern from `components/BookmarksButton.js` and provide an in-package fallback without third-party network disclosure.\n\nAdd or update repository privacy documentation so tabs, bookmarks, history, screenshots/thumbnails, sync storage, and any remaining network behavior are accurately described. Include a Chrome Web Store disclosure checklist; do not claim compliance that was not verified outside the repository.\n\nAcceptance criteria:\n- No `google.com/s2/favicons` request remains in shipped code.\n- Missing favicons degrade to a packaged/local fallback.\n- Privacy documentation matches actual extension behavior.\n- Tests or reproducible validation cover tabs, bookmarks, history, missing favicons, and failure fallback.",
+  "label": "Bug",
+  "agent_id": "coder",
+  "priority": "high",
+  "title": "Eliminate Google favicon domain leakage and add privacy disclosures",
+  "status": "done",
+  "id": "eliminate-google-favicon-domain-leakage-and-add-1f75",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:29.561Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:29.561Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T01:00:52.257Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:08:19.008Z",
+      "type": "watchdog_redispatch",
+      "content": "Agent process exited before completing — re-queued for dispatch."
+    },
+    {
+      "timestamp": "2026-07-26T01:08:19.922Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:18:04.334Z",
+      "type": "output",
+      "content": "Implemented the favicon privacy fix and repository disclosures.\n\n- Replaced the sidebar's Google S2 fallback in both shipped trees with a shared Chrome `/_favicon/` helper.\n- Routed sidebar tabs, bookmark/history rows, and search result favicon construction through the packaged endpoint.\n- Added a generated letter-tile fallback for missing URLs and failed favicon loads, with no third-party fallback request.\n- Added `PRIVACY.md` covering tabs, bookmarks, history, locally extracted page metadata, screenshots/thumbnails, local and sync storage, custom backgrounds, permissions, remaining network behavior, retention, and an explicitly unverified Chrome Web Store disclosure checklist.\n- Linked the privacy policy from the README.\n- Added regression tests for tab, bookmark, and history favicon URLs, missing favicons, failed loads, and both shipped sidebar copies.\n\nValidation:\n\n- `node --test`: 21/21 passing.\n- Repository-wide literal scan: no `google.com/s2/favicons` reference.\n- `git diff --check`: passing.\n- Root and `meridian-extension` copies of all affected shipped files are byte-identical.",
+      "attachment": "active/eliminate-google-favicon-domain-leakage-and-add-1f75/eliminate-google-favicon-domain-leakage-and-add-pr.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.435Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T01:08:19.030Z",
+    "auto_router_mode": null
+  },
+  "last_agent_attempt_id": "attempt-a012c7fff1fa8eea15bc",
+  "watchdog_redispatch_count": 1,
+  "agent_attempt_id": "attempt-565dc5537074d882774e",
+  "agent_startup_started_at": "2026-07-26T01:08:19.798Z",
+  "agent_session_confirmed_run_id": "agent-eliminate-google-favicon-domain-leakage-and-add-1f75",
+  "agent_session_confirmed_at": "2026-07-26T01:08:19.919Z"
+}

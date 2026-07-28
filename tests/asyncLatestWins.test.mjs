@@ -50,7 +50,15 @@ test("sidebar search ignores reversed and cleared async results", async () => {
       writes.push(["html", value]);
     },
   });
-  const button = { addEventListener() {} };
+  const button = {
+    addEventListener() {},
+    classList: { toggle() {} },
+    setAttribute() {},
+  };
+  const clearButton = {
+    addEventListener() {},
+    classList: { toggle() {} },
+  };
 
   const harness = new Function(
     "document",
@@ -61,7 +69,13 @@ test("sidebar search ignores reversed and cleared async results", async () => {
     "renderTabList",
     `
       const PROVIDER_URLS = { google: "https://example.test/?q=" };
+      const SCOPE_PLACEHOLDERS = {
+        all: "Search anything",
+        bookmarks: "Search bookmarks",
+        history: "Search history",
+      };
       let query = "";
+      let searchScope = "all";
       let isSearching = false;
       let searchGeneration = 0;
       ${isCurrentSearch}
@@ -73,6 +87,7 @@ test("sidebar search ignores reversed and cleared async results", async () => {
     {
       getElementById(id) {
         if (id === "search-input") return input;
+        if (id === "search-clear-btn") return clearButton;
         if (id === "tab-list") return container;
         return button;
       },
@@ -161,6 +176,317 @@ test("sidebar search ignores reversed and cleared async results", async () => {
   await pendingSearch;
   assert.deepEqual(writes, afterClear);
   assert.deepEqual(writes.at(-1), ["tabs"]);
+});
+
+test("sidebar bookmark and history controls switch the list scope", async () => {
+  const source = await readFile(
+    new URL("../components/sidebar.js", import.meta.url),
+    "utf8",
+  );
+  const isCurrentSearch = extractFunction(
+    source,
+    "function isCurrentSearch(",
+  );
+  const runSearch = extractFunction(source, "async function runSearch(");
+  const attachListeners = extractFunction(source, "function attachListeners(");
+
+  function makeButton() {
+    const listeners = {};
+    return {
+      listeners,
+      disabled: false,
+      addEventListener(type, listener) {
+        listeners[type] = listener;
+      },
+      classList: { toggle() {} },
+      setAttribute() {},
+    };
+  }
+
+  const input = {
+    value: "",
+    placeholder: "",
+    addEventListener() {},
+    focus() {},
+  };
+  const clearButton = makeButton();
+  const bookmarkButton = makeButton();
+  const historyButton = makeButton();
+  const genericButton = makeButton();
+  const container = { innerHTML: "", appendChild() {} };
+  const requestedPermissions = [];
+  const searchedScopes = [];
+  const renderedSections = [];
+  const treeRenders = [];
+  const historyLoads = [];
+  let tabListRenders = 0;
+
+  const harness = new Function(
+    "document",
+    "chrome",
+    "getEnabledLocalSearchSources",
+    "setLocalSearchSourceEnabled",
+    "search",
+    "renderResultSection",
+    "renderBookmarkTree",
+    "loadFullHistoryResults",
+    "renderTabList",
+    `
+      const PROVIDER_URLS = { google: "https://example.test/?q=" };
+      const SCOPE_PLACEHOLDERS = {
+        all: "Search anything",
+        bookmarks: "Search bookmarks",
+        history: "Search history",
+      };
+      let query = "";
+      let searchScope = "all";
+      let isSearching = false;
+      let searchGeneration = 0;
+      let currentWindowId = null;
+      ${isCurrentSearch}
+      ${runSearch}
+      ${attachListeners}
+      return { attachListeners };
+    `,
+  )(
+    {
+      getElementById(id) {
+        if (id === "search-input") return input;
+        if (id === "search-clear-btn") return clearButton;
+        if (id === "scope-bookmarks") return bookmarkButton;
+        if (id === "scope-history") return historyButton;
+        if (id === "tab-list") return container;
+        return genericButton;
+      },
+      querySelector() {
+        return null;
+      },
+    },
+    {
+      storage: { sync: { get: async () => ({}) } },
+      tabs: { create() {} },
+      bookmarks: {
+        getTree: async () => [
+          { children: [{ id: "1", title: "Bookmarks Bar", children: [] }] },
+        ],
+      },
+    },
+    async () => ({ tabs: true, bookmarks: true, history: true }),
+    async (scope, enabled) => {
+      requestedPermissions.push([scope, enabled]);
+    },
+    async (_query, scope) => {
+      searchedScopes.push(scope);
+      return {
+        tabs: [],
+        bookmarks:
+          scope === "bookmarks" ? [{ title: "Saved page" }] : [],
+        history: scope === "history" ? [{ title: "Visited page" }] : [],
+      };
+    },
+    (_container, label) => renderedSections.push(label),
+    (_container, roots) => treeRenders.push(roots[0].title),
+    async (query) => {
+      historyLoads.push(query);
+      return [{ title: "Visited page" }];
+    },
+    () => {
+      tabListRenders += 1;
+    },
+  );
+
+  harness.attachListeners();
+
+  await bookmarkButton.listeners.click();
+  assert.equal(input.placeholder, "Search bookmarks");
+  assert.deepEqual(requestedPermissions, [["bookmarks", true]]);
+  assert.deepEqual(searchedScopes, []);
+  assert.deepEqual(treeRenders, ["Bookmarks Bar"]);
+
+  await historyButton.listeners.click();
+  assert.equal(input.placeholder, "Search history");
+  assert.deepEqual(requestedPermissions.at(-1), ["history", true]);
+  assert.deepEqual(searchedScopes, []);
+  assert.deepEqual(historyLoads, [""]);
+  assert.deepEqual(renderedSections, ["History"]);
+
+  await historyButton.listeners.click();
+  assert.equal(input.placeholder, "Search anything");
+  assert.equal(tabListRenders, 1);
+});
+
+test("sidebar history scope paginates through all available history", async () => {
+  const source = await readFile(
+    new URL("../components/sidebar.js", import.meta.url),
+    "utf8",
+  );
+  const loadFullHistoryResults = extractFunction(
+    source,
+    "async function loadFullHistoryResults(",
+  ).replace("const pageSize = 10000;", "const pageSize = 2;");
+
+  const requests = [];
+  const pages = [
+    [
+      { id: "a", title: "Newest", url: "https://a.test", lastVisitTime: 30 },
+      { id: "b", title: "Middle", url: "https://b.test", lastVisitTime: 20 },
+    ],
+    [
+      { id: "b", title: "Middle", url: "https://b.test", lastVisitTime: 20 },
+      { id: "c", title: "Oldest", url: "https://c.test", lastVisitTime: 10 },
+    ],
+    [
+      { id: "c", title: "Oldest", url: "https://c.test", lastVisitTime: 10 },
+    ],
+  ];
+  const load = new Function(
+    "chrome",
+    `${loadFullHistoryResults}; return loadFullHistoryResults;`,
+  )({
+    history: {
+      async search(request) {
+        requests.push(request);
+        return pages.shift();
+      },
+    },
+  });
+
+  const results = await load("");
+  assert.deepEqual(
+    results.map((item) => item.title),
+    ["Newest", "Middle", "Oldest"],
+  );
+  assert.equal(requests.length, 3);
+  assert.ok(requests.every((request) => request.maxResults === 2));
+  assert.equal(requests[1].endTime, 20);
+  assert.equal(requests[2].endTime, 10);
+});
+
+test("sidebar bookmark tree opens the toolbar with nested folders collapsed", async () => {
+  const source = await readFile(
+    new URL("../components/sidebar.js", import.meta.url),
+    "utf8",
+  );
+  const functions = [
+    "function makeRowInteractive(",
+    "function buildResultRow(",
+    "function countBookmarks(",
+    "function buildBookmarkTreeNode(",
+    "function renderBookmarkTree(",
+  ]
+    .map((signature) => extractFunction(source, signature))
+    .join("\n");
+
+  class MockElement {
+    constructor(tagName) {
+      this.tagName = tagName;
+      this.children = [];
+      this.listeners = {};
+      this.attributes = {};
+      this.styles = {};
+      this._classes = new Set();
+      this.classList = {
+        add: (...names) => names.forEach((name) => this._classes.add(name)),
+        contains: (name) => this._classes.has(name),
+        remove: (...names) =>
+          names.forEach((name) => this._classes.delete(name)),
+        toggle: (name, force) => {
+          const enabled =
+            force === undefined ? !this._classes.has(name) : Boolean(force);
+          if (enabled) this._classes.add(name);
+          else this._classes.delete(name);
+          return enabled;
+        },
+      };
+      this.style = {
+        setProperty: (name, value) => {
+          this.styles[name] = value;
+        },
+      };
+    }
+
+    set className(value) {
+      this._classes = new Set(value.split(/\s+/).filter(Boolean));
+    }
+
+    get className() {
+      return [...this._classes].join(" ");
+    }
+
+    get childElementCount() {
+      return this.children.length;
+    }
+
+    appendChild(child) {
+      this.children.push(child);
+      return child;
+    }
+
+    append(...children) {
+      this.children.push(...children);
+    }
+
+    setAttribute(name, value) {
+      this.attributes[name] = value;
+    }
+
+    addEventListener(type, listener) {
+      this.listeners[type] = listener;
+    }
+  }
+
+  const renderBookmarkTree = new Function(
+    "document",
+    "chrome",
+    "makeFaviconImg",
+    "activateTab",
+    `${functions}; return renderBookmarkTree;`,
+  )(
+    { createElement: (tagName) => new MockElement(tagName) },
+    { tabs: { create() {} } },
+    () => new MockElement("img"),
+    () => {},
+  );
+
+  const container = new MockElement("div");
+  renderBookmarkTree(container, [
+    { id: "2", title: "Other bookmarks", children: [] },
+    {
+      id: "1",
+      title: "Bookmarks Bar",
+      children: [
+        { id: "a", title: "Saved", url: "https://saved.test" },
+        {
+          id: "folder",
+          title: "Nested",
+          children: [
+            { id: "b", title: "Nested saved", url: "https://nested.test" },
+          ],
+        },
+      ],
+    },
+  ]);
+
+  const tree = container.children[0];
+  const toolbarFolder = tree.children[0];
+  const toolbarRow = toolbarFolder.children[0];
+  const toolbarChildren = toolbarFolder.children[1];
+  const nestedFolder = toolbarChildren.children[1];
+  const nestedRow = nestedFolder.children[0];
+  const otherFolder = tree.children[1];
+
+  assert.equal(
+    toolbarRow.children[2].children[0].textContent,
+    "Bookmarks Bar",
+  );
+  assert.equal(toolbarFolder.classList.contains("collapsed"), false);
+  assert.equal(nestedFolder.classList.contains("collapsed"), true);
+  assert.equal(otherFolder.classList.contains("collapsed"), true);
+  assert.equal(toolbarRow.attributes["aria-expanded"], "true");
+
+  nestedRow.listeners.click();
+  assert.equal(nestedFolder.classList.contains("collapsed"), false);
+  assert.equal(nestedRow.attributes["aria-expanded"], "true");
 });
 
 test("background accent ignores reversed image analysis", async () => {

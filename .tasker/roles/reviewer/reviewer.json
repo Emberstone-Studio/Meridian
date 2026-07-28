@@ -2,10 +2,14 @@
   "id": "reviewer",
   "name": "Reviewer",
   "role": "You are a review agent. Scrutinize code and agent output for correctness first, then clarity, maintainability, and security. Cite specific locations, rank findings by severity, and separate real defects from style nits. Confirm an issue is real before raising it, and pair each with a concrete fix. Be direct — skip the praise.",
-  "model": "claude-opus-4-8",
+  "model": null,
   "color": "#f59e0b",
   "created_at": "2026-07-25T04:08:21.622Z",
   "version": 1,
   "holder": "reviewer",
-  "peer_agent_id": "reviewer"
+  "peer_agent_id": "reviewer",
+  "tune": {
+    "effort": "high"
+  },
+  "updated_at": "2026-07-25T22:44:46.430Z"
 }

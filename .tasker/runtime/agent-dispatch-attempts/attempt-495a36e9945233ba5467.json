@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "attemptId": "attempt-495a36e9945233ba5467",
+  "status": "failed",
+  "spawnRequestedAt": "2026-07-26T00:36:13.648Z",
+  "updatedAt": "2026-07-26T00:39:15.558Z",
+  "taskId": "audit-background-worker-utilities-packaged-exten-ca38",
+  "runId": "agent-audit-background-worker-utilities-packaged-exten-ca38",
+  "kind": "peer",
+  "roleSlug": "reviewer",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": "agent",
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 36896,
+    "status": "running"
+  },
+  "agent": {
+    "pid": 41384,
+    "status": "failed",
+    "exitCode": 1,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "failed",
+    "sessionId": "019f9ba4-1a4b-7932-8028-f8841ea97a47",
+    "establishedAt": "2026-07-26T00:36:13.689Z",
+    "waitingSince": "2026-07-26T00:36:13.771Z",
+    "failure": "process_exited_before_session"
+  },
+  "stderrTail": "Reading additional input from stdin...\n2026-07-26T00:37:02.535998Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.4 seconds\nOutput:\nmanifest.json\t47 lines\t0C1E23716E37\r\nmeridian-extension/manifest.json\t47 lines\t0C1E23716E37\r\nbackground.js\t243 lines\tECF51CF36F3D\r\nutils/browserSearch.js\t449 lines\t235D4F7E28E1\r\nutils/customBackground.js\t102 lines\tB4B4749D6370\r\nutils/domainCluster.js\t67 lines\t10E5188D69DF\r\nutils/storageMutationQueue.js\t24 lines\t762EDF23F663\r\nutils/thumbnailCache.js\t73 lines\tBFD3E35C7737\r\nutils/workspaceManager.js\t96 lines\t198669FCBD45\r\n\n2026-07-26T00:39:11.801604Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T00:36:13.648Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T00:36:13.660Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T00:36:13.683Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 36896
+    },
+    {
+      "at": "2026-07-26T00:36:13.690Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T00:36:13.745Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 36896
+    },
+    {
+      "at": "2026-07-26T00:36:13.772Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 41384
+    },
+    {
+      "at": "2026-07-26T00:36:13.777Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T00:39:15.558Z",
+      "component": "agent",
+      "state": "failed",
+      "exitCode": 1,
+      "signal": null
+    }
+  ]
+}

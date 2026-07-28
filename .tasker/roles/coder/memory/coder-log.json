@@ -1,36 +1,66 @@
 {
   "status": "idle",
-  "task_id": "harden-thumbnail-cache-serialize-pruning-fix-byt-4568",
-  "task_title": "Harden thumbnail cache: serialize pruning + fix byte accounting",
-  "started_at": "2026-07-25T05:09:38.449Z",
-  "updated_at": "2026-07-25T05:11:54.800Z",
+  "task_id": "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
+  "task_title": "Investigate blank thumbnails and add non-intrusive lazy refresh",
+  "started_at": "2026-07-27T00:00:39.038Z",
+  "updated_at": "2026-07-27T03:44:01.881Z",
   "completed_at": "2026-07-25T04:40:25.816Z",
-  "last_output": "Implemented the thumbnail-cache hardening follow-up.\n\n- Serialized thumbnail saves, pruning, and eviction through the access-map mutation queue.\n- Changed access metadata to `{ t, b }`, pruned from metadata without loading all thumbnail blobs, and corrected ASCII data URL byte accounting.\n- Removed the unused unsafe `saveWorkspaceData` export.\n- Swallowed queued mutation failures in all async tab event listeners.\n- Updated thumbnail tests for the metadata shape and byte-based pruning.\n\nValidation: `node --test tests/*.test.mjs` - 10 tests passed; `git diff --check` passed.",
+  "last_output": "Implemented a durable, non-destructive thumbnail cache rework in both source and the running `meridian-extension/` mirror.\n\n- Added IndexedDB-backed JPEG blob storage with reusable `blob:` display URLs; `unlimitedStorage` applies to the extension-local database.\n- Migrates existing `chrome.storage.local` thumbnail data URLs into IndexedDB instead of dropping them.\n- Preserves the last-known-good blob when an image fails to render.\n- Retries a failed image once, then shows a placeholder and marks the thumbnail for replacement on the tab's next natural activation; it no longer deletes the stored thumbnail.\n- New captures are decoded/validated before replacing the durable record.\n- Cache pruning still protects live tabs and removes both image data and metadata when a tab closes.\n- Updated the custom-background IndexedDB schema version, runtime render notifications, privacy/store documentation, runtime mirror, and regressions.\n\nValidation: 117/117 Node tests pass; all runtime JavaScript syntax checks pass; source/runtime parity passes; non-Tasker diff check is clean.",
   "timeline": [
     {
-      "timestamp": "2026-07-25T05:07:59.296Z",
+      "timestamp": "2026-07-26T18:03:18.280Z",
       "type": "created",
       "content": "Task created"
     },
     {
-      "timestamp": "2026-07-25T05:07:59.296Z",
-      "type": "actor",
-      "content": "chat chat-e29dbc37-00d9-4498-b8b0-778dab2f68ff-97a17bb6 called mcp__tasker__task_create"
-    },
-    {
-      "timestamp": "2026-07-25T05:09:28.534Z",
+      "timestamp": "2026-07-26T18:03:54.793Z",
       "type": "updated",
       "content": "Task updated"
     },
     {
-      "timestamp": "2026-07-25T05:09:37.134Z",
+      "timestamp": "2026-07-26T18:04:07.093Z",
       "type": "updated",
-      "content": "Task updated before Run Now"
+      "content": "Task updated"
     },
     {
-      "timestamp": "2026-07-25T05:09:37.991Z",
+      "timestamp": "2026-07-26T18:48:26.149Z",
       "type": "moved",
       "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T19:01:50.311Z",
+      "type": "output",
+      "content": "## Result\n\nConfirmed the in-session loss path: the cache pruned a metadata-only global LRU without checking current Chrome tab IDs. Crossing 200 entries or 50 MB therefore deleted older thumbnails for still-open tabs, matching the observed old placeholders/new survivor pattern. It also removed prior entries before the incoming storage write, so a quota/write failure could leave a partially deleted cache. Full-window JPEG storage accelerated byte pressure.\n\n## Fix\n\n- Reconciled `thumb_*` values and `thumbnailCacheAccess` on every save, recalculating actual UTF-8 stored bytes and serializing the complete cache mutation.\n- Protected all live-tab thumbnails. Closed/orphaned entries are pruned first; if live entries alone exceed a limit, the limit is a deterministic soft cap rather than silently deleting live screenshots.\n- Made the incoming thumbnail plus reconciled metadata write succeed before orphan cleanup. Failed refresh, resize, focus guard, or storage writes preserve the prior valid thumbnail.\n- Resized captures to a maximum 960�600 JPEG before storage and rechecked the active tab after processing.\n- Added per-window deduplicated lazy recovery when a missing tab naturally becomes active or completes loading while active. It never activates a tab and is bounded to three attempts with 750/1500 ms backoff. Existing thumbnails are not recaptured merely on activation; completed navigation refreshes once.\n- Added card image-error handling that immediately renders an honest letter placeholder and compare-and-removes only the exact corrupt cached value, protecting a newer concurrent replacement.\n- Added structured cache/lifecycle diagnostics covering live tab IDs, stored keys, metadata keys, byte totals, prune decisions, and removal/load events.\n- Mirrored every runtime change into `meridian-extension`; no permissions were added.\n\n## Regression coverage\n\nAdded deterministic coverage for entry and byte pressure, live soft-cap behavior, orphan-first pruning, metadata reconciliation, accurate byte accounting, concurrent saves, incoming write/removal failures, close/removal lifecycle, discarded/frozen/navigation events, focus races, capture resizing and decode failures, image load errors, compare-and-remove safety, retry bounds, and no-focus-change behavior.\n\n## Validation\n\n- `node --test tests/*.test.mjs`: **107 passed, 0 failed**\n- `node --check` for every JavaScript file: **passed**\n- Packaged source parity: **passed**\n- `git diff --check`: **passed**\n- Commit: `8c97ad0 Protect live thumbnails and add lazy recovery`"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.884Z",
+      "type": "review",
+      "content": "Reviewer rework required: Eliminate the cross-context removal race. TabCard currently performs a read/compare/remove in the page context while background capture writes through a different module-local queue, so a new thumbnail can be deleted between the comparison and removal. Route conditional removal through the background worker so thumbnail mutations share one serialized context. Also gate/remove the per-save diagnostic dumps and log counts only when debugging. Add a regression for a save racing a failed-image cleanup."
+    },
+    {
+      "timestamp": "2026-07-27T00:00:35.689Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:02:31.829Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:04:04.391Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-27T00:07:55.291Z",
+      "type": "output",
+      "content": "## Result\n\nCompleted the reviewer-requested hardening for the thumbnail-loss fix.\n\n- Routed corrupt-image conditional cleanup from `TabCard` to the background service worker via `REMOVE_THUMBNAIL_IF_MATCHES`. Capture saves and failed-image cleanup now use the same background `thumbnailCacheAccess` mutation queue, eliminating the cross-context read/compare/remove race that could delete a newly saved replacement.\n- Kept compare-and-remove semantics: cleanup removes only the exact failed data URL and leaves a newer thumbnail intact.\n- Gated cache-decision diagnostics behind explicit `DEBUG_THUMBNAILS` mode and reduced debug payloads to counts and byte totals instead of tab IDs, storage keys, and removal key lists.\n- Mirrored runtime changes into `meridian-extension`.\n- Updated the card error regression to verify background routing and added a save-versus-failed-image-cleanup race regression.\n\n## Validation\n\n- `node --test tests/*.test.mjs`: **113 passed, 0 failed**\n- `node --check` across all 52 tracked JavaScript files: **passed**\n- Packaged runtime parity test: **passed**\n- Manifest parsing: **passed**\n- `git diff --check`: **passed**\n- Worktree: **clean**\n- Commit: `ce680d7 Serialize corrupt thumbnail cleanup`"
+    },
+    {
+      "timestamp": "2026-07-27T03:38:12.009Z",
+      "type": "review",
+      "content": "Additional rework after live testing: thumbnails still disappear. Implement durable IndexedDB blob storage/migration, preserve cached data on render errors, retry display before showing a placeholder, and mark failed thumbnails for replacement on natural activation rather than deleting them."
     }
   ],
   "history": [
@@ -77,6 +107,42 @@
       "started_at": "2026-07-25T05:09:38.449Z",
       "completed_at": "2026-07-25T04:40:25.816Z",
       "last_output": "Implemented the thumbnail-cache hardening follow-up.\n\n- Serialized thumbnail saves, pruning, and eviction through the access-map mutation queue.\n- Changed access metadata to `{ t, b }`, pruned from metadata without loading all thumbnail blobs, and corrected ASCII data URL byte accounting.\n- Removed the unused unsafe `saveWorkspaceData` export.\n- Swallowed queued mutation failures in all async tab event listeners.\n- Updated thumbnail tests for the metadata shape and byte-based pruning.\n\nValidation: `node --test tests/*.test.mjs` - 10 tests passed; `git diff --check` passed.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "eliminate-google-favicon-domain-leakage-and-add-1f75",
+      "task_title": "Eliminate Google favicon domain leakage and add privacy disclosures",
+      "status": "ready",
+      "started_at": "2026-07-26T01:06:50.074Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": null,
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "gate-local-search-data-access-and-minimize-exten-e0ab",
+      "task_title": "Gate local search data access and minimize extension permissions",
+      "status": "in_review",
+      "started_at": "2026-07-26T04:37:05.272Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "## Completed\n\n- Optional bookmark/history search now requires both an explicit saved `true` preference and the corresponding Chrome permission. Missing preferences remain disabled even if an old grant exists, and no permission inspection or underlying search occurs for those sources.\n- Restored the shipped one-shot page metadata extractor for completed tabs in both source and packaged trees. Meta descriptions and H1/H2 headings are retained in the local tab index and contribute to search scoring.\n- Restored the required installed `scripting` permission while keeping `bookmarks` and `history` optional. Persistent `<all_urls>` and `scripting` are documented with the exact automatic thumbnail/metadata-indexing justification.\n- Updated README, privacy/store-listing guidance, release validation notes, manifest assertions, optional-permission regression coverage, and metadata-extraction coverage.\n\n## Verification\n\n- `node --test --test-concurrency=1 tests/*.test.mjs` - 43 passed, 0 failed.\n- `node --check` - all 40 shipped JavaScript files parsed.\n- Source/package SHA-256 parity - all changed mirrored files match.\n- `git diff --check` - clean.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "add-regression-coverage-and-run-final-chrome-rel-cd5c",
+      "task_title": "Add regression coverage and run final Chrome release validation",
+      "status": "ready",
+      "started_at": "2026-07-26T04:52:06.497Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "## Completed\n\nAdded release-package regression coverage, fixed the two stale packaged runtime files it exposed, and completed automated plus unpacked-Chrome validation.\n\n### Changes\n\n- Added `tests/packagedParity.test.mjs`, which compares every runtime entrypoint and every file under `components/` and `utils/` with the shipped `meridian-extension/` copy.\n- Synchronized `meridian-extension/components/ContextMenu.js` so moving a tab into a new native group clears its Meridian assignment.\n- Synchronized `meridian-extension/components/WorkspaceLane.js` so packaged lane rename correctly handles Enter, Escape, and blur without duplicate commits.\n- Added `RELEASE_VALIDATION.md` with exact commands, results, the unpacked Chrome procedure, console observations, cleanup, and Chrome Web Store risks.\n\nThe new parity regression was run before the packaged fixes and failed on both stale files. It passes after synchronization.\n\n### Automated validation\n\n- `node --test tests/*.test.mjs` - 41 passed, 0 failed.\n- `node --check` across all runtime JavaScript - 40 files passed.\n- Third-party favicon fallback scan - no Google S2, DuckDuckGo icon service, FaviconKit, or Clearbit fallback references in shipped runtime files.\n- `git diff --check` - passed.\n\nCoverage includes local favicon fallback/privacy, sidebar and accent latest-result wins, lane rename Enter/Escape/blur, native assignment cleanup, disabled local-search API suppression, web-search clearing, homepage validation, sidebar keyboard activation, optional permission denial/removal/revocation, thumbnail refresh, storage serialization, and source/package parity.\n\n### Chrome validation\n\nLoaded `meridian-extension/` through Chrome 150.0.7871.182's normal **Developer mode ? Load unpacked** UI in a fresh temporary profile. Verified startup, local/web search and clearing, settings, theme persistence across reload, HTTPS JPEG thumbnail capture, native grouping and lane rendering, native rename Enter/Escape/blur, native assignment cleanup, `/` and Escape keyboard navigation, sidebar Enter activation, and cleanup of temporary tabs/groups/storage.\n\nExtension-page and side-panel console captures were clean. The service worker had no unhandled exception. It emitted two handled capture warnings when the validation activated privileged Chrome/extension pages, then successfully captured the HTTPS test page and continued normally.\n\n### Remaining Store blockers/risks\n\nNo code or automated-test blocker remains. Chrome Web Store submission remains blocked on publisher-side verification that cannot be established from this repository: a reachable matching privacy-policy URL, reconciled Store data-use declarations, permission justifications for `<all_urls>`, `unlimitedStorage`, thumbnails and optional sources, disclosure of provider-icon/Picsum requests, and byte-for-byte audit of the submitted archive. Broad host access and stored visible-page screenshots remain likely review-scrutiny areas; the handled privileged-page capture warnings are not a functional blocker.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
+      "task_title": "Investigate blank thumbnails and add non-intrusive lazy refresh",
+      "status": "in_review",
+      "started_at": "2026-07-27T00:00:39.038Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "## Result\n\nCompleted the reviewer-requested hardening for the thumbnail-loss fix.\n\n- Routed corrupt-image conditional cleanup from `TabCard` to the background service worker via `REMOVE_THUMBNAIL_IF_MATCHES`. Capture saves and failed-image cleanup now use the same background `thumbnailCacheAccess` mutation queue, eliminating the cross-context read/compare/remove race that could delete a newly saved replacement.\n- Kept compare-and-remove semantics: cleanup removes only the exact failed data URL and leaves a newer thumbnail intact.\n- Gated cache-decision diagnostics behind explicit `DEBUG_THUMBNAILS` mode and reduced debug payloads to counts and byte totals instead of tab IDs, storage keys, and removal key lists.\n- Mirrored runtime changes into `meridian-extension`.\n- Updated the card error regression to verify background routing and added a save-versus-failed-image-cleanup race regression.\n\n## Validation\n\n- `node --test tests/*.test.mjs`: **113 passed, 0 failed**\n- `node --check` across all 52 tracked JavaScript files: **passed**\n- Packaged runtime parity test: **passed**\n- Manifest parsing: **passed**\n- `git diff --check`: **passed**\n- Worktree: **clean**\n- Commit: `ce680d7 Serialize corrupt thumbnail cleanup`",
       "pipeline_agents": []
     }
   ],

@@ -1,0 +1,47 @@
+{
+  "description": "Fix both confirmed last-writer-wins races:\n1. `components/sidebar.js:367-401,437-467`: an older search may render after a newer query or after clear. Increment a generation for every input transition, including clear, and guard every result DOM write with generation plus current-query checks.\n2. `components/SettingsPanel.js:459-465,757-815,979-985`: slow image analysis may apply an obsolete background's accent. Add a generation/abort mechanism so only the current background updates cached dominant color, luminance, and CSS variables, including storage-triggered changes.\n\nAcceptance criteria:\n- Out-of-order completion cannot overwrite the newest sidebar query or cleared state.\n- Out-of-order image loads/sampling cannot overwrite the newest background accent.\n- Regression tests force reversed completion order for both pipelines.",
+  "label": "Bug",
+  "agent_id": "coder",
+  "priority": "high",
+  "title": "Prevent stale sidebar search and auto-accent async results",
+  "status": "done",
+  "id": "prevent-stale-sidebar-search-and-auto-accent-asy-c041",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T23:35:29.679Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T23:35:29.679Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T01:18:05.215Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T01:25:35.877Z",
+      "type": "output",
+      "content": "Implemented latest-update-wins protection for both async pipelines.\n\n- Added a sidebar search generation that advances on every input change and Escape clear. Search DOM writes now require both the captured generation and query to still be current, including after the provider lookup.\n- Added an accent-analysis generation that guards delayed custom URL resolution, image sampling, cached dominant color/luminance, and derived CSS writes.\n- Updated storage-triggered appearance handling to start the newest accent request immediately and prevent delayed custom-background resolution from applying an older appearance.\n- Kept the root sources and `meridian-extension` mirror synchronized.\n- Added reversed-completion regressions for old/new sidebar searches, clear-during-search, the no-results provider await, image loads, and custom URL resolution.\n\nValidation:\n- `node --check` passed for changed runtime sources.\n- Full suite: 23 tests passed.\n- `git diff --check` passed.\n- Commit: `8b546b4 Prevent stale async appearance and search results`",
+      "attachment": "active/prevent-stale-sidebar-search-and-auto-accent-asy-c041/prevent-stale-sidebar-search-and-auto-accent-async.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.448Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "epic": "epic-code-review-follow-ups",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T01:18:04.356Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-71fe16b62c8b77b1aac7",
+  "agent_startup_started_at": "2026-07-26T01:18:05.189Z",
+  "agent_session_confirmed_run_id": "agent-prevent-stale-sidebar-search-and-auto-accent-asy-c041",
+  "agent_session_confirmed_at": "2026-07-26T01:18:05.736Z"
+}

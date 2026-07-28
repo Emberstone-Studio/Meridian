@@ -1,0 +1,75 @@
+{
+  "agent": "coder",
+  "description": "Correct rebuildIndex() in utils/browserSearch.js so a cold worker rebuild cannot retain entries for tabs that no longer exist. The current implementation merges current tabs into the stored index but does not delete absent tab IDs.\n\nAcceptance criteria:\n- Build a set of IDs returned by chrome.tabs.query({}) and remove every stored index entry not in that set as part of the serialized mutation.\n- Preserve valid metadata and lastActive values for still-open tabs.\n- Add regression coverage proving stale entries are removed while current entries retain their existing metadata.\n- Run the full Node test suite and JavaScript syntax checks.",
+  "label": "Bug",
+  "priority": "medium",
+  "title": "Remove stale closed tabs during browser search index rebuild",
+  "status": "done",
+  "id": "remove-stale-closed-tabs-during-browser-search-i-d232",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:00:11.222Z",
+  "updated_at": "2026-07-26T23:58:18.821Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:00:11.222Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:05:00.600Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:14:37.479Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T18:17:18.392Z",
+      "type": "output",
+      "content": "## Remove stale closed tabs during browser search index rebuild\n\n### Problem\n`rebuildIndex()` in `utils/browserSearch.js` merged the current tabs from `chrome.tabs.query({})` into the stored index but never removed entries for tab IDs that were absent. A cold service-worker rebuild therefore retained search entries for tabs that had already been closed, so stale tabs kept showing up in search results.\n\n### Fix\nInside `rebuildIndex()`, within the same serialized `mutateStorageValue(INDEX_KEY, ...)` mutation:\n- Build a `Set` of the currently-open tab IDs (`String(tab.id)`, matching the string keys used by the stored index object).\n- After seeding/refreshing entries for live tabs (which preserves existing `metaDescription`, `headings`, and `lastActive` via `buildEntry(tab, index[tab.id])`), iterate `Object.keys(index)` and `delete` any entry whose ID is not in the live set.\n\nBecause the deletion runs inside the queued mutation, it is serialized against the event-listener writes and is persisted atomically with the rebuild.\n\n### Files changed\n- `utils/browserSearch.js` — remove absent tab IDs during rebuild.\n- `meridian-extension/utils/browserSearch.js` — packaged mirror kept byte-identical (enforced by `packagedParity.test.mjs`).\n- `tests/browserSearchRebuild.test.mjs` — new regression test.\n\n### Regression coverage\n`tests/browserSearchRebuild.test.mjs` seeds the index with a live tab (id 7, with metadata + `lastActive`) and a closed tab (id 99). `chrome.tabs.query` returns only tab 7. After `rebuildIndex()` the test asserts:\n- entry 99 is removed,\n- entry 7 retains its `metaDescription` (\"Quarterly roadmap\"), `headings`, `lastActive` (111), and `url`,\n- only key `7` remains in the index.\n\n### Validation\n- `node --test tests/*.test.mjs` → **83 tests pass, 0 fail** (including the new test and `packagedParity`).\n- `node --check` over every tracked `.js` file (and the new `.mjs` test) → all pass.\n- `git diff --check` → clean (no whitespace errors).",
+      "attachment": "active/remove-stale-closed-tabs-during-browser-search-i-d232/remove-stale-closed-tabs-during-browser-search-ind.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.821Z",
+      "type": "review",
+      "content": "Reviewer decision: Approved. Rebuilding now removes index entries absent from the live tab set while preserving metadata for tabs that remain open. Regression coverage passed."
+    }
+  ],
+  "epic": "epic-search-command-center",
+  "agent_id": "coder",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Bug",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T18:14:07.107Z",
+    "auto_router_mode": null,
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    }
+  },
+  "agent_attempt_id": "attempt-41d8826614cd2e94c692",
+  "agent_startup_started_at": "2026-07-26T18:14:37.454Z"
+}

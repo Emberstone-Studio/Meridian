@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "attemptId": "attempt-4927a80e76a592b29efa",
+  "status": "completed",
+  "spawnRequestedAt": "2026-07-26T05:57:07.020Z",
+  "updatedAt": "2026-07-26T06:08:04.693Z",
+  "taskId": "add-accessible-combobox-and-listbox-semantics-to-a370",
+  "runId": "agent-add-accessible-combobox-and-listbox-semantics-to-a370",
+  "kind": "peer",
+  "roleSlug": "coder",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": null,
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 14640,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 38680,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019f9cff-a4a3-7031-8cb3-1e5d50eb42db",
+    "waitingSince": "2026-07-26T05:57:07.116Z",
+    "establishedAt": "2026-07-26T05:57:07.839Z"
+  },
+  "stderrTail": "rrentTab = tab;\\n    clearTimeout(closeTimer);\\n\\n    if (thumbnail) {\\n      thumbEl.src = thumbnail;\\n      thumbEl.classList.remove(\"hidden\");\\n      placeholderEl.classList.add(\"hidden\");\\n    } else {\\n      thumbEl.src = \"\";\\n      thumbEl.classList.add(\"hidden\");\\n      placeholderEl.textContent = (tab.title || \"?\").charAt(0).toUpperCase();\\n      placeholderEl.classList.remove(\"hidden\");\\n    }\\n\\n    if (tab.favIconUrl) {\\n      faviconEl.src = tab.favIconUrl;\\n    }\\n    faviconEl.classList.toggle(\"hidden\", !tab.favIconUrl);\\n\\n    titleEl.textContent = tab.title || tab.url || \"New Tab\";\\n    urlEl.textContent = tab.url || \"\";\\n\\n    const vw = window.innerWidth;\\n    const vh = window.innerHeight;\\n    // thumbnail height + body section (title + meta + padding)\\n    const approxH = Math.round((LIGHTBOX_W * 10) / 16) + 80;\\n\\n    // Center both horizontally and vertically on the card\\n    const cardCX = rect.left + rect.width / 2;\\n    const cardCY = rect.top + rect.height / 2;\\n\\n    let left = cardCX - LIGHTBOX_W / 2;\\n    left = Math.max(MARGIN, Math.min(left, vw - LIGHTBOX_W - MARGIN));\\n\\n    let top = cardCY - approxH / 2;\\n    top = Math.max(MARGIN, Math.min(top, vh - approxH - MARGIN));\\n\\n    // Transform-origin at the card\\'s center so it appears to grow from the card\\n    const originX = Math.round(\\n      ((rect.left + rect.width / 2 - left) / LIGHTBOX_W) * 100,\\n    );\\n    const originY = Math.round(\\n      ((rect.top + rect.height / 2 - top) / approxH) * 100,\\n    );\\n    lightbox.style.setProperty(\"--lightbox-origin-x\", `${originX}%`);\\n    lightbox.style.setProperty(\"--lightbox-origin-y\", `${originY}%`);\\n    lightbox.style.setProperty(\"--lightbox-left\", `${left}px`);\\n    lightbox.style.setProperty(\"--lightbox-top\", `${top}px`);\\n    lightbox.classList.remove(\"hidden\");\\n  }\\n\\n  function hideLightbox() {\\n    lightbox.classList.add(\"hidden\");\\n    currentTab = null;\\n  }\\n\\n  lightbox.addEventListener(\"mouseleave\", () => {\\n    closeTimer = setTimeout(hideLightbox, 150);\\n  });\\n  lightbox.addEventListener(\"mouseenter\", () => clearTimeout(closeTimer));\\n\\n  lightbox.addEventListener(\"click\", navigate);\\n\\n  document.addEventListener(\"tab-lightbox-show\", (e) => {\\n    // Suppress the hover preview while a context menu is open (same intent as\\n    // hovering the tab\\'s close \"X\").\\n    if (isContextMenuOpen()) return;\\n    showLightbox(e.detail);\\n  });\\n  document.addEventListener(\"dragstart\", hideLightbox);\\n\\n  return {\\n    hide: hideLightbox,\\n    isVisible: () => !lightbox.classList.contains(\"hidden\"),\\n  };\\n}\\n\\nasync function handleNewTabBehavior() {\\n  const [newTabBehavior, { homepageUrl }] = await Promise.all([\\n    getNewTabBehavior(),\\n    chrome.storage.sync.get(\"homepageUrl\"),\\n  ]);\\n  if (newTabBehavior === \"focus-pinned\") {\\n    const [currentTab, { meridianTabId }] = await Promise.all([\\n      chrome.tabs.getCurrent(),\\n      chrome.storage.local.get(\"meridianTabId\"),\\n    ]);\\n    if (meridianTabId && currentTab && meridianTabId !== currentTab.id) {\\n      await chrome.tabs.update(meridianTabId, { active: true });\\n      window.close();\\n    }\\n  } else if (newTabBehavior === \"open-homepage\") {\\n    const normalizedHomepage = normalizeHomepageUrl(homepageUrl ?? \"\");\\n    if (!normalizedHomepage) return;\\n\\n    const [currentTab, { meridianTabId }] = await Promise.all([\\n      chrome.tabs.getCurrent(),\\n      chrome.storage.local.get(\"meridianTabId\"),\\n    ]);\\n    if (!currentTab || currentTab.id === meridianTabId) return;\\n    try {\\n      await chrome.tabs.update(currentTab.id, { url: normalizedHomepage });\\n    } catch (error) {\\n      console.warn(\"Could not open the configured homepage.\", error);\\n    }\\n  }\\n}\\n\\nlet searchBarApi = null;\\nlet browserSearchActive = false;\\nlet browserSearchSequence = 0;\\nlet resultsPopup = null; // shared shell for the \"search everything\" results\\nlet resultsSelection = null;\\nlet settingsPopup = null; // shared shell for the settings dropdown\\n\\nfunction setupKeyboardNav() {\\n  document.addEventListener(\"keydown\", (e) => {\\n    const tag = document.activeElement?.tagName;\\n    const isEditing =\\n      tag === \"INPUT\" ||\\n      tag === \"TEXTAREA\" ||\\n      document.activeElement?.contentEditable === \"true\";\\n\\n    if (e.key === \"/\" && !isEditing) {\\n      e.preventDefault();\\n      searchBarApi?.focus();\\n      return;\\n    }\\n\\n    if (e.key === \"Escape\") {\\n      if (lightboxApi?.isVisible()) {\\n        lightboxApi.hide();\\n        return;\\n      }\\n      if (settingsPopup?.isOpen()) {\\n        closeSettings();\\n        return;\\n      }\\n      if (browserSearchActive) {\\n        clearBrowserSearch();\\n        searchBarApi?.clearSearch?.();\\n        return;\\n      }\\n      if (document.activeElement?.tagName === \"INPUT\") {\\n        document.activeElement.blur();\\n        focusFirstCard();\\n      }\\n      return;\\n    }\\n\\n    if ([\"ArrowRight\", \"ArrowLeft\", \"ArrowUp\", \"ArrowDown\"].includes(e.key)) {\\n      if (isEditing) return;\\n      e.preventDefault();\\n      navigateCards(e.key);\\n    }\\n  });\\n}\\n\\nfunction navigateCards(key) {\\n  const cards = [...document.querySelectorAll(\".tab-card\")];\\n  if (!cards.length) return;\\n  const focused = document.activeElement;\\n  if (!cards.includes(focused)) {\\n    cards[0].focus();\\n    return;\\n  }\\n\\n  const grid = focused.closest(\".tab-grid\");\\n  const lane = focused.closest(\".workspace-lane\");\\n  const gridCards = [...grid.querySelectorAll(\".tab-card\")];\\n  const gridIdx = gridCards.indexOf(focused);\\n\\n  let next = null;\\n  if (key === \"ArrowRight\") next = gridCards[gridIdx + 1] ?? null;\\n  if (key === \"ArrowLeft\") next = gridIdx > 0 ? gridCards[gridIdx - 1] : null;\\n\\n  if (key === \"ArrowDown\" || key === \"ArrowUp\") {\\n    const lanes = [...document.querySelectorAll(\".workspace-lane\")];\\n    const laneIdx = lanes.indexOf(lane);\\n    const targetLane =\\n      key === \"ArrowDown\" ? lanes[laneIdx + 1] : lanes[laneIdx - 1];\\n    if (targetLane) next = targetLane.querySelector(\".tab-card\");\\n  }\\n\\n  next?.focus();\\n}\\n\\nfunction focusFirstCard() {\\n  document.querySelector(\".tab-card\")?.focus();\\n}\\n\\nasync function handleTabClosed(tabId) {\\n  await chrome.tabs.remove(tabId);\\n}\\n\\nfunction openSettings() {\\n  settingsPopup?.open();\\n}\\n\\nfunction closeSettings() {\\n  settingsPopup?.close();\\n}\\n\\nasync function openBookmark(url) {\\n  await openUrlFromMeridian(url);\\n}\\n\\nfunction colorLabel(color) {\\n  return color ? color.charAt(0).toUpperCase() + color.slice(1) : \"Group\";\\n}\\n\\nlet renderTimer = null;\\nlet renderRunning = false;\\n\\nfunction scheduleRender() {\\n  clearTimeout(renderTimer);\\n  renderTimer = setTimeout(async () => {\\n    if (renderRunning) {\\n      scheduleRender();\\n      return;\\n    }\\n    renderRunning = true;\\n    try {\\n      await render();\\n    } finally {\\n      renderRunning = false;\\n    }\\n  }, 50);\\n}\\n\\nfunction sortByTabOrder(tabs, order) {\\n  if (!order?.length) return tabs;\\n  const pos = new Map(order.map((id, i) => [id, i]));\\n  return [...tabs].sort(\\n    (a, b) => (pos.get(a.id) ?? Infinity) - (pos.get(b.id) ?? Infinity),\\n  );\\n}\\n\\nasync function'... 19604 more characters,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\n2026-07-26T06:04:17.574468Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T06:04:30.017519Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T06:07:01.519679Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T06:07:13.519247Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.3 seconds\nOutput:\nrg: regex parse error:\n    (?:role\\)\n    ^\nerror: unclosed group\n\n2026-07-26T06:07:13.549306Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T06:07:17.576389Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T05:57:07.020Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T05:57:07.031Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T05:57:07.047Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 14640
+    },
+    {
+      "at": "2026-07-26T05:57:07.093Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 14640
+    },
+    {
+      "at": "2026-07-26T05:57:07.118Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 38680
+    },
+    {
+      "at": "2026-07-26T05:57:07.122Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T05:57:07.840Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T06:08:04.665Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-26T06:08:04.693Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "attemptId": "attempt-a012c7fff1fa8eea15bc",
+  "status": "completed",
+  "spawnRequestedAt": "2026-07-26T01:00:52.232Z",
+  "updatedAt": "2026-07-26T01:08:02.436Z",
+  "taskId": "eliminate-google-favicon-domain-leakage-and-add-1f75",
+  "runId": "agent-eliminate-google-favicon-domain-leakage-and-add-1f75",
+  "kind": "peer",
+  "roleSlug": "coder",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": null,
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 24860,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 46996,
+    "status": "exited",
+    "exitCode": null,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019f9bf0-6bb4-7843-9cce-0f4d07a86859",
+    "waitingSince": "2026-07-26T01:00:52.320Z",
+    "establishedAt": "2026-07-26T01:06:49.857Z"
+  },
+  "stderrTail": "Reading additional input from stdin...\n2026-07-26T01:03:00.179064Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.2 seconds\nOutput:\nThe string is missing the terminator: \".\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : TerminatorExpectedAtEndOfString\r\n \r\n\n2026-07-26T01:04:00.088094Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.3 seconds\nOutput:\n✔ empty omni search returns no results (2.5362ms)\n✔ empty bookmark scope lists bookmarks only (0.6754ms)\n✔ empty history scope lists recent history only (19.2763ms)\n✖ tab, bookmark, and history results use Chrome-local favicon URLs (2.1936ms)\n✔ sidebar resolves tab favicons through Chrome's packaged endpoint (5.5113ms)\n✔ sidebar replaces a failed local favicon with an in-package placeholder (1.3808ms)\n✔ sidebar renders a placeholder when no page URL is available (1.6314ms)\nℹ tests 7\nℹ suites 0\nℹ pass 6\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 110.1484\n\n✖ failing tests:\n\ntest at tests\\browserSearchScopes.test.mjs:86:1\n✖ tab, bookmark, and history results use Chrome-local favicon URLs (2.1936ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  0 !== 1\n  \n      at TestContext.<anonymous> (file:///C:/Users/russp/AppData/Local/Temp/tasker-task-worktrees/2b13ff41ffe7/eliminate-google-favicon-domain-leakage-and-add--d4fad9e30a7de162/tests/browserSearchScopes.test.mjs:90:10)\n      at async Test.run (node:internal/test_runner/test:1113:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 0,\n    expected: 1,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n\n2026-07-26T01:06:35.442767Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 8.6 seconds\nOutput:\nInvoke-RestMethod : Unable to connect to the remote server\r\nAt line:2 char:351\r\n+ ... ertTo-Json; Invoke-RestMethod -Headers $headers -Uri $uri -Method Pos ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Invoke-RestMethod], WebException\r\n    + FullyQualifiedErrorId : System.Net.WebException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand\r\n \r\nInvoke-RestMethod : Unable to connect to the remote server\r\nAt line:17 char:115\r\n+ ... n -Depth 6; Invoke-RestMethod -Headers $headers -Uri $uri -Method Pos ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : NotSpecified: (:) [Invoke-RestMethod], WebException\r\n    + FullyQualifiedErrorId : System.Net.WebException,Microsoft.PowerShell.Commands.InvokeRestMethodCommand\r\n \r\n\n2026-07-26T01:06:35.659124Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T01:07:01.876912Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 4.4 seconds\nOutput:\nTasker reporting endpoint remained unavailable after three attempts.\r\nAt line:2 char:622\r\n+ ... onnected) { throw 'Tasker reporting endpoint remained unavailable aft ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : OperationStopped: (Tasker reportin...three attempts.:String) [], RuntimeException\r\n    + FullyQualifiedErrorId : Tasker reporting endpoint remained unavailable after three attempts.\r\n \r\n\n2026-07-26T01:07:19.078796Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.3 seconds\nOutput:\n{\r\n    \"reachable\":  false,\r\n    \"error\":  \"The remote server returned an error: (401) Unauthorized.\"\r\n}\r\n\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T01:00:52.232Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T01:00:52.240Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T01:00:52.254Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 24860
+    },
+    {
+      "at": "2026-07-26T01:00:52.299Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 24860
+    },
+    {
+      "at": "2026-07-26T01:00:52.321Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 46996
+    },
+    {
+      "at": "2026-07-26T01:00:52.325Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T01:00:52.779Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T01:06:49.860Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T01:08:01.451Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-26T01:08:02.436Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": null,
+      "signal": null
+    }
+  ]
+}

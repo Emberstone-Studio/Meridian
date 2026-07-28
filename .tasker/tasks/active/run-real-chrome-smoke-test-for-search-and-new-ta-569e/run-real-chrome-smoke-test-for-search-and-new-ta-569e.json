@@ -1,0 +1,57 @@
+{
+  "description": "Run release-oriented validation in a clean Chrome profile using the unpacked meridian-extension package after the keyboard and accessibility work lands.\n\nRequired coverage:\n- New unpinned Meridian tabs attempt to focus the page search field; document Chrome omnibox limitations and the exact observed behavior.\n- Focus-pinned behavior, pinned/unpinned result navigation, direct URL recognition, Web search, bookmarks/history scopes, and query persistence.\n- Arrow navigation, highlighted-result activation, Escape, mouse/keyboard synchronization, ARIA state changes, and live-region announcements.\n- Search popup placement, scrolling, empty/local/Web fallback, permissions denial/revocation, settings, grouping, thumbnails, sidebar, and persistence across reload/restart.\n- Inspect extension-page, side-panel, and service-worker consoles for errors or unhandled rejections.\n- Run syntax, full automated suite, source/package parity, and git diff checks.\n- Record exact Chrome version, commands/procedure, results, limitations, and remaining blockers in RELEASE_VALIDATION.md. Do not claim that page focus overrides Chrome omnibox focus unless verified in a real New Tab session.",
+  "label": "Feature",
+  "deps": [
+    "add-keyboard-selection-navigation-to-search-resu-0fce",
+    "add-accessible-combobox-and-listbox-semantics-to-a370"
+  ],
+  "priority": "high",
+  "title": "Run real Chrome smoke test for search and New Tab behavior",
+  "status": "done",
+  "id": "run-real-chrome-smoke-test-for-search-and-new-ta-569e",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T05:45:48.255Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T05:45:48.255Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T05:48:29.451Z",
+      "type": "moved",
+      "content": "Moved from ready to in_progress"
+    },
+    {
+      "timestamp": "2026-07-26T05:48:33.235Z",
+      "type": "moved",
+      "content": "Moved from in_progress to ready"
+    },
+    {
+      "timestamp": "2026-07-26T06:09:08.670Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T06:43:25.461Z",
+      "type": "output",
+      "content": "## Validation complete\n\nUpdated `RELEASE_VALIDATION.md` with the clean-profile Chrome for Testing 151.0.7922.47 release matrix, exact launch/procedure details, headed New Tab/omnibox evidence, navigation/search/accessibility/permissions/settings/grouping/thumbnail/side-panel coverage, reload and restart persistence, console diagnostics, limitations, and concrete blocker fixes.\n\n### Verification\n\n- `node --test tests/*.test.mjs`: 74 passed, 0 failed.\n- `node --check`: 48 JavaScript files passed.\n- Source/package SHA-256 parity: 31 pairs, 0 mismatches.\n- `git diff --check`: passed.\n- Final worktree delta: only `RELEASE_VALIDATION.md`.\n\n### Real Chrome results\n\n- Headed `Ctrl+T`: Windows UI Automation identified `Address and search bar` (`OmniboxViewViews`) as the actual focused control. Typing `meridian-focus-probe-569e` populated the omnibox while the Meridian input stayed empty, even though the document reported `.search-input` as `activeElement`. Meridian's autofocus attempt does not override Chrome's omnibox.\n- Focus-pinned, pinned/unpinned navigation, direct URL recognition, DuckDuckGo Web search, query retention, Arrow/Enter/Escape behavior, pointer/keyboard synchronization, live announcements, popup placement/scrolling, access-off/deny/allow/revoke flows, native grouping, 18 thumbnails, actual side panel behavior, reload persistence, and clean browser restart persistence were exercised.\n- Extension page, actual side panel, and service worker produced 0 runtime exceptions, console/log errors, or unhandled rejections. Two handled thumbnail warnings are documented.\n\n### Release blockers found\n\n1. **High:** Opening Settings from an active Bookmarks/History scope with a retained query immediately closes Settings when the asynchronous all-results popup opens (`meridian.js:653`, `meridian.js:775`). Invalidate the pending browser search before Settings takes ownership.\n2. **High accessibility:** Switching directly between already-open Bookmark and History scopes leaves the listbox visible and selectable while the combobox reports `aria-expanded=\"false\"` (`components/SearchBar.js:122`, `components/SearchPopup.js:32`). Re-synchronize open listeners/state for an already-visible popup.\n\nThe validation task is complete; the extension release itself remains blocked on those two documented defects.",
+      "attachment": "active/run-real-chrome-smoke-test-for-search-and-new-ta-569e/run-real-chrome-smoke-test-for-search-and-new-tab-.md"
+    }
+  ],
+  "epic": "epic-search-command-center",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Feature",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T06:09:07.624Z",
+    "auto_router_mode": "roles",
+    "chosen_role": "reviewer"
+  },
+  "agent_attempt_id": "attempt-4b162b937857d427d11b",
+  "agent_startup_started_at": "2026-07-26T06:09:08.645Z",
+  "agent_session_confirmed_run_id": "agent-run-real-chrome-smoke-test-for-search-and-new-ta-569e",
+  "agent_session_confirmed_at": "2026-07-26T06:09:09.456Z"
+}

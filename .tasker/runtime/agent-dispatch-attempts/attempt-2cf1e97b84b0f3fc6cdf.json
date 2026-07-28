@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "attemptId": "attempt-2cf1e97b84b0f3fc6cdf",
+  "status": "completed",
+  "spawnRequestedAt": "2026-07-26T05:49:55.096Z",
+  "updatedAt": "2026-07-26T05:56:11.723Z",
+  "taskId": "add-keyboard-selection-navigation-to-search-resu-0fce",
+  "runId": "agent-add-keyboard-selection-navigation-to-search-resu-0fce",
+  "kind": "peer",
+  "roleSlug": "coder",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": null,
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 20260,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 44404,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019f9cf9-0d90-7851-8b10-1efc35abd354",
+    "waitingSince": "2026-07-26T05:49:55.196Z",
+    "establishedAt": "2026-07-26T05:49:55.922Z"
+  },
+  "stderrTail": "Reading additional input from stdin...\n2026-07-26T05:50:04.375015Z ERROR codex_core::exec: exec error: The directory name is invalid. (os error 267)\n2026-07-26T05:50:04.375358Z ERROR codex_core::tools::router: error=execution error: Io(Os { code: 267, kind: NotADirectory, message: \"The directory name is invalid.\" })\n2026-07-26T05:50:09.742428Z ERROR codex_core::exec: exec error: The directory name is invalid. (os error 267)\n2026-07-26T05:50:09.742900Z ERROR codex_core::tools::router: error=execution error: Io(Os { code: 267, kind: NotADirectory, message: \"The directory name is invalid.\" })\n2026-07-26T05:50:14.167839Z ERROR codex_core::exec: exec error: The directory name is invalid. (os error 267)\n2026-07-26T05:50:14.168264Z ERROR codex_core::tools::router: error=execution error: Io(Os { code: 267, kind: NotADirectory, message: \"The directory name is invalid.\" })\n2026-07-26T05:52:16.609115Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T05:52:32.213341Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T05:53:19.210338Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.4 seconds\nOutput:\n✔ findBookmarksBar resolves the bar by stable id 1 (0.8973ms)\n✔ findBookmarksBar falls back to a title match when id 1 is absent (0.2081ms)\n✔ flattenBookmarks (Bookmarks Bar view) recurses folders and drops folder nodes (0.8979ms)\n✔ allBookmarksRoot preserves folder nodes for drill-in (does not flatten) (0.3204ms)\n✔ allBookmarksRoot excludes the bookmarks bar subtree (0.1841ms)\n✔ a disabled popup source explains access without querying it (0.6963ms)\n✔ history scope opens with the retained search query (0.4224ms)\n✔ Enter web search clears the field and notifies the public query handler (2.438ms)\n✔ web search submit delegates navigation to the Meridian tab policy (0.3988ms)\n✔ Enter treats a domain-like value as a URL instead of a search (0.7387ms)\n✔ magnifier submits the active scope and scope toggles preserve the query (0.5309ms)\n✔ homepage URLs must be absolute HTTP(S) URLs and are normalized (0.2438ms)\n✔ settings feedback and guarded homepage navigation use the shared validator (8.5125ms)\n✔ sidebar tab and result rows expose keyboard activation and visible focus (3.8354ms)\n✔ web search renders as a labeled result section without a local-empty message (1.5262ms)\n✖ an empty local result set renders only the Web section (1.5204ms)\n✔ the Web section launches the selected provider and clears the query (2.538ms)\n✔ the packaged extension matches every runtime source file (34.7632ms)\nℹ tests 18\nℹ suites 0\nℹ pass 17\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 134.8119\n\n✖ failing tests:\n\ntest at tests\\interactionDefects.test.mjs:340:1\n✖ an empty local result set renders only the Web section (1.5204ms)\n  ReferenceError: resultsSelection is not defined\n      at renderSearchResults (eval at <anonymous> (file:///C:/Users/russp/AppData/Local/Temp/tasker-task-worktrees/2b13ff41ffe7/add-keyboard-selection-navigation-to-search-resu-d93d0e5406a262b6/tests/interactionDefects.test.mjs:347:31), <anonymous>:6:3)\n      at TestContext.<anonymous> (file:///C:/Users/russp/AppData/Local/Temp/tasker-task-worktrees/2b13ff41ffe7/add-keyboard-selection-navigation-to-search-resu-d93d0e5406a262b6/tests/interactionDefects.test.mjs:374:3)\n      at async Test.run (node:internal/test_runner/test:1113:7)\n      at async Test.processPendingSubtests (node:internal/test_runner/test:788:7)\n\n2026-07-26T05:54:59.118102Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T05:55:19.061661Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T05:55:24.554853Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T05:55:40.292331Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 0.2 seconds\nOutput:\nAt line:2 char:645\r\n+ ... ustomobject]@{ Source = $pair[0]; MirrorMatches = $same } } | Format- ...\r\n+                                                                 ~\r\nAn empty pipe element is not allowed.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : EmptyPipeElement\r\n \r\n\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T05:49:55.096Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T05:49:55.109Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T05:49:55.124Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 20260
+    },
+    {
+      "at": "2026-07-26T05:49:55.176Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 20260
+    },
+    {
+      "at": "2026-07-26T05:49:55.197Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 44404
+    },
+    {
+      "at": "2026-07-26T05:49:55.203Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T05:49:55.923Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T05:56:11.695Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-26T05:56:11.723Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

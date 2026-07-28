@@ -1,0 +1,148 @@
+{
+  "agent": "reviewer",
+  "description": "After the remaining code and disclosure fixes land, rerun release validation against the exact directory/archive intended for upload. The current RELEASE_VALIDATION.md is stale: it records 74 tests and two blockers that now have regression fixes.\n\nAcceptance criteria:\n- Run the complete Node suite, JavaScript syntax checks, manifest parsing, git diff checks, and runtime-file parity checks used by the repository.\n- Run the full headed Chrome matrix for new-tab behavior, search scopes and keyboard navigation, settings, optional permission grant/denial/revocation, grouping/drag-and-drop, thumbnails, side panel, persistence, network requests, accessibility state, service worker, and console errors.\n- Specifically verify both formerly documented popup blockers and the thumbnail capture race fix.\n- Test the exact final release candidate, not an earlier working tree.\n- Update RELEASE_VALIDATION.md with final version, commit SHA, validation environment, archive/directory SHA-256 information, current test count, observed warnings, and an accurate release decision.",
+  "label": "Release",
+  "priority": "high",
+  "title": "Run final Chrome validation against the release candidate and update the release record",
+  "status": "ready",
+  "id": "run-final-chrome-validation-against-the-release-9f59",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:00:11.562Z",
+  "updated_at": "2026-07-27T21:57:35.051Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:00:11.562Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:02:52.924Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T20:13:44.431Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T20:41:44.521Z",
+      "type": "moved",
+      "content": "Stopped by user — agent process tree killed; task returned to Ready"
+    },
+    {
+      "timestamp": "2026-07-26T21:38:18.473Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T22:40:13.016Z",
+      "type": "stall_warning",
+      "content": "Agent process alive but no transcript progress for ~15m — possible stall (review or stop)."
+    },
+    {
+      "timestamp": "2026-07-26T22:55:14.508Z",
+      "type": "watchdog_redispatch",
+      "content": "Agent was alive but made no progress for ~30m (stalled, likely a transient API error) — killed and re-queued for dispatch."
+    },
+    {
+      "timestamp": "2026-07-26T22:55:15.472Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T22:55:16.096Z",
+      "type": "output",
+      "content": "## Completed\n\nUpdated `RELEASE_VALIDATION.md` and committed it as `a64bcb6` (`Update final release validation record`). The worktree is clean.\n\n- Candidate: Meridian `1.1.0` from source commit `bc08589f9ec0a88450c27cd842b1662b7c1409bc`\n- Automated checks: 112/112 Node tests, 52 JavaScript syntax checks, 2 manifest parses, 33 runtime parity pairs, `git diff --check`\n- Exact artifact: 47 files; directory/extracted tree SHA-256 `c981864c38d24466312a09a3b61c757fe1e81f1d583f51f3c01558896084a51b`\n- Upload ZIP SHA-256: `d6e92c4940900390cfb37130b567a84c38c2fe249156165a63682e82dc0277c7`\n- Headed Chrome 150 matrix: passed new-tab modes, direct/provider navigation, omni/scoped search, keyboard selection/Escape, both former popup regressions, Settings, native permission deny/grant/revoke, native grouping and drag-and-drop, thumbnail race discard, 12/12 full thumbnail refresh, actual side panel, Chrome accessibility tree, disclosed network origins, storage persistence, service worker, and console inspection\n- Former blockers: both no longer reproduce; scoped transitions settle with `aria-expanded=\"true\"`, and retained-query results do not displace Settings\n- Thumbnail race: returning to Meridian before the delayed capture left no stale thumbnail; explicit refresh stored all 12 eligible thumbnails and restored Meridian\n- Runtime errors: 0 exceptions, console errors, log errors, or unhandled rejections\n- Release decision: **Pass - ready as the release candidate**, subject to owner-only Chrome Web Store privacy/disclosure/upload work documented in the record\n\nObserved limitations are recorded: Chrome owns initial New Tab focus; Chrome 150 default startup did not restore fixture tabs/native groups, while extension settings, revoked permission state, pinned Meridian, and all 12 thumbnails persisted.",
+      "attachment": "active/run-final-chrome-validation-against-the-release-9f59/run-final-chrome-validation-against-the-release-ca.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.940Z",
+      "type": "review",
+      "content": "Reviewer decision: Keep pending. The recorded validation used meridian-extension and a temporary archive, not the final release artifact. After the version bump and final ZIP are prepared, rerun validation against that exact unpacked/archive content, record its version and commit SHA, and update the release record. This must be the last release task."
+    },
+    {
+      "timestamp": "2026-07-27T00:11:56.220Z",
+      "type": "moved",
+      "content": "Moved from in_review to backlog"
+    },
+    {
+      "timestamp": "2026-07-27T21:57:35.051Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    }
+  ],
+  "epic": "epic-review-fixes-qa",
+  "deps": [
+    "prevent-automatic-thumbnail-capture-from-saving-5df5",
+    "remove-stale-closed-tabs-during-browser-search-i-d232",
+    "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
+    "add-in-product-disclosure-for-automatic-thumbnai-f891",
+    "investigate-blank-thumbnails-and-add-non-intrusi-3fba"
+  ],
+  "agent_id": "reviewer",
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "alternates": [],
+    "shape": "Release",
+    "decided_by": "run-queue",
+    "decided_at": "2026-07-26T22:55:14.572Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "architecture_review"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=false,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "last_agent_attempt_id": "attempt-b5ac51dbf9866e6d62cf",
+  "agent_attempt_id": "attempt-ed1083ac3ed8f6fd4ae2",
+  "agent_startup_started_at": "2026-07-26T22:55:15.436Z",
+  "plan": [
+    {
+      "label": "Inspect the committed release candidate, validation record, and retained evidence",
+      "done": true
+    },
+    {
+      "label": "Rerun deterministic repository validation against the exact candidate",
+      "done": true
+    },
+    {
+      "label": "Verify headed Chrome coverage, former regressions, and artifact hashes from evidence",
+      "done": true
+    },
+    {
+      "label": "Correct and commit the release record if needed, then report the final decision",
+      "done": true
+    }
+  ]
+}

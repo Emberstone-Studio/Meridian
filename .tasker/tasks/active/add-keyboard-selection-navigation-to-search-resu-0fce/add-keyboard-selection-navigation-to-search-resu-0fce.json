@@ -1,0 +1,53 @@
+{
+  "priority": "high",
+  "title": "Add keyboard selection navigation to search results",
+  "description": "Implement full keyboard navigation for Meridian search results.\n\nRequirements:\n- ArrowDown/ArrowUp move a single visible highlight through every actionable row in the active search popup, across Open Tabs, Bookmarks, History, and Web sections.\n- Enter and the magnifier open the highlighted result when one is selected; otherwise retain the current default-submit behavior.\n- Navigation wraps or clamps consistently, scrolls the active row into view, and resets safely when the query, scope, popup contents, or popup visibility changes.\n- Mouse hover/click and keyboard selection remain synchronized without stale selection after asynchronous result replacement.\n- Escape behavior and persisted query behavior must remain unchanged.\n- Preserve pinned-versus-unpinned URL navigation and direct-URL recognition.\n- Apply changes to root and meridian-extension mirrors.\n- Add regression tests for Up/Down, cross-section movement, Enter activation, async replacement, empty results, and scoped popups.",
+  "status": "done",
+  "label": "Feature",
+  "id": "add-keyboard-selection-navigation-to-search-resu-0fce",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T05:45:47.897Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T05:45:47.897Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T05:48:26.658Z",
+      "type": "moved",
+      "content": "Moved from ready to in_progress"
+    },
+    {
+      "timestamp": "2026-07-26T05:48:32.327Z",
+      "type": "moved",
+      "content": "Moved from in_progress to ready"
+    },
+    {
+      "timestamp": "2026-07-26T05:49:55.128Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T05:56:12.557Z",
+      "type": "output",
+      "content": "## Completed\n\nImplemented full keyboard selection navigation for Meridian search results in both the root source and `meridian-extension` mirror.\n\n- Added a shared popup selection controller with wrapped Up/Down movement, one visible active row, nearest-row scrolling, pointer synchronization, activation, and safe reset behavior.\n- Routed Enter and the magnifier through the highlighted row first while preserving default web/scoped submit behavior when no row is selected.\n- Integrated selection across Open Tabs, Bookmarks, History, Web, and scoped bookmarks/history popups.\n- Reset selection on query/scope changes, popup open/close, content rendering, async result replacement, and clearing.\n- Preserved existing Escape/query behavior, direct URL recognition, and pinned-versus-unpinned navigation.\n- Added regression coverage for Up/Down wrapping, cross-section traversal, Enter/magnifier activation, async replacement, empty results, pointer synchronization, and scoped popup rows.\n\nValidation: `node --test` - 69 passed, 0 failed. `git diff --check` passed. Root/mirror parity passed.",
+      "attachment": "active/add-keyboard-selection-navigation-to-search-resu-0fce/add-keyboard-selection-navigation-to-search-result.md"
+    }
+  ],
+  "epic": "epic-search-command-center",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Feature",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T05:49:51.664Z",
+    "auto_router_mode": "roles",
+    "chosen_role": "coder"
+  },
+  "agent_attempt_id": "attempt-2cf1e97b84b0f3fc6cdf",
+  "agent_startup_started_at": "2026-07-26T05:49:55.096Z",
+  "agent_session_confirmed_run_id": "agent-add-keyboard-selection-navigation-to-search-resu-0fce",
+  "agent_session_confirmed_at": "2026-07-26T05:49:55.922Z"
+}

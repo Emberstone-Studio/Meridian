@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "attemptId": "attempt-a638f105875469bb767c",
+  "status": "completed",
+  "spawnRequestedAt": "2026-07-26T01:25:36.710Z",
+  "updatedAt": "2026-07-26T01:29:13.249Z",
+  "taskId": "fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+  "runId": "agent-fix-lane-rename-keyboard-handling-and-native-gro-8a12",
+  "kind": "peer",
+  "roleSlug": "coder",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": null,
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 23596,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 18908,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019f9c07-126c-72e2-b988-bb6f5de8ae5f",
+    "waitingSince": "2026-07-26T01:25:36.801Z",
+    "establishedAt": "2026-07-26T01:25:37.254Z"
+  },
+  "stderrTail": "Reading additional input from stdin...\n2026-07-26T01:27:32.971032Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T01:25:36.710Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T01:25:36.717Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T01:25:36.733Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 23596
+    },
+    {
+      "at": "2026-07-26T01:25:36.779Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 23596
+    },
+    {
+      "at": "2026-07-26T01:25:36.802Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 18908
+    },
+    {
+      "at": "2026-07-26T01:25:36.808Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T01:25:37.256Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T01:29:13.234Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-07-26T01:29:13.249Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

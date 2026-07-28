@@ -1,0 +1,11 @@
+{
+  "chatId": "bbbc6ea9",
+  "title": "The icon in the sidebar (next to search) stopped working,",
+  "summary": "Working in the Meridian browser extension project (c:\\Users\\russp\\Documents\\Meridian). Fixed sidebar Meridian icon (adaptive SVG, removed destructive dark-mode filter). Implemented persistent pinned Meridian tab behavior across windows. Confirmed Chrome's side-panel icon/title cannot be removed by the extension. Replaced the search-bar icon with a proper 2×2 grid of four rounded squares (final approved design, after rejecting refresh/circular-arrow and a three-column grid). Diagnosed and fixed thumbnail loss on Chrome/window close (tabs.onRemoved was deleting all thumbnails); restored tabs now recover thumbnails by URL. Implemented cross-window tab navigation: selecting a tab in another window activates it and focuses that window, applied across tab cards, keyboard nav, hover-preview, search, sidebar results, and placeholders. Committed as `e73a16f Harden multi-window navigation and thumbnail persistence`. Restyled sidebar search to match main app's CSS pill exactly (44px, spacing, shadows, focus ring, colors) and added bookmark/history toggle icons on the right that switch the list below, mirroring main app behavior. 124 tests passing; source and packaged extension synced. Awaiting user verification after reload; not yet committed.",
+  "agents": [
+    "coder"
+  ],
+  "threadPath": ".tasker/chats/bbbc6ea9",
+  "createdAt": "2026-07-27T12:58:32.160Z",
+  "updatedAt": "2026-07-27T20:57:47.832Z"
+}

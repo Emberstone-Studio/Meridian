@@ -1,0 +1,106 @@
+{
+  "id": "review-entire-meridian-codebase-for-errors-184a",
+  "title": "Review entire Meridian codebase for errors",
+  "description": "Static code review of the root Meridian codebase — read the source only; do NOT run or load anything, and do NOT execute the test suite. Scope is the ROOT source ONLY: meridian.js, meridian.css, meridian.html, and components/*. Do NOT review meridian-extension/ — that directory is the running extension and is out of scope. Audit for correctness bugs and dead code. Focus areas from the recent search/settings work: the scoped omni-search + auto-accent engine (SettingsPanel.js), the unified SearchPopup.js shell, the mutually-exclusive icon toggle group (magnifier/bookmarks/history/settings) in meridian.js, lane-title inline rename, and the web-search row.\n\nAlso scan for Chrome Web Store compliance: verify the manifest (permissions/host_permissions are minimal and justified — flag any over-broad or unused permissions; prefer activeTab/optional permissions where possible), Manifest V3 conformance, a compliant/present privacy-relevant disclosures, no remotely-hosted code or eval/inline-script that violates the extension CSP, no obfuscated code, and that requested APIs match declared permissions. Flag anything likely to trigger Chrome Web Store review rejection.\n\nReport findings ranked by severity; do not fix — review only.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Maintenance",
+  "agent_id": "reviewer",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-25T22:41:45.033Z",
+  "updated_at": "2026-07-26T21:37:31.098Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-25T22:41:45.033Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-25T22:41:45.033Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-25T22:42:32.419Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T22:43:23.884Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T22:44:02.570Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-91f4e4ea738eaeea30578075207f86d9-c42b102c",
+        "task_id": null
+      },
+      "task_id": "review-entire-meridian-codebase-for-errors-184a",
+      "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-25T22:45:13.293Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-25T22:45:14.120Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-25T22:58:48.875Z",
+      "type": "output",
+      "content": "# Static review: root Meridian source\n\nNo critical code-execution defect was found. One high-severity Chrome Web Store/privacy blocker, six medium defects/risks, and three low defects were confirmed. Review was source-only: no application code or tests were executed, `meridian-extension/` was not inspected, and no files were changed.\n\n## High\n\n### 1. Sidebar search transmits browsing domains to Google, with no reviewed privacy/disclosure surface\n\n**Locations:** `components/sidebar.js:64-67`, `components/sidebar.js:73-77`, `components/sidebar.js:324-329`; compare `components/BookmarksButton.js:26-30`. Manifest access is at `manifest.json:13-14`; the reviewed README has no privacy policy or Limited Use disclosure.\n\n`faviconUrl()` embeds each page hostname in `https://www.google.com/s2/favicons?...`. Tab rows use it when Chrome has no favicon, and every sidebar search result calls `makeFaviconImg(item.url, null)`, so domains from tabs, bookmarks, and history can be sent to Google. Chrome classifies domains/URLs as browsing activity and requires a privacy policy even when user data stays local; this actual third-party transfer is more serious. This is likely to block or endanger Web Store review. See the official [User Data FAQ](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq).\n\n**Fix:** use the packaged `/_favicon/` endpoint already implemented in `BookmarksButton.js` and an in-package fallback. Publish a privacy policy and keep Web Store privacy fields/Limited Use certification consistent with tab, bookmark, history, screenshot, sync-storage, and network behavior. If any browsing-data transfer remains, add required prominent disclosure and consent before it occurs.\n\n## Medium\n\n### 2. Inline lane rename loses Enter/Escape after the first typed key\n\n**Location:** `components/WorkspaceLane.js:409-437`.\n\nThe rename `keydown` listener uses `{ once: true }`. The first ordinary character removes it, so Enter no longer commits via blur and Escape no longer restores the original title after typing.\n\n**Fix:** keep the listener for the editing session and explicitly remove it from one cleanup path after Enter, Escape, or blur.\n\n### 3. Sidebar search allows stale async results to overwrite the current query or cleared list\n\n**Locations:** `components/sidebar.js:367-401`, `components/sidebar.js:437-446`, `components/sidebar.js:461-467`.\n\nInput events await `runSearch()` without a sequence/current-query check. A slower old query can render after a newer one; clearing renders the tab list, but a pending search can later replace it with stale results.\n\n**Fix:** increment a generation on every input change, including clear, and check generation plus current query before each DOM write. `meridian.js:639-658` already demonstrates the required guard.\n\n### 4. Auto-accent analysis can apply a stale background\n\n**Locations:** `components/SettingsPanel.js:459-465`, `components/SettingsPanel.js:757-815`, `components/SettingsPanel.js:979-985`.\n\nPhoto/custom analysis waits for image load and canvas sampling, but `applyAccentFromBackground()` has no generation check. A slow old photo can finish after a newer selection and overwrite `lastDominant`, `lastBgLum`, and the current CSS variables.\n\n**Fix:** add an analysis generation token (or abortable pipeline) and cache/apply only the latest result, including storage-triggered updates.\n\n### 5. “Move to new group” leaves a stale Meridian assignment\n\n**Locations:** `components/ContextMenu.js:67-88`; compare `components/ContextMenu.js:102-112`.\n\nThe native new-group branch never calls `unassignTab(tab.id)`, while the existing-group path does. The hidden assignment returns if the tab is later ungrouped, unexpectedly sending it back to its old Meridian workspace.\n\n**Fix:** after successful native grouping, `await unassignTab(tab.id)` before dispatching the rename event.\n\n### 6. Disabled local-search sources are queried before being filtered out\n\n**Locations:** `meridian.js:647-654`, `components/sidebar.js:367-374`, settings at `components/SettingsPanel.js:270-312`.\n\nBoth callers invoke aggregate `search()` before loading `localSearch`; disabled tab/bookmark/history results are discarded only afterward. The toggles reduce display but do not prevent backend access/work, contrary to data minimization and likely user expectation.\n\n**Fix:** read enabled sources first and pass them to the backend, or invoke only enabled source searches. If bookmarks/history become optional permissions, request them only when their source or explicit scope is enabled.\n\n### 7. Install-time permissions are broader than the reviewed source can justify\n\n**Location:** `manifest.json:13-14`; thumbnail refresh is at `components/SettingsPanel.js:624-645` and `README.md:51-52`.\n\nThe manifest requires `scripting` and `<all_urls>` at install and has no optional permissions. No in-scope file invokes `chrome.scripting`; `<all_urls>` may support the excluded background worker’s all-tab screenshots, but that cannot be verified within the assigned scope. Web Store policy requires the narrowest permissions and recommends optional grants where possible. See [Declare permissions](https://developer.chrome.com/docs/extensions/develop/concepts/declare-permissions) and [minimum permission](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq#minimum_permission).\n\n**Fix:** verify the excluded worker before release; remove `scripting` if unused. Prefer optional `<all_urls>` requested from thumbnail enable/refresh and consider optional bookmarks/history tied to their controls. If persistent all-site access is essential, document the exact user-facing justification in the listing and privacy material.\n\n## Low\n\n### 8. Enter-to-web-search leaves stale results behind a cleared field\n\n**Locations:** `components/SearchBar.js:125-135`, `meridian.js:627-633`.\n\n`doSearch()` clears input UI but does not notify the query handler, so the popup retains the old query. The web-search row correctly calls `clearSearch()`. Returning after an Enter-launched search can show stale results under an empty field.\n\n**Fix:** use the public `clearSearch()` path or call `notifyQuery()` after clearing.\n\n### 9. Homepage settings save and navigate unvalidated URLs\n\n**Locations:** `components/SettingsPanel.js:217-227`, `meridian.js:149-170`.\n\nThe URL input is saved without `checkValidity()` or scheme validation and passed verbatim to `chrome.tabs.update`. Invalid, relative, or unsupported-scheme values can fail or resolve unexpectedly.\n\n**Fix:** parse with `new URL`, allow supported `http:`/`https:` schemes, normalize before saving, show validation feedback, and catch navigation failures.\n\n### 10. Sidebar ArrowDown targets non-focusable rows\n\n**Locations:** `components/sidebar.js:179-209`, `components/sidebar.js:324-358`, `components/sidebar.js:456-459`.\n\nBoth builders create plain `div.tab-row` elements without `tabIndex`; result rows have no Enter/Space handler. `.focus()` therefore does not provide the intended keyboard transition.\n\n**Fix:** use semantic buttons/links or add `tabIndex`, role/label semantics, and Enter/Space activation.\n\n## Dead code / maintainability nits\n\nConfirmed refactor leftovers, not product defects:\n\n- `meridian.js:29,195-198`: `bookmarksApi` is never assigned.\n- `meridian.js:175,469,656`: `browserSearchResults` is never read.\n- `meridian.js:449-465,645`: `filterGrid()` is only called with `\"\"`; its non-empty branch is unreachable.\n- `meridian.js:704-708`: `.search-web-fallback` styles have no element.\n- `components/SearchBar.js:29-35,67`: bookmark/history glyph constants are unreachable; only `SCOPE_GLYPHS.all` is used.\n- `components/SearchPopup.js:34-39`: `setContent` and `setLabel` have no in-scope caller.\n- `components/SettingsPanel.js:121`: `onClose` is unused.\n- `meridian.css:219-245,283-304,652-675,813-857,928-958`: obsolete old engine/scope/bookmark/new-group/select selectors have no matching markup.\n- `components/sidebar.css:334-351`: `.sidebar-title` and `#sidebar-header` do not exist in sidebar HTML/JS.\n\n**Fix:** remove these stale symbols/selectors; simplify `filterGrid` to its actual reset behavior or restore a real non-empty caller.\n\n## Chrome Web Store checks that passed in scope\n\n- Manifest V3 is declared; the module service worker, side-panel files, and icons exist.\n- Both HTML entry points use packaged external module scripts; there are no inline handlers.\n- No `eval`, `new Function`, remote JavaScript imports, or obfuscation was found. Remote resources are images, not executable code.\n- In-scope tabs, tab-groups, storage, bookmarks, history, side-panel, and packaged-favicon APIs have corresponding declarations; `chrome.action.setIcon` needs no separate permission.\n- Static SVG passed to `innerHTML` is hard-coded package content, not user-controlled markup.\n\n## Validation\n\nStatic inspection only. No source, extension page, service worker, or test suite was executed or loaded. `meridian-extension/`, `background.js`, and `utils/*` bodies were not reviewed. The worktree remains clean.",
+      "attachment": "active/review-entire-meridian-codebase-for-errors-184a/review-entire-meridian-codebase-for-errors.md"
+    },
+    {
+      "timestamp": "2026-07-26T04:30:37.377Z",
+      "type": "review_passed",
+      "content": "Reviewer approved: implementation/output verified against the task scope; combined suite passes (41/41) and shipped source/package parity passes."
+    }
+  ],
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-25T22:45:13.337Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-dfcb1b6802ca40b98209",
+  "agent_startup_started_at": "2026-07-25T22:45:14.096Z",
+  "role_docs": [
+    {
+      "role_slug": "reviewer",
+      "doc_path": "roles/reviewer/memory/tasks/review-entire-meridian-codebase-for-errors-184a.md",
+      "direction": "self",
+      "at": "2026-07-25T22:58:48.875Z"
+    }
+  ],
+  "epic": "epic-code-review-follow-ups"
+}

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "attemptId": "attempt-8285cece9ada1e86f6a4",
+  "status": "failed",
+  "spawnRequestedAt": "2026-07-26T20:13:44.401Z",
+  "updatedAt": "2026-07-26T20:41:44.726Z",
+  "taskId": "run-final-chrome-validation-against-the-release-9f59",
+  "runId": "agent-run-final-chrome-validation-against-the-release-9f59",
+  "kind": "peer",
+  "roleSlug": "reviewer",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": "agent",
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 10252,
+    "status": "running"
+  },
+  "agent": {
+    "pid": 18508,
+    "status": "failed",
+    "exitCode": 1,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019fa00f-e7a4-7312-a61d-787cfe8f12f9",
+    "waitingSince": "2026-07-26T20:13:44.496Z",
+    "establishedAt": "2026-07-26T20:13:44.948Z"
+  },
+  "stderrTail": "rome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D1%26title%3DFinal%2520Smoke%2520Tab%252001&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D2%26title%3DFinal%2520Smoke%2520Tab%252002&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D11%26title%3DFinal%2520Smoke%2520Tab%252011&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D10%26title%3DFinal%2520Smoke%2520Tab%252010&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D9%26title%3DFinal%2520Smoke%2520Tab%252009&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D8%26title%3DFinal%2520Smoke%2520Tab%252008&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D7%26title%3DFinal%2520Smoke%2520Tab%252007&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D6%26title%3DFinal%2520Smoke%2520Tab%252006&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D5%26title%3DFinal%2520Smoke%2520Tab%252005&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D4%26title%3DFinal%2520Smoke%2520Tab%252004&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D3%26title%3DFinal%2520Smoke%2520Tab%252003&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Ftab%3Fn%3D1%26title%3DFinal%2520Smoke%2520Tab%252001&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Fbookmark%3Ftitle%3DMeridian%2520Final%2520Bookmark&size=16\"\r\n    },\r\n    {\r\n      \"target\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/meridian.html\",\r\n      \"type\": \"Image\",\r\n      \"url\": \"chrome-extension://kjkegmpnhiejgidobnckifpghlehfech/_favicon/?pageUrl=http%3A%2F%2F127.0.0.1%3A60664%2Fbookmark%3Ftitle%3DMeridian%2520Final%2520Bookmark&size=16\"\r\n    }\r\n  ],\r\n  \"chromeStderr\": [\r\n    \"[20784:11108:0726/163124.180:ERROR:sandbox\\\\policy\\\\win\\\\sandbox_win.cc:804] Sandbox cannot access executable C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\chrome-for-testing-151.0.7922.47\\\\chrome-win64\\\\chrome.exe. Check filesystem permissions are valid. See https://bit.ly/31yqMJR.: Access is denied. (0x5)\",\r\n    \"DevTools listening on ws://127.0.0.1:9661/devtools/browser/961a1290-8c34-4091-97bb-ff27c6aba3e6\",\r\n    \"[20784:20724:0726/163124.226:ERROR:content\\\\browser\\\\network_service_instance_impl.cc:618] Network service crashed or was terminated, restarting service.\",\r\n    \"[20784:20724:0726/163124.602:ERROR:chrome\\\\browser\\\\ui\\\\webui\\\\ntp\\\\new_tab_ui.cc:54] Requested load of chrome://newtab/ for incorrect profile type.\",\r\n    \"[20784:20724:0726/163127.563:ERROR:chrome\\\\browser\\\\ui\\\\webui\\\\ntp\\\\new_tab_ui.cc:54] Requested load of chrome://newtab/ for incorrect profile type.\",\r\n    \"[20784:20724:0726/163129.872:ERROR:chrome\\\\browser\\\\ui\\\\webui\\\\ntp\\\\new_tab_ui.cc:54] Requested load of chrome://newtab/ for incorrect profile type.\",\r\n    \"[20784:39608:0726/163130.249:ERROR:google_apis\\\\gcm\\\\engine\\\\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT\",\r\n    \"[20784:20724:0726/163135.267:ERROR:chrome\\\\browser\\\\ui\\\\webui\\\\ntp\\\\new_tab_ui.cc:54] Requested load of chrome://newtab/ for incorrect profile type.\"\r\n  ]\r\n}\r\n\n2026-07-26T20:32:52.944575Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:32:57.778703Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:33:05.000315Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:33:15.632702Z ERROR codex_core::tools::router: error=Exit code: 124\nWall time: 5 seconds\nOutput:\ncommand timed out after 5041 milliseconds\n\n2026-07-26T20:35:15.351178Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:36:00.305598Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:36:47.333940Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 21.7 seconds\nOutput:\n\n2026-07-26T20:37:33.494956Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 23 seconds\nOutput:\n\n2026-07-26T20:38:30.955202Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 37.3 seconds\nOutput:\n\n2026-07-26T20:38:31.097607Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:38:36.823983Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:38:56.242863Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:39:53.479420Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 36.6 seconds\nOutput:\n\n2026-07-26T20:40:47.385290Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 27.7 seconds\nOutput:\n\n2026-07-26T20:41:21.082945Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:41:31.033160Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 6.8 seconds\nOutput:\n\n2026-07-26T20:41:31.072000Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n2026-07-26T20:41:37.056192Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 88 column 5\n",
+  "transitions": [
+    {
+      "at": "2026-07-26T20:13:44.401Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-07-26T20:13:44.411Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-07-26T20:13:44.427Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 10252
+    },
+    {
+      "at": "2026-07-26T20:13:44.474Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 10252
+    },
+    {
+      "at": "2026-07-26T20:13:44.499Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 18508
+    },
+    {
+      "at": "2026-07-26T20:13:44.504Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-07-26T20:13:44.953Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-07-26T20:41:44.517Z",
+      "component": "agent",
+      "state": "stopped",
+      "signal": "user_stop"
+    },
+    {
+      "at": "2026-07-26T20:41:44.726Z",
+      "component": "agent",
+      "state": "failed",
+      "exitCode": 1,
+      "signal": null
+    }
+  ]
+}

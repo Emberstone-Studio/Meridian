@@ -1,0 +1,77 @@
+{
+  "agent": "coder",
+  "description": "Fix the automatic thumbnail race in background.js. The delayed onActivated/onUpdated handlers can call captureVisibleTab after a different tab, including Meridian, has become active and then persist that screenshot under the original tab ID.\n\nAcceptance criteria:\n- Immediately before captureVisibleTab, verify the active tab in the target window still matches the intended tab ID; skip persistence on mismatch or missing tab.\n- Every activation, including activation of Meridian, invalidates incompatible pending captures.\n- Debounce/generation state is scoped per window so activity in one window does not incorrectly cancel valid work in another.\n- Add regression tests for tab A -> Meridian, tab A complete -> tab B, and cross-window activation behavior.\n- Run the full Node test suite and JavaScript syntax checks.",
+  "label": "Bug",
+  "priority": "high",
+  "title": "Prevent automatic thumbnail capture from saving the wrong active tab",
+  "status": "done",
+  "id": "prevent-automatic-thumbnail-capture-from-saving-5df5",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-26T18:00:11.065Z",
+  "updated_at": "2026-07-26T23:58:18.794Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-26T18:00:11.065Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-26T18:02:30.793Z",
+      "type": "updated",
+      "content": "Task updated"
+    },
+    {
+      "timestamp": "2026-07-26T18:14:41.379Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-26T18:19:46.281Z",
+      "type": "output",
+      "content": "## Prevented automatic thumbnail capture from saving under the wrong tab\n\n### Root cause\nbackground.js debounced automatic captures with two GLOBAL records (lastActivation, lastUpdate) and had no guard immediately before captureVisibleTab. Two failures resulted:\n\n1. Meridian activation was silently ignored. The onActivated handler returned early BEFORE recording a new debounce token when the newly active tab was Meridian, so a pending capture for the previous tab was never invalidated — it woke 600ms later and persisted Meridian pixels under the previous tab id.\n2. Global debounce state crossed windows. A single global record meant activity in one window overwrote the token for another, cancelling a valid pending capture in a different window.\n\n### Fix (background.js, mirrored to meridian-extension/background.js for packaged parity)\n- Final guard in captureTab: immediately before captureVisibleTab it queries {active:true, windowId} and returns without persisting when the active tab is missing or its id no longer matches the intended tab id.\n- Per-window generation state: replaced the two globals with a captureGenerations Map keyed by windowId plus a nextCaptureGeneration(windowId) helper. Each capture path snapshots its generation before sleeping and proceeds only if the window generation is unchanged, so activity in one window cannot cancel valid work in another.\n- Every activation invalidates, including Meridian: handleActivatedCapture now bumps the window generation for ALL activations (the Meridian early-return happens after the bump), so switching to Meridian supersedes any pending capture for the previous tab in that window.\n- Extracted the listener bodies into named handleActivatedCapture / handleUpdatedCapture functions (registered via addListener) so the logic is unit-testable, matching the repo extract-and-run test pattern.\n\n### Regression tests (tests/thumbnailCaptureRace.test.mjs, 7 tests)\n- tab A -> Meridian: A pending capture is discarded.\n- tab A completes -> tab B: each is captured under its own id.\n- cross-window activation: window B activity does not cancel window A valid capture.\n- completed navigation superseded by a newer activation is discarded.\n- captureTab persists only on active-tab match; skips on mismatch (Meridian took over) and skips when the window has no active tab.\n\n### Verification\n- node --test tests/*.test.mjs  ->  89 passed, 0 failed.\n- node --check on every non-node_modules .js file  ->  all OK.\n- git diff --check clean; packaged copy kept byte-for-byte in parity (packagedParity test passes).",
+      "attachment": "active/prevent-automatic-thumbnail-capture-from-saving-5df5/prevent-automatic-thumbnail-capture-from-saving-th.md"
+    },
+    {
+      "timestamp": "2026-07-26T23:58:18.794Z",
+      "type": "review",
+      "content": "Reviewer decision: Approved. The per-window generation invalidation and final active-tab guard address stale captures, including switches to Meridian. The combined automated suite passed."
+    }
+  ],
+  "epic": "epic-thumbnails",
+  "agent_id": "coder",
+  "routing": {
+    "rationale": "Free execution inherits Tasker's model (claude-sonnet-5)",
+    "shape": "Bug",
+    "decided_by": "free-execution-driver",
+    "decided_at": "2026-07-26T18:14:07.107Z",
+    "auto_router_mode": null,
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": true,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "multimodal": true,
+      "notes": null
+    }
+  },
+  "agent_attempt_id": "attempt-47b7412c72e1891ea5bc",
+  "agent_startup_started_at": "2026-07-26T18:14:41.350Z",
+  "agent_session_confirmed_run_id": "agent-prevent-automatic-thumbnail-capture-from-saving-5df5",
+  "agent_session_confirmed_at": "2026-07-26T18:14:43.489Z"
+}

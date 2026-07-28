@@ -1,0 +1,13 @@
+{
+  "chatId": "4006e4ba",
+  "title": null,
+  "summary": "Failed to authenticate: OAuth session expired and could not be refreshed",
+  "agents": [
+    "tasker",
+    "designer",
+    "coder"
+  ],
+  "threadPath": ".tasker/chats/4006e4ba",
+  "createdAt": "2026-07-27T21:57:38.405Z",
+  "updatedAt": "2026-07-27T22:00:10.744Z"
+}
