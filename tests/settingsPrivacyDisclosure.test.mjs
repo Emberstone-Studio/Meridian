@@ -88,7 +88,7 @@ test("the privacy disclosure states data stays local and names the feature contr
   assert.match(text, /stored locally/i);
   assert.match(text, /no server/i);
   assert.match(text, /never uploads/i);
-  assert.match(text, /Local Search/);
+  assert.match(text, /Search options/);
   assert.match(text, /Thumbnails/);
 });
 

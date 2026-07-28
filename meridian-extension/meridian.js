@@ -16,10 +16,7 @@ import {
 import { getCustomBackgroundUrl } from "./utils/customBackground.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
-import {
-  getEnabledLocalSearchSources,
-  setLocalSearchSourceEnabled,
-} from "./utils/localSearch.js";
+import { getEnabledLocalSearchSources } from "./utils/localSearch.js";
 import { normalizeHomepageUrl } from "./utils/homepageUrl.js";
 import { openUrlFromMeridian } from "./utils/tabNavigation.js";
 import { activateTab } from "./utils/tabActivation.js";
@@ -859,21 +856,29 @@ async function init() {
     bookmarks: document.getElementById("scope-bookmarks"),
     history: document.getElementById("scope-history"),
   };
+  // The chips are pure scope filters, not an enrollment mechanism — Settings
+  // is the only place that grants the underlying permission. A chip only
+  // appears once its source is actually enabled there.
   for (const [scopeName, btn] of Object.entries(scopeButtons)) {
-    btn?.addEventListener("click", async () => {
-      if (searchBarApi.getScope() === scopeName) {
-        searchBarApi.setScope(scopeName);
-        return;
-      }
-      btn.disabled = true;
-      try {
-        await setLocalSearchSourceEnabled(scopeName, true);
-      } finally {
-        btn.disabled = false;
-      }
+    btn?.addEventListener("click", () => {
       searchBarApi.setScope(scopeName);
     });
   }
+  async function syncScopeButtons() {
+    const enabled = await getEnabledLocalSearchSources();
+    for (const [scopeName, btn] of Object.entries(scopeButtons)) {
+      const isEnabled = !!enabled[scopeName];
+      btn?.classList.toggle("hidden", !isEnabled);
+      if (btn) btn.hidden = !isEnabled;
+      if (!isEnabled && searchBarApi.getScope() === scopeName) {
+        // The active scope's source was just disabled — fall back to "all"
+        // instead of leaving the search bar pointed at a hidden chip.
+        searchBarApi.setScope(scopeName);
+      }
+    }
+  }
+  await syncScopeButtons();
+  window.addEventListener("settings-changed", syncScopeButtons);
   searchBarApi.onScopeChange = (activeScope) => {
     for (const [scopeName, btn] of Object.entries(scopeButtons)) {
       const active = scopeName === activeScope;

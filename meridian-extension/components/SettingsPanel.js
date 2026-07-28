@@ -228,7 +228,7 @@ export function createSettingsPanel(container) {
   privacyStorage.className = "settings-privacy-text";
   privacyStorage.textContent =
     "This data is stored locally in your Chrome profile. Meridian has no " +
-    "server and never uploads it. Local Search controls which " +
+    "server and never uploads it. Search options controls which " +
     "sources are searchable, and Thumbnails lets you " +
     "regenerate them on demand.";
 
@@ -237,7 +237,7 @@ export function createSettingsPanel(container) {
   privacyOptional.textContent =
     "Bookmark and history access is never automatic — Meridian only asks " +
     "Chrome for that permission when you turn on Bookmarks or History " +
-    "under Local Search.";
+    "under Search options.";
 
   const privacyLink = document.createElement("a");
   privacyLink.className = "settings-privacy-link";
@@ -406,13 +406,13 @@ export function createSettingsPanel(container) {
   domainGroup.appendChild(toggleRow);
   tabsSection.appendChild(domainGroup);
 
-  // --- Local Search ---
+  // --- Search options ---
   const localSearchGroup = document.createElement("div");
   localSearchGroup.className = "settings-group";
 
   const localSearchLabel = document.createElement("span");
   localSearchLabel.className = "settings-label";
-  localSearchLabel.textContent = "Local Search";
+  localSearchLabel.textContent = "Search options";
   localSearchGroup.appendChild(localSearchLabel);
 
   let localSearch = { ...DEFAULT_LOCAL_SEARCH };
@@ -451,11 +451,12 @@ export function createSettingsPanel(container) {
         );
         localSearch[source.key] = result.enabled;
         checkbox.checked = result.enabled;
-        if (source.optional) {
-          permissionStatus.textContent = result.denied
+        // Only the denial case needs explaining — a plain enable/disable is
+        // already reflected by the checkbox itself.
+        permissionStatus.textContent =
+          source.optional && result.denied
             ? `${source.label} permission was not granted. This source remains off.`
-            : `${source.label} access ${result.enabled ? "enabled" : "disabled"}.`;
-        }
+            : "";
         window.dispatchEvent(new CustomEvent("settings-changed"));
       } catch {
         checkbox.checked = localSearch[source.key];
@@ -565,7 +566,7 @@ export function createSettingsPanel(container) {
     }
   }
 
-  // Search Engine on top, then Local Search beneath it.
+  // Search Engine on top, then Search options beneath it.
   searchSection.append(searchEngineGroup, localSearchGroup);
 
   // --- Theme ---

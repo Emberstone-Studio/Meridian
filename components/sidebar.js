@@ -1,9 +1,6 @@
 import { search, getPreviousTab } from '../utils/browserSearch.js';
 import { createFavicon } from '../utils/favicon.js';
-import {
-  getEnabledLocalSearchSources,
-  setLocalSearchSourceEnabled,
-} from '../utils/localSearch.js';
+import { getEnabledLocalSearchSources } from '../utils/localSearch.js';
 import { activateTab } from '../utils/tabActivation.js';
 import { watchToolbarIconTheme } from '../utils/toolbarIcon.js';
 
@@ -48,6 +45,9 @@ let meridianTabId = null;
 let currentWindowId = null;
 let draggedTabId = null;
 let collapsedSections = new Set();
+// Set once attachListeners() runs; lets the module-level storage listener
+// re-sync scope chip visibility when Settings changes localSearch.
+let syncScopeButtons = null;
 
 const COLLAPSED_KEY = 'sidebarCollapsed';
 
@@ -660,6 +660,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
     const generation = ++searchGeneration;
     runSearch(query, generation);
   }
+  if (area === 'sync' && changes.localSearch) {
+    syncScopeButtons?.();
+  }
 });
 
 if (hasNativeGroups) {
@@ -755,21 +758,30 @@ function attachListeners() {
 
   clearBtn.addEventListener('click', clearSearch);
 
+  // The chips are pure scope filters, not an enrollment mechanism — Settings
+  // is the only place that grants the underlying permission. A chip only
+  // appears once its source is actually enabled there.
   for (const [scope, button] of Object.entries(scopeButtons)) {
     button.addEventListener('click', async () => {
       const nextScope = searchScope === scope ? 'all' : scope;
-      if (nextScope !== 'all') {
-        button.disabled = true;
-        try {
-          await setLocalSearchSourceEnabled(scope, true);
-        } finally {
-          button.disabled = false;
-        }
-      }
       await setScope(nextScope);
       input.focus();
     });
   }
+
+  syncScopeButtons = async () => {
+    const enabled = await getEnabledLocalSearchSources();
+    for (const [scope, button] of Object.entries(scopeButtons)) {
+      const isEnabled = !!enabled[scope];
+      button.classList.toggle('hidden', !isEnabled);
+      button.hidden = !isEnabled;
+      if (!isEnabled && searchScope === scope) {
+        // The active scope's source was just disabled — fall back to "all"
+        // instead of leaving the search bar pointed at a hidden chip.
+        await setScope('all');
+      }
+    }
+  };
 
   document.getElementById('new-tab-btn').addEventListener('click', () => {
     chrome.tabs.create({});
@@ -787,6 +799,7 @@ function attachListeners() {
   });
 
   updateScopeControls();
+  syncScopeButtons();
 }
 
 // ---------------------------------------------------------------------------
