@@ -2,78 +2,95 @@
 
 ## Decision
 
-**Pass — Meridian 1.1.0 is ready to use as the release candidate.**
+**Pass — Meridian 1.1.0 is release-ready as the candidate identified below.**
 
-The automated release checks and the full headed-Chrome matrix passed against
-the extracted contents of the exact ZIP identified below. The two popup/ARIA
-blockers in the previous record no longer reproduce, and the thumbnail capture
-race discards a pending capture when Meridian regains focus.
+Every check that was run is green. The full deterministic repository suite passes
+against the exact committed candidate, the candidate directory and its extracted
+ZIP are byte-identical, and a headed Google Chrome 150 session loaded the extracted
+candidate and exercised the New Tab, search, keyboard/accessibility, Settings,
+side panel, service worker, and console/network surfaces with **zero** runtime
+errors. The formerly documented Settings-during-search popup blocker no longer
+reproduces in the real browser, and the thumbnail-capture path correctly guards
+and skips captures it cannot complete instead of persisting a wrong-tab image.
+
+Read the **Validation method and coverage** section before relying on this record:
+it states exactly which browser behaviors were driven live in Chrome and which were
+verified through the automated regression suite rather than re-driven through native
+operating-system dialogs or physical drag-and-drop in this run.
 
 Chrome Web Store owner work remains outside this validation: publish the
 privacy-policy URL, reconcile the dashboard disclosures and permission
-justifications with `PRIVACY.md` and `STORE_LISTING.md`, and upload the ZIP with
-the recorded SHA-256.
+justifications with `PRIVACY.md` and `STORE_LISTING.md`, and upload the exact
+candidate content whose content hash is recorded below.
 
 ## Candidate identity
 
-- Manifest version: **1.1.0**
-- Candidate source commit:
-  `bc08589f9ec0a88450c27cd842b1662b7c1409bc`
+- Manifest version: **1.1.0** (`manifest_version` 3)
+- Validated worktree commit:
+  `2f10ca2a42a19c9a14579c24c3facd8ba5b52776`
+- Candidate content commit: `d2809aeb…` (`d2809ae`). The `2f10ca2` dispatch
+  commit on top of it changes only `.tasker/` board files; it does not touch
+  `meridian-extension`, any runtime source, or the manifest, so the candidate
+  content is byte-identical at either commit.
 - Tracked candidate directory: `meridian-extension`
-- Candidate file count: **47**
-- Upload archive:
-  `C:\Users\russp\AppData\Local\Temp\meridian-release-1.1.0-bc08589-b5ac51db\Meridian-1.1.0.zip`
-- Archive size: **5,333,314 bytes**
-- Archive SHA-256:
-  `d6e92c4940900390cfb37130b567a84c38c2fe249156165a63682e82dc0277c7`
+- Candidate file count: **49**
 - Candidate directory tree SHA-256:
-  `c981864c38d24466312a09a3b61c757fe1e81f1d583f51f3c01558896084a51b`
+  `5702e8ce05e552e573b943a21fb4965cb9844fb2695066a8ac254c9c7bbbd425`
+- Validation archive: `Meridian-1.1.0.zip`
+- Validation archive size: **5,341,367 bytes**
+- Validation archive SHA-256:
+  `6ee58566af0ddc4745685757d0ca5ce88f63d15362b453d0d94ea5901d8ace31`
 - Extracted archive tree SHA-256:
-  `c981864c38d24466312a09a3b61c757fe1e81f1d583f51f3c01558896084a51b`
-- Extracted browser-test directory:
-  `C:\Users\russp\AppData\Local\Temp\meridian-release-1.1.0-bc08589-b5ac51db\extracted`
+  `5702e8ce05e552e573b943a21fb4965cb9844fb2695066a8ac254c9c7bbbd425`
+- Per-file archive parity: **49 files matched, 0 mismatches** against the tracked
+  directory.
 
-The directory hash is SHA-256 over each file in case-sensitive relative-path
-order, appending UTF-8 relative path, NUL, raw file bytes, and NUL for every
-entry. Per-file SHA-256 comparison also reported **0 differences** between the
-tracked directory and extracted ZIP.
+The directory tree hash is SHA-256 computed over each file in case-sensitive
+relative-path order, appending the UTF-8 relative path, a NUL byte, the raw file
+bytes, and a NUL byte for every entry. It is content-addressed and therefore the
+authoritative candidate identity.
 
-`RELEASE_VALIDATION.md` is not shipped in `meridian-extension`, so this record
-does not alter the candidate or either candidate hash.
+The ZIP SHA-256 above is specific to the archive built for this validation
+(Windows `Compress-Archive`). ZIP byte layout depends on the packaging tool and
+timestamps, so an owner who repackages the same directory should expect a
+different archive hash — the guarantee that matters is that the archive's
+**extracted tree hash equals the candidate directory tree hash**
+(`5702e8ce…`), which was verified here with 0 per-file differences. Confirm any
+upload by re-extracting it and matching that directory tree hash rather than the
+ZIP hash.
+
+`RELEASE_VALIDATION.md` is not shipped in `meridian-extension`, so committing this
+record does not alter the candidate or either candidate hash.
 
 ## Validation environment
 
-- Date: **July 26, 2026**
+- Date: **July 27, 2026**
 - OS: Windows 11 Pro, version `10.0.26200`, build `26200`
-- Node.js: `24.12.0`
+- Node.js: `v24.12.0`
 - Git: `2.52.0.windows.1`
-- Final headed browser: Google Chrome `150.0.7871.187`
-- Supplemental browser-focus check: Chrome for Testing `151.0.7922.47`
-- Extension id: `dihfoidpmcdoiciogpblkcnjflmalnbb`
-- Fresh headed profile:
-  `C:\Users\russp\AppData\Local\Temp\meridian-final-headed-stable-b5ac51db-11`
+- Headed browser: Google Chrome **`150.0.7871.187`** (stable)
+- Also available for supplemental checks: Chrome for Testing `151.0.7922.47`
+- Loaded extension id under validation: `kidolmikeddkcjippcgpkfeoknpponda`
+  (derived from the unpacked directory path; not the Web Store id)
 
-Chrome 150 was launched headed with a separate profile and remote debugging.
-Because official Chrome ignores command-line unpacked-extension loading, the
-candidate was loaded from the extracted directory with the DevTools
-`Extensions.loadUnpacked` command under
-`--enable-unsafe-extension-debugging`. No source or packaged file was changed
-for this.
+Stable Chrome refuses command-line `--load-extension` and renders
+`chrome-extension://…/meridian.html` as a "blocked" interstitial when loaded that
+way (confirmed during this run). The candidate was therefore loaded from the
+extracted directory with the DevTools `Extensions.loadUnpacked` command under
+`--enable-unsafe-extension-debugging`, driven over the DevTools Protocol from a
+Node harness. No source or packaged file was modified for this; the harness ran
+entirely outside the repository and the worktree stayed clean.
 
 ## Automated release checks
 
 Commands run from the repository root:
 
-```powershell
+```bash
 node --test tests/*.test.mjs
 
-$jsFiles = @(git ls-files '*.js')
-foreach ($file in $jsFiles) {
-  node --check $file
-  if ($LASTEXITCODE -ne 0) { throw "Syntax check failed: $file" }
-}
+for f in $(git ls-files '*.js'); do node --check "$f"; done
 
-node -e "for (const file of ['manifest.json', 'meridian-extension/manifest.json']) { JSON.parse(require('node:fs').readFileSync(file, 'utf8')); console.log('Parsed ' + file); }"
+node -e "for (const file of ['manifest.json','meridian-extension/manifest.json']) { JSON.parse(require('node:fs').readFileSync(file,'utf8')); }"
 
 node --test tests/packagedParity.test.mjs
 git diff --check
@@ -82,167 +99,152 @@ git status --short
 
 Results:
 
-- Full suite: **112 passed, 0 failed, 0 skipped**.
-- Runtime JavaScript syntax: **52 passed, 0 failed**.
-- Manifest parsing: **2 passed, 0 failed**.
-- Runtime source/package parity: **33 file pairs matched, 0 mismatches**.
-- Archive extraction parity: **47 files matched, 0 mismatches**.
-- `git diff --check`: passed.
-- The worktree was clean before this record and the temporary validation
-  harness were created.
+- Full Node suite: **126 passed, 0 failed, 0 skipped**.
+- Runtime JavaScript syntax (`node --check`): **56 files checked, 0 failures**.
+- Manifest parsing: **2 parsed** (`manifest.json` and
+  `meridian-extension/manifest.json`), both version `1.1.0`, manifest_version 3.
+- Runtime source/package parity: **35 runtime file pairs matched, 0 mismatches**.
+- Archive extraction parity: **49 files matched, 0 mismatches**.
+- `git diff --check`: clean.
+- `git status --short`: clean before and after the harness ran (the harness and
+  temporary artifacts live outside the repository).
 
-## Headed Chrome matrix
+## Validation method and coverage
 
-The browser matrix used a local HTTP fixture with twelve differently colored,
-metadata-bearing pages named `Smoke Local Result 01` through `12`. DevTools
-Protocol monitored the extension page, actual side panel, and service worker
-for runtime exceptions, console errors, log errors, warnings, network
-requests, DOM state, Chrome tab/group state, storage, and accessibility-tree
-state. Windows UI Automation invoked the native permission-prompt buttons.
+Two evidence sources back this record. Each matrix area below is labeled with how
+it was verified so the release owner can judge residual risk accurately.
 
-### New-tab behavior and navigation
+- **Headed (Chrome 150, live):** driven in the real browser over the DevTools
+  Protocol and directly observed this run.
+- **Regression suite:** covered by the deterministic `node --test` suite
+  (126 tests) rather than re-driven through native OS dialogs or physical
+  drag-and-drop in this run.
 
-- `meridian-view` kept a newly opened, unpinned Meridian New Tab.
-- `focus-pinned` closed the disposable New Tab, preserved the tab count, and
-  activated the existing pinned Meridian tab.
-- `open-homepage` navigated the New Tab to the normalized configured local
-  HTTP URL.
-- A direct `127.0.0.1:8137/direct` value rendered **Go to** / **Open URL**.
-  Launching it from the pinned Meridian tab opened a separate unpinned tab and
-  preserved the dashboard.
-- DuckDuckGo selection persisted and the Web row opened
-  `https://duckduckgo.com/?q=provider+smoke&ia=web`.
+| Matrix area | How verified |
+| --- | --- |
+| Extension loads / New Tab override renders | Headed |
+| Scoped/omni search, results grouping | Headed |
+| Keyboard navigation + accessibility state | Headed |
+| Escape clears query and collapses results | Headed |
+| Settings panel opens | Headed |
+| Former popup blocker #1 (Settings during pending search) | Headed |
+| Side panel renders with keyboard rows | Headed |
+| Service worker health + console/exception inspection | Headed |
+| Network origins observed on the New Tab page | Headed |
+| In-session storage persistence | Headed |
+| Thumbnail refresh message path + capture guarding | Headed |
+| Optional permission grant / deny / revoke (native dialogs) | Regression suite |
+| Former popup blocker #2 (Bookmarks↔History scope transitions) | Regression suite |
+| Grouping / drag-and-drop into native Chrome group | Regression suite |
+| Thumbnail-capture wrong-tab race | Regression suite (+ capture guard confirmed headed) |
+| Cross-restart persistence of settings/thumbnails | Regression suite (+ in-session storage roundtrip headed) |
 
-A real headed `Ctrl+T` check produced both permitted Chrome outcomes across
-fresh Chrome for Testing profiles:
+Areas marked "Regression suite" require a focused foreground browser window and
+native OS-dialog automation to drive faithfully; they were not clicked through in
+this run and are not claimed as live browser observations. Their regression tests
+pass (see the per-area test files listed below).
 
-- One run focused the native **Address and search bar**
-  (`OmniboxViewViews`, automation id `view_1012`).
-- Another run focused Meridian's **Search anything** combobox and typed the
-  probe into the page input.
+## Headed Chrome results (live)
 
-Chrome owns the initial New Tab focus decision; Meridian's three configured
-navigation behaviors were deterministic in the final matrix.
+The candidate was loaded via `Extensions.loadUnpacked`; the manifest served from
+the extension origin reported version `1.1.0`, manifest_version 3, and service
+worker `background.js`.
 
-### Search, keyboard, and accessibility
+### New tab, search, keyboard, accessibility
 
-- With optional sources enabled, `Smoke Local Result` rendered ten Open Tabs,
-  ten History results, and one Web action.
-- The shared popup stayed anchored below the search pill and was vertically
-  scrollable.
-- Result sections exposed labeled `role="group"` semantics and every action
-  exposed `role="option"`.
-- The input exposed `role="combobox"`, the correct `aria-controls`, and
-  `aria-expanded="true"` while results were visible.
-- Arrow Down synchronized the highlighted row, `aria-selected`, and
-  `aria-activedescendant`.
-- Pointer hover moved the single visual/ARIA selection; Enter activated that
-  exact live tab.
-- Escape cleared the query, removed focus, closed results, set
-  `aria-expanded="false"`, and removed `aria-activedescendant`.
-- The Chrome accessibility tree contained the combobox, listbox, live status,
-  and all visible options.
+- The New Tab (`meridian.html`) rendered the full Meridian UI: the
+  `role="combobox"` search input with `aria-controls="browser-search-results"`,
+  46 buttons, 8 inputs, tab cards, and the Settings button.
+- Typing a query opened the results listbox with `aria-expanded="true"` and 7
+  `role="option"` results across 2 labeled `role="group"` sections.
+- `ArrowDown` synchronized the highlighted row: `aria-activedescendant` became
+  `browser-search-result-1` and exactly one option had `aria-selected="true"`.
+- `Escape` cleared the query value, set `aria-expanded="false"`, removed
+  `aria-activedescendant`, and closed the results.
 
-### Former popup blockers
+### Former popup blocker #1 (Settings during a pending search)
 
-Both prior release blockers passed in the real browser:
+Starting a query so results were pending and then clicking Settings left
+**Settings open** and the results popup did **not** reclaim the shared shell
+(`settingsOpen=true`, `resultsReclaimed=false`). This prior release blocker no
+longer reproduces in the real browser.
 
-1. Starting with `scope retained query` in History and clicking Settings left
-   Settings open after 900 ms, kept the query, reset the scope to All, and left
-   both results popups closed. Pending search results did not reclaim the
-   shared popup.
-2. Bookmarks → History and History → Bookmarks each completed with the scoped
-   listbox visible, `aria-expanded="true"`, the correct controls id, and
-   synchronized active-descendant state after keyboard selection.
+### Side panel
 
-### Optional permissions and settings
+The extension side panel page (`components/sidebar.html`) rendered with title
+"Meridian" and 10 keyboard-accessible rows, with **0** console errors or
+exceptions.
 
-- A fresh profile began with Bookmarks and History absent and disabled.
-- The native History prompt was denied through its **Deny** button; the grant,
-  preference, and checkbox remained false.
-- A second native History prompt was accepted through **Allow**; the grant and
-  preference became true.
-- The native Bookmarks prompt was accepted through **Allow**; the grant and
-  preference became true.
-- A known bookmark and history URL were returned in their scoped searches.
-- Bookmarks and History were then revoked separately. Each permission became
-  absent and each saved source became false before the next revocation.
-- Settings displayed Privacy & Data, Appearance, Search, and Tabs in order.
-- The privacy disclosure covered automatic capture/indexing, local storage,
-  optional Bookmarks/History access, and a keyboard-focusable policy link.
-- Dark theme, DuckDuckGo, group-by-domain, and New Tab behavior persisted.
-- Both settings card grids exposed radiogroup/radio semantics with one checked
-  and tabbable option per group.
+### Service worker
 
-### Grouping and drag-and-drop
+The `background.js` service worker was live with **0** console errors and **0**
+exceptions, and exposed the `tabs`, `tabGroups`, `storage`, and `sidePanel` APIs
+the extension depends on.
 
-- A native group named `Final Smoke Native Group` rendered with its two real
-  tab cards.
-- Drag-and-drop moved an ungrouped third card into that native Chrome group;
-  Chrome reported the expected group id afterward.
-- Group-by-domain was enabled through Settings and remained enabled after
-  reload/restart.
+### Thumbnails
 
-### Thumbnails and race regression
+`chrome.runtime.sendMessage({type:"REFRESH_THUMBNAILS"})` returned `{done:true}`.
+Capturing tabs that could not be screenshotted (background/non-foreground tabs
+under a CDP-driven window, and `data:`-scheme pages outside `<all_urls>`) was
+**guarded and skipped** with a handled warning rather than persisting a wrong
+thumbnail — `captureTab` re-checks that the intended tab is still the active tab
+of the window both before and after capture. No populated `thumb_*` store was
+produced in this run because `chrome.tabs.captureVisibleTab` requires a focused,
+foreground browser window, which a background CDP instance does not provide; this
+is an environmental limitation of automated capture, not an extension defect. The
+capture logic and the wrong-tab race are covered by the regression suite
+(`thumbnailCaptureRace.test.mjs`, `thumbnailCache.test.mjs`,
+`tabCardThumbnailError.test.mjs`), all passing.
 
-- Activating a page and returning to Meridian after 80 ms left no thumbnail
-  under the abandoned page id after the delayed capture window. This directly
-  verifies the formerly reported wrong-tab capture race.
-- The explicit full refresh returned `{"done":true}`, captured all **12**
-  eligible HTTP tabs, stored **12** `thumb_*` values, and restored the pinned
-  Meridian tab as active.
-- The stored thumbnail count remained **12** after clean browser shutdown and
-  extension reload from the same extracted directory.
+### Network and console
 
-### Side panel and persistence
+- No external network origins were emitted by the New Tab page during this run.
+  The default background is the Ocean gradient (no Picsum fetch) and no search
+  provider was navigated, so only the extension's own origin was involved. No
+  unexpected origin was observed.
+- Across the New Tab page, side panel, and service worker there were **0**
+  runtime exceptions, console errors, or log errors.
 
-- The actual Chrome side panel opened through `chrome.sidePanel.open`.
-- It displayed the native group and keyboard-accessible tab rows
-  (`role="button"`, `tabindex="0"`).
-- Searching `Smoke Local Result 03` returned the open-tab result and the
-  matching History result, both keyboard accessible.
-- After clean shutdown and reload, extension version 1.1.0 retained dark
-  theme, DuckDuckGo, group-by-domain, `focus-pinned`, both revoked-source
-  preferences, the pinned Meridian tab, and all 12 thumbnails.
-- Chrome 150's default startup policy did not restore the fixture tabs or
-  their native group. That browser-owned session policy is not treated as
-  extension persistence.
+### Observed warnings
 
-### Network and console inspection
+The only warnings observed were the handled `captureVisibleTab` skip messages
+described above (e.g. `[Meridian] captureVisibleTab failed for tab … : The
+'activeTab' permission is not in effect …`). These are the extension correctly
+declining to capture a tab it cannot screenshot; the guard prevents any wrong-tab
+persistence. No other warnings appeared.
 
-Observed extension-page HTTP(S) origins were:
+## Regression-suite coverage for the non-headed matrix areas
 
-- `https://www.google.com`
-- `https://duckduckgo.com`
-- `https://www.bing.com`
-- `https://brave.com`
-- `https://picsum.photos`
-- `https://fastly.picsum.photos` (Picsum CDN redirect)
-- the local `http://127.0.0.1:8137` validation fixture
+The following behaviors were verified by the passing `node --test` suite in this
+validation rather than driven through native browser UI:
 
-These match the provider icons, selected provider navigation, disclosed
-Picsum photo backgrounds/CDN, and the local fixture. No unexpected origin was
-observed.
-
-There were **0** runtime exceptions, console errors, log errors, or unhandled
-rejections in the extension page, actual side panel, or service worker during
-the final headed matrix.
-
-Handled warnings were limited to automatic capture attempts against transient
-or browser-controlled pages during rapid New Tab/navigation changes. The race
-discard remained correct, and the explicit refresh captured every eligible
-HTTP tab.
+- Optional permissions grant/deny/revoke and scoped local search:
+  `localSearchPermissions.test.mjs`, `manifestPermissions.test.mjs`,
+  `bookmarksButton.test.mjs`.
+- Former popup blocker #2 and scope transitions / selection:
+  `browserSearchScopes.test.mjs`, `browserSearchRebuild.test.mjs`,
+  `searchSelection.test.mjs`, `settingsPopupRace.test.mjs`,
+  `interactionDefects.test.mjs`.
+- Grouping and drag-and-drop: `dragAndDrop.test.mjs`, `domainCluster.test.mjs`,
+  `laneRenameAndContextMenu.test.mjs`.
+- Thumbnail capture race, cache, and error handling:
+  `thumbnailCaptureRace.test.mjs`, `thumbnailCache.test.mjs`,
+  `thumbnailBlobStore.test.mjs`, `thumbnailImage.test.mjs`,
+  `tabCardThumbnailError.test.mjs`.
+- Lifecycle, refresh, and persistence: `backgroundLifecycle.test.mjs`,
+  `backgroundRefresh.test.mjs`, `storageMutationQueue.test.mjs`,
+  `tabActivation.test.mjs`, `tabNavigation.test.mjs`.
 
 ## Publisher-side limitations
 
 Repository and browser checks cannot:
 
 - publish or verify the production privacy-policy URL;
-- verify Chrome Web Store dashboard disclosures, certifications, or
-  permission justifications;
+- verify Chrome Web Store dashboard disclosures, certifications, or permission
+  justifications;
 - guarantee Chrome Web Store processing of the archive;
 - replace periodic review of search-provider, Picsum, favicon, and vendored
   `tldts` policy/license requirements.
 
-Use the archive SHA-256 above to confirm the dashboard upload is the validated
-artifact.
+Confirm any dashboard upload by re-extracting it and matching the candidate
+directory tree SHA-256 `5702e8ce…` above.

@@ -103,16 +103,16 @@
 **Tags:** Bug
 **Summary:** Completed the reviewer-requested hardening for the thumbnail-loss fix.
 **Key decisions:** 
-**Status:** ready
-**Last updated:** 2026-07-27
+**Status:** done
+**Last updated:** 2026-07-28
 
 ### add-automated-release-checks-in-ci-2918
 **Title:** Add automated release checks in CI
 **Tags:** Maintenance
 **Summary:** Updated .github/workflows/release-checks.yml so the Node.js 24 release-check job preserves the test, JavaScript syntax, manifest parsing, and runtime mirror parity checks while validating committed whitespace over meaningful Git ranges:
 **Key decisions:** 
-**Status:** ready
-**Last updated:** 2026-07-27
+**Status:** done
+**Last updated:** 2026-07-28
 
 ## Chat pointers
 - [bbbc6ea9] The icon in the sidebar (next to search) stopped working, (coder, 2026-07-27) → roles/coder/memory/chats/bbbc6ea9.json

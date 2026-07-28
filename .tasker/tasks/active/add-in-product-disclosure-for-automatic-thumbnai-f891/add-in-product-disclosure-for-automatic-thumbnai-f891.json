@@ -4,12 +4,12 @@
   "label": "Release",
   "priority": "high",
   "title": "Add in-product disclosure for automatic thumbnails and metadata indexing",
-  "status": "in_review",
+  "status": "done",
   "id": "add-in-product-disclosure-for-automatic-thumbnai-f891",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-26T18:00:44.441Z",
-  "updated_at": "2026-07-27T00:12:44.027Z",
+  "updated_at": "2026-07-28T04:37:06.472Z",
   "activity": [
     {
       "timestamp": "2026-07-26T18:00:44.441Z",
@@ -51,6 +51,11 @@
       "timestamp": "2026-07-27T00:12:44.027Z",
       "type": "output",
       "content": "Implemented the requested Settings placement change in both source and the running `meridian-extension/` mirror.\n\n- Moved Privacy & Data after Appearance, Search, and Tabs so it is the final Settings section.\n- Replaced the always-visible section with a native collapsed `<details>` / `<summary>` control.\n- Added expansion-chevron and keyboard focus styling.\n- Kept the complete disclosure and policy link inside the expandable content.\n- Updated regression coverage for native semantics, collapsed default, and bottom placement.\n- Validation: all 113 Node tests pass; source/package parity and JavaScript syntax checks pass.\n\nFinal approval still requires the published privacy-policy URL to return successfully."
+    },
+    {
+      "timestamp": "2026-07-28T04:37:06.472Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
     }
   ],
   "agent_id": "writer",

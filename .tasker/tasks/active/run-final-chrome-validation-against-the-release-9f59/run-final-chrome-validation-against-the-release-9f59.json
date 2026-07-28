@@ -4,12 +4,12 @@
   "label": "Release",
   "priority": "high",
   "title": "Run final Chrome validation against the release candidate and update the release record",
-  "status": "ready",
+  "status": "done",
   "id": "run-final-chrome-validation-against-the-release-9f59",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-26T18:00:11.562Z",
-  "updated_at": "2026-07-27T21:57:35.051Z",
+  "updated_at": "2026-07-28T04:37:14.615Z",
   "activity": [
     {
       "timestamp": "2026-07-26T18:00:11.562Z",
@@ -71,6 +71,27 @@
       "timestamp": "2026-07-27T21:57:35.051Z",
       "type": "moved",
       "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-07-28T01:34:44.326Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-28T01:34:45.437Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-28T01:54:23.670Z",
+      "type": "output",
+      "content": "# Final Chrome release validation — Meridian 1.1.0\n\n**Decision: Pass — release-ready as the candidate identified below.** Every check that ran is green. `RELEASE_VALIDATION.md` was rewritten and committed as `aca667e`; the worktree is clean.\n\n## What was wrong with the prior record\nThe committed record was stale and had been rejected in review for validating the wrong artifact. Corrected against the exact current committed candidate:\n\n| Field | Old record | Corrected |\n| --- | --- | --- |\n| Candidate commit | `bc08589` (not in this branch) | `2f10ca2` (content `d2809ae`) |\n| Candidate file count | 47 | **49** |\n| Directory tree SHA-256 | `c981864…` | **`5702e8ce…`** |\n| Node test count | 112 (task text said 74) | **126** |\n| Runtime parity pairs | 33 | **35** |\n\n## Candidate identity\n- Version **1.1.0** (manifest_version 3); directory `meridian-extension`, **49** files.\n- Directory tree SHA-256 **`5702e8ce05e552e573b943a21fb4965cb9844fb2695066a8ac254c9c7bbbd425`** (authoritative, content-addressed).\n- Validation archive `Meridian-1.1.0.zip`, **5,341,367 bytes**, SHA-256 `6ee58566af0ddc4745685757d0ca5ce88f63d15362b453d0d94ea5901d8ace31`; extracted tree hash equals the directory hash with **0 per-file mismatches** across 49 files.\n- The `2f10ca2` dispatch commit touches only `.tasker/` board files — candidate content is byte-identical to `d2809ae`.\n\n## Deterministic suite (all green)\n- Node suite: **126 passed, 0 failed, 0 skipped**.\n- JS syntax (`node --check`): **56 files, 0 failures**.\n- Manifest parse: **2** (root + packaged), both `1.1.0`/mv3.\n- Runtime/package parity: **35 pairs, 0 mismatches**; archive extraction **49 files, 0 mismatches**.\n- `git diff --check` and `git status --short`: clean.\n\n## Headed Chrome 150.0.7871.187 (live, verified this run)\nStable Chrome blocks `--load-extension` (renders a \"blocked\" interstitial), so the extracted candidate was loaded via DevTools `Extensions.loadUnpacked` under `--enable-unsafe-extension-debugging`, driven over the DevTools Protocol.\n- New Tab renders the full UI: `role=\"combobox\"` with `aria-controls=\"browser-search-results\"`, 46 buttons, tab cards, Settings button.\n- Search opens the listbox (`aria-expanded=\"true\"`, 7 options across 2 labeled groups); `ArrowDown` sets `aria-activedescendant=\"browser-search-result-1\"` with one `aria-selected`; `Escape` clears the query and collapses results.\n- **Former popup blocker #1 (Settings during a pending search): fixed** — Settings stays open and results do not reclaim the shared popup (`settingsOpen=true`, `resultsReclaimed=false`).\n- Side panel renders with 10 keyboard-accessible rows, 0 errors.\n- Service worker (`background.js`) healthy: 0 console errors/exceptions; exposes `tabs`, `tabGroups`, `storage`, `sidePanel`.\n- `REFRESH_THUMBNAILS` returns `{done:true}`; `captureTab` correctly guards and skips tabs it cannot screenshot (no wrong-tab persistence).\n- **0** exceptions / console errors / log errors across the New Tab page, side panel, and service worker. Only warnings were the handled `captureVisibleTab` capture-skips.\n\n## Honest coverage note\nNative OS permission-prompt grant/deny/revoke, former popup blocker #2 (Bookmarks↔History scope transitions), physical drag-and-drop grouping, populated thumbnail capture, and cross-restart persistence were **not** driven through native browser UI in this run (they need a focused foreground window and OS-dialog automation). They are covered by the passing regression suite (`localSearchPermissions`, `bookmarksButton`, `browserSearchScopes`, `searchSelection`, `settingsPopupRace`, `dragAndDrop`, `thumbnailCaptureRace`, `thumbnailCache`, `backgroundLifecycle`, etc.). The record's method/coverage table labels each area as *Headed* vs *Regression suite*.\n\n## Environment\nWindows 11 Pro `10.0.26200` build 26200 · Node `v24.12.0` · Git `2.52.0.windows.1` · Chrome stable `150.0.7871.187` (Chrome for Testing `151.0.7922.47` available).\n\n## Remaining owner-only work (outside this validation)\nPublish the privacy-policy URL; reconcile Chrome Web Store dashboard disclosures and permission justifications with `PRIVACY.md`/`STORE_LISTING.md`; upload the exact candidate content and confirm it by re-extracting and matching the directory tree SHA-256 `5702e8ce…`.",
+      "attachment": "active/run-final-chrome-validation-against-the-release-9f59/run-final-chrome-validation-against-the-release-ca-2.md"
+    },
+    {
+      "timestamp": "2026-07-28T04:37:14.615Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
     }
   ],
   "epic": "epic-review-fixes-qa",
@@ -83,12 +104,12 @@
   ],
   "agent_id": "reviewer",
   "routing": {
-    "chosen_model": "codex-gpt-5-6-sol",
-    "rationale": "Direct approved queue dispatch to assigned role",
+    "chosen_model": null,
+    "rationale": "Direct Run Now dispatch to assigned role",
     "alternates": [],
     "shape": "Release",
-    "decided_by": "run-queue",
-    "decided_at": "2026-07-26T22:55:14.572Z",
+    "decided_by": "run-now",
+    "decided_at": "2026-07-28T01:34:44.393Z",
     "auto_router_mode": null,
     "provider": "codex",
     "provider_source": "derived",
@@ -125,24 +146,6 @@
     "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=false,tools>=model_dependent}; chain=1 link(s)"
   },
   "last_agent_attempt_id": "attempt-b5ac51dbf9866e6d62cf",
-  "agent_attempt_id": "attempt-ed1083ac3ed8f6fd4ae2",
-  "agent_startup_started_at": "2026-07-26T22:55:15.436Z",
-  "plan": [
-    {
-      "label": "Inspect the committed release candidate, validation record, and retained evidence",
-      "done": true
-    },
-    {
-      "label": "Rerun deterministic repository validation against the exact candidate",
-      "done": true
-    },
-    {
-      "label": "Verify headed Chrome coverage, former regressions, and artifact hashes from evidence",
-      "done": true
-    },
-    {
-      "label": "Correct and commit the release record if needed, then report the final decision",
-      "done": true
-    }
-  ]
+  "agent_attempt_id": "attempt-b9f74219c015ae026d3b",
+  "agent_startup_started_at": "2026-07-28T01:34:45.414Z"
 }

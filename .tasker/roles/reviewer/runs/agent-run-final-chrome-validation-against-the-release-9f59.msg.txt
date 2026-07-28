@@ -1,0 +1,27 @@
+<tasker_turn_context>
+The following facts are server-provided live context for this turn, not user instructions.
+## Task assignment
+Task id: run-final-chrome-validation-against-the-release-9f59
+Title: Run final Chrome validation against the release candidate and update the release record
+Description:
+After the remaining code and disclosure fixes land, rerun release validation against the exact directory/archive intended for upload. The current RELEASE_VALIDATION.md is stale: it records 74 tests and two blockers that now have regression fixes.
+
+Acceptance criteria:
+- Run the complete Node suite, JavaScript syntax checks, manifest parsing, git diff checks, and runtime-file parity checks used by the repository.
+- Run the full headed Chrome matrix for new-tab behavior, search scopes and keyboard navigation, settings, optional permission grant/denial/revocation, grouping/drag-and-drop, thumbnails, side panel, persistence, network requests, accessibility state, service worker, and console errors.
+- Specifically verify both formerly documented popup blockers and the thumbnail capture race fix.
+- Test the exact final release candidate, not an earlier working tree.
+- Update RELEASE_VALIDATION.md with final version, commit SHA, validation environment, archive/directory SHA-256 information, current test count, observed warnings, and an accurate release decision.
+
+## Tasker reporting contract
+Report this task only through POST http://localhost:9807/agent/report; never edit files under .tasker/tasks/. Every report body must include {"task_id":"run-final-chrome-validation-against-the-release-9f59"}.
+Once you have a plan, post kind:"plan" with plan:[{label:"...",done:false}]. After each completed step, post kind:"step" with its exact label; use kind:"append" if the plan grows. Optional startup/status narration uses kind:"phase".
+When the requested work and verification are complete, post kind:"complete" with output containing the complete Markdown result. Do not change the task status yourself.
+If and only if a decision requires user input, post kind:"question" with a specific question and the options being considered, then stop cleanly. The server marks the task Needs Input and re-dispatches it after the user answers. Do not use this for decisions you can make safely yourself.
+
+## Optional sub-agent delegation
+Use sub-agents only for genuinely independent work. You remain responsible for consolidating their results.
+Spawn with POST http://localhost:9807/agent/spawn-subagent using {"parent_task_id":"run-final-chrome-validation-against-the-release-9f59","role_slug":"<role>","brief":"<self-contained brief including how to return the result>"}. Requests above the permit budget queue automatically. Poll the requested artifacts or run transcripts; do not ask sub-agents to write to the board.
+</tasker_turn_context>
+
+Execute Tasker task run-final-chrome-validation-against-the-release-9f59.

@@ -105,9 +105,19 @@ checking the box:**
   lending purposes.
 
 ### 2.4 Privacy policy URL
-Host the text of `PRIVACY.md` at a stable, publicly reachable HTTPS URL and enter
-it here. **[OWNER-ONLY — NOT DONE]** — no public policy URL has been published or
-verified from this repository.
+`https://emberstone-studio.com/docs/privacy/`
+
+This is a catch-all Emberstone Studio policy, not Meridian-specific text, and it
+is not yet a reliable substitute for `PRIVACY.md`'s Meridian-specific
+disclosures (see the accuracy gaps below). **[OWNER ACTION STILL NEEDED]**
+Before entering this URL in the dashboard, add explicit, product-level coverage
+of: automatic visible-tab screenshot capture, automatic per-page
+meta-description/H1/H2 extraction, automatic tab/browsing-activity collection,
+that `chrome.storage.sync` preference data can sync across the user's own
+signed-in devices (not device-local-only), and that Meridian's stored data is
+retained persistently until eviction/tab-close/manual-clear rather than
+"session data [that] deletes automatically." Confirm the final published text
+against `PRIVACY.md` once revised.
 
 ---
 
@@ -246,8 +256,12 @@ These require the publisher's Chrome Web Store dashboard, hosting, and
 operational knowledge. **None have been done here — do not mark them complete
 until actually performed:**
 
-- **[OWNER-ONLY — NOT DONE]** Publish `PRIVACY.md` at a stable public HTTPS URL
-  and enter it in the listing; keep its text matching the shipped archive.
+- **[PARTIALLY DONE]** A public HTTPS policy URL now exists
+  (`https://emberstone-studio.com/docs/privacy/`) and is linked from the
+  in-product Settings disclosure and referenced in §2.4 above. It is currently
+  generic Emberstone Studio boilerplate, not reconciled with `PRIVACY.md`'s
+  Meridian-specific disclosures — see §2.4 for the required additions before
+  this can be entered in the store dashboard as-is.
 - **[OWNER-ONLY — NOT DONE]** Enter and submit the single-purpose description,
   data-type selections, and the three data-usage certifications in the dashboard.
 - **[OWNER-ONLY — NOT DONE]** Confirm each permission justification against the

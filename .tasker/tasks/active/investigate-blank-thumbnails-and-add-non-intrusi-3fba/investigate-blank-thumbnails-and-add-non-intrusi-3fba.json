@@ -7,12 +7,12 @@
   ],
   "priority": "high",
   "title": "Investigate blank thumbnails and add non-intrusive lazy refresh",
-  "status": "in_review",
+  "status": "done",
   "id": "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-26T18:03:18.280Z",
-  "updated_at": "2026-07-27T03:44:01.553Z",
+  "updated_at": "2026-07-28T04:37:07.919Z",
   "activity": [
     {
       "timestamp": "2026-07-26T18:03:18.280Z",
@@ -75,6 +75,11 @@
       "timestamp": "2026-07-27T03:44:01.553Z",
       "type": "output",
       "content": "Implemented a durable, non-destructive thumbnail cache rework in both source and the running `meridian-extension/` mirror.\n\n- Added IndexedDB-backed JPEG blob storage with reusable `blob:` display URLs; `unlimitedStorage` applies to the extension-local database.\n- Migrates existing `chrome.storage.local` thumbnail data URLs into IndexedDB instead of dropping them.\n- Preserves the last-known-good blob when an image fails to render.\n- Retries a failed image once, then shows a placeholder and marks the thumbnail for replacement on the tab's next natural activation; it no longer deletes the stored thumbnail.\n- New captures are decoded/validated before replacing the durable record.\n- Cache pruning still protects live tabs and removes both image data and metadata when a tab closes.\n- Updated the custom-background IndexedDB schema version, runtime render notifications, privacy/store documentation, runtime mirror, and regressions.\n\nValidation: 117/117 Node tests pass; all runtime JavaScript syntax checks pass; source/runtime parity passes; non-Tasker diff check is clean."
+    },
+    {
+      "timestamp": "2026-07-28T04:37:07.919Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
     }
   ],
   "agent_id": "coder",
