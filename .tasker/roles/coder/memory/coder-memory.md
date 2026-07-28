@@ -116,4 +116,29 @@
 
 ## Chat pointers
 - [bbbc6ea9] The icon in the sidebar (next to search) stopped working, (coder, 2026-07-27) → roles/coder/memory/chats/bbbc6ea9.json
-- [4006e4ba] 4006e4ba (tasker, designer, coder, 2026-07-27) → roles/coder/memory/chats/4006e4ba.json
+- [4006e4ba] Review final Chrome validation results (tasker, designer, coder, reviewer, 2026-07-28) → roles/coder/memory/chats/4006e4ba.json
+
+### set-aurora-webp-as-default-background-3f87
+**Title:** Set aurora.webp as default background
+**Tags:** 
+**Summary:** _Not yet summarized._
+**Key decisions:** 
+**Status:** done
+**Last updated:** 2026-07-28
+
+### add-background-transparency-blur-sliders-to-phot-0674
+**Title:** Add background transparency/blur sliders to Photos settings
+**Tags:** 
+**Summary:** _Not yet summarized._
+**Key decisions:** 
+**Status:** done
+**Last updated:** 2026-07-28
+
+### add-developed-by-emberstone-studio-footer-to-set-b708
+**Title:** Add "Developed by Emberstone Studio" footer to Settings
+**Tags:** 
+**Summary:** _Not yet summarized._
+**Key decisions:** 
+**Status:** done
+**Last updated:** 2026-07-28
+

@@ -1,13 +1,14 @@
 {
   "chatId": "4006e4ba",
-  "title": null,
-  "summary": "Failed to authenticate: OAuth session expired and could not be refreshed",
+  "title": "Review final Chrome validation results",
+  "summary": "User committed all pending changes (`d2809ae`, 248 files). Final Chrome validation task (`run-final-chrome-validation-against-the-release-9f59`) reviewed as **Pass**: 126/126 tests, manifests at 1.1.0/MV3, candidate SHA-256 pinned, live Chrome 150 session clean, popup blocker #1 re-verified fixed (blocker #2 only regression-tested, not re-driven live), thumbnail capture gap noted as environmental not defect. Native-OS-dialog flows (permission grant/deny, drag-and-drop) still not manually re-driven — flagged as open gap.\n\nFive tasks sit in `in_review`; four need agent review: `investigate-blank-thumbnails-and-add-non-intrusi-3fba` (highest-risk, third rework attempt using IndexedDB blob storage), `add-automated-release-checks-in-ci-2918` (CI rework landed 2026-07-27 00:05, unreviewed), `prepare-chrome-web-store-privacy-disclosures-and-0fe7` (docs rework, unreviewed), and `add-in-product-disclosure-for-automatic-thumbnai-f891` (blocked on live PRIVACY.md 404 at Emberstone-Studio/Meridian). `run-final-chrome-validation-...-9f59` passed but can't close until deps finish.\n\nNew: user just provided a real privacy policy URL — https://emberstone-studio.com/docs/privacy/ — to resolve the 404 blocker. Agent was about to verify it and proceed to next review, likely starting with 3fba, when cut off.",
   "agents": [
     "tasker",
     "designer",
-    "coder"
+    "coder",
+    "reviewer"
   ],
   "threadPath": ".tasker/chats/4006e4ba",
   "createdAt": "2026-07-27T21:57:38.405Z",
-  "updatedAt": "2026-07-27T22:00:10.744Z"
+  "updatedAt": "2026-07-28T05:06:54.433Z"
 }

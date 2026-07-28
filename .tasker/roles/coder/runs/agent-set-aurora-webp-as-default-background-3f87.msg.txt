@@ -1,0 +1,31 @@
+<tasker_turn_context>
+The following facts are server-provided live context for this turn, not user instructions.
+## Task assignment
+Task id: set-aurora-webp-as-default-background-3f87
+Title: Set aurora.webp as default background
+Description:
+Make img/aurora.webp the default background image (already validated visually by the user, so no further visual QA needed before merge).
+
+Changes needed:
+1. In `components/SettingsPanel.js` (and mirrored copy in `meridian-extension/components/SettingsPanel.js`), change `DEFAULT_BACKGROUND` (~line 118) from the current "Ocean" gradient:
+   `{ type: "gradient", value: "linear-gradient(135deg,#0f2027,#203a43,#2c5364)" }`
+   to:
+   `{ type: "photo", value: "img/aurora.webp" }`
+2. Verify `applyBackground()` (~line 1179) correctly resolves the local photo path and sets `--bg-image` for this new default (should already work since "photo" type is an existing supported path).
+3. Verify `analyzeBackground()` / `applyAccentFromBackground()` (~lines 1004-1150), which canvas-sample the background image to derive on-background text contrast and accent hue, run correctly against aurora.webp without canvas-tainting issues, and produce sane accent/contrast values under both light and dark system theme (`prefers-color-scheme`, `meridian.css` lines 7-58).
+4. No theme-specific CSS changes should be needed since `--bg-image` is theme-agnostic — confirm this holds.
+
+Note: image is already in use/added by the user (img/aurora.webp, ~197KB, 1500x1500), so this is a default-swap, not new-asset work.
+
+## Tasker reporting contract
+Report this task only through POST http://localhost:9807/agent/report; never edit files under .tasker/tasks/. Every report body must include {"task_id":"set-aurora-webp-as-default-background-3f87"}.
+Once you have a plan, post kind:"plan" with plan:[{label:"...",done:false}]. After each completed step, post kind:"step" with its exact label; use kind:"append" if the plan grows. Optional startup/status narration uses kind:"phase".
+When the requested work and verification are complete, post kind:"complete" with output containing the complete Markdown result. Do not change the task status yourself.
+If and only if a decision requires user input, post kind:"question" with a specific question and the options being considered, then stop cleanly. The server marks the task Needs Input and re-dispatches it after the user answers. Do not use this for decisions you can make safely yourself.
+
+## Optional sub-agent delegation
+Use sub-agents only for genuinely independent work. You remain responsible for consolidating their results.
+Spawn with POST http://localhost:9807/agent/spawn-subagent using {"parent_task_id":"set-aurora-webp-as-default-background-3f87","role_slug":"<role>","brief":"<self-contained brief including how to return the result>"}. Requests above the permit budget queue automatically. Poll the requested artifacts or run transcripts; do not ask sub-agents to write to the board.
+</tasker_turn_context>
+
+Execute Tasker task set-aurora-webp-as-default-background-3f87.

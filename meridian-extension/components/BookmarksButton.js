@@ -189,7 +189,7 @@ export function createScopePopup(
 
   function renderHeader() {
     const header = document.createElement("div");
-    header.className = "bookmarks-panel-header";
+    header.className = "search-panel-header";
 
     const tabs = document.createElement("div");
     tabs.className = "bookmarks-tabs";
@@ -291,7 +291,36 @@ export function createScopePopup(
     panel.appendChild(list);
   }
 
+  // Mirrors the Bookmarks header container (.search-panel-header) but with
+  // History's own single action instead of the Bookmarks Bar/All Bookmarks
+  // tabs — a quick way out to Chrome's own full history UI (search, delete,
+  // clear-by-range) that this lightweight popup doesn't attempt to replicate.
+  function renderHistoryHeader() {
+    const header = document.createElement("div");
+    header.className = "search-panel-header";
+
+    // Same row/button treatment as the Bookmarks Bar/All Bookmarks tabs
+    // (.bookmarks-tabs/.bookmarks-tab) rather than the accent text-link style
+    // used for the "Open all in group" sub-action, since this sits in the
+    // same header slot those tabs occupy.
+    const row = document.createElement("div");
+    row.className = "bookmarks-tabs";
+
+    const openHistoryPage = document.createElement("button");
+    openHistoryPage.type = "button";
+    openHistoryPage.className = "bookmarks-tab";
+    openHistoryPage.textContent = "Open history page";
+    openHistoryPage.addEventListener("click", () => {
+      openItem("chrome://history/");
+    });
+
+    row.appendChild(openHistoryPage);
+    header.appendChild(row);
+    return header;
+  }
+
   function renderHistory() {
+    panel.appendChild(renderHistoryHeader());
     const list = makeResultsList();
     if (!historyItems.length) {
       renderEmpty(

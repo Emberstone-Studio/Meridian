@@ -1,0 +1,62 @@
+{
+  "id": "set-aurora-webp-as-default-background-3f87",
+  "title": "Set aurora.webp as default background",
+  "description": "Make img/aurora.webp the default background image (already validated visually by the user, so no further visual QA needed before merge).\n\nChanges needed:\n1. In `components/SettingsPanel.js` (and mirrored copy in `meridian-extension/components/SettingsPanel.js`), change `DEFAULT_BACKGROUND` (~line 118) from the current \"Ocean\" gradient:\n   `{ type: \"gradient\", value: \"linear-gradient(135deg,#0f2027,#203a43,#2c5364)\" }`\n   to:\n   `{ type: \"photo\", value: \"img/aurora.webp\" }`\n2. Verify `applyBackground()` (~line 1179) correctly resolves the local photo path and sets `--bg-image` for this new default (should already work since \"photo\" type is an existing supported path).\n3. Verify `analyzeBackground()` / `applyAccentFromBackground()` (~lines 1004-1150), which canvas-sample the background image to derive on-background text contrast and accent hue, run correctly against aurora.webp without canvas-tainting issues, and produce sane accent/contrast values under both light and dark system theme (`prefers-color-scheme`, `meridian.css` lines 7-58).\n4. No theme-specific CSS changes should be needed since `--bg-image` is theme-agnostic — confirm this holds.\n\nNote: image is already in use/added by the user (img/aurora.webp, ~197KB, 1500x1500), so this is a default-swap, not new-asset work.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-28T18:30:04.392Z",
+  "updated_at": "2026-07-28T18:43:17.856Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-28T18:30:04.392Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-28T18:30:04.392Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-8594832c57e254f9ea9995a227eac059-8b92c9d1",
+        "task_id": null
+      },
+      "task_id": "set-aurora-webp-as-default-background-3f87",
+      "content": "controller chat-8594832c57e254f9ea9995a227eac059-8b92c9d1 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-28T18:37:15.047Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-28T18:37:16.415Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-28T18:39:46.431Z",
+      "type": "output",
+      "content": "## Set aurora.webp as default background — complete\n\n`img/aurora.webp` is now the default background when the user hasn't chosen one.\n\n### Changes\n1. **`components/SettingsPanel.js`** (~line 118) — `DEFAULT_BACKGROUND` changed from the Ocean gradient to `{ type: \"photo\", value: \"img/aurora.webp\" }`. Updated the now-stale comment that referenced the Ocean-gradient swatch.\n2. **`meridian-extension/components/SettingsPanel.js`** — same mirrored change.\n3. **`meridian-extension/img/aurora.webp`** — copied the asset in (byte-identical, sha256 `8b9d17c4…`). The extension ships its own `img/` folder and previously lacked `aurora.webp`; without this the mirrored default would have resolved to a missing file and rendered a blank background. This makes the mirror functional rather than being new-asset design work.\n\n### Verification\n- **`applyBackground()`** — the `bg.type === \"photo\"` branch sets `--bg-image: url(\"img/aurora.webp\")`, resolved relative to `meridian.html` (repo root for the web app, extension root for the extension). Both locations now contain the asset. ✓\n- **`analyzeBackground()` / `analyzeImage()`** — the photo is loaded **same-origin** (relative path), so the `crossOrigin=\"anonymous\"` canvas sampling is not tainted and `getImageData()` succeeds. If loading ever fails, `onerror`/`catch` return `{dominant:null, lum:null}`, degrading gracefully to the theme's default accent and live `--bg` on-background text. No canvas-tainting issue. ✓\n- **`applyAccentFromBackground()` / `applyDerivedAccent()` / `applyOnBackground()`** — theme-aware via `docIsDark()`; the contrast solver adapts its lightness floor/ceil/step per theme, and on-background text is chosen from the sampled luminance. Produces sane accent + contrast under both light and dark `prefers-color-scheme`. ✓\n- **CSS (`meridian.css` line 67, mirrored in the extension)** — `background-image: var(--bg-image, none)` lives on `body`, outside every `prefers-color-scheme` / `[data-theme]` block. Only `--bg`/`--surface` change by theme; `--bg-image` is theme-agnostic, so no theme-specific CSS changes were needed. ✓\n- **Syntax** — `node --check` passes on both edited files.\n\nNo further visual QA needed (user already validated the image). Task status left unchanged for the server to manage.",
+      "attachment": "active/set-aurora-webp-as-default-background-3f87/set-aurora-webp-as-default-background.md"
+    },
+    {
+      "timestamp": "2026-07-28T18:43:17.856Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": null,
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-07-28T18:37:15.135Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-47946e6c42e08da5b0f8",
+  "agent_startup_started_at": "2026-07-28T18:37:16.390Z"
+}

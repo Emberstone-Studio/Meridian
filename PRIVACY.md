@@ -86,6 +86,12 @@ user actions can contact external services:
 - Choosing the custom-homepage behavior or opening a tab, bookmark, or history
   result navigates Chrome to the selected URL. The destination then receives a
   normal browser navigation.
+- The Settings panel's Emberstone Studio footer shows two outbound links — the
+  studio site (`https://emberstone-studio.com`) and a Ko-fi donation page
+  (`https://ko-fi.com/emberstonestudio`). Both are inert until the user
+  explicitly clicks one, which opens that destination in a new tab. Meridian
+  performs no background request for them and adds no click tracking or
+  analytics.
 - The code fetches the packaged Meridian SVG through
   `chrome.runtime.getURL`; that is an extension-local resource, not an Internet
   request.

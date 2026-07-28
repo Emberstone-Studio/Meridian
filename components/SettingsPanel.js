@@ -1,6 +1,7 @@
 import {
   saveCustomBackground,
   getCustomBackgroundUrl,
+  clearCustomBackground,
 } from "../utils/customBackground.js";
 import {
   DEFAULT_LOCAL_SEARCH,
@@ -180,7 +181,9 @@ export function createSettingsPanel(container) {
   let currentTheme = "system";
   let currentBg = DEFAULT_BACKGROUND;
   let customBgUrl = null;
-  let photoSeeds = generateSeeds();
+  // The photo grid holds 12 tiles in a 3×4 layout; the first is the custom
+  // image tile, so we only need 11 stock photo seeds.
+  let photoSeeds = generateSeeds(11);
   let photoAdjust = { ...DEFAULT_PHOTO_ADJUST };
 
   const panel = document.createElement("div");
@@ -786,7 +789,7 @@ export function createSettingsPanel(container) {
   function renderBgSection() {
     bgGroup
       .querySelectorAll(
-        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-photo-adjust, .settings-bg-upload-btn, .settings-bg-file-input",
+        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-photo-adjust",
       )
       .forEach((el) => el.remove());
 
@@ -851,7 +854,7 @@ export function createSettingsPanel(container) {
     refreshBtn.className = "settings-bg-refresh";
     refreshBtn.textContent = "↻ Refresh";
     refreshBtn.addEventListener("click", () => {
-      photoSeeds = generateSeeds(12, new Set(photoSeeds));
+      photoSeeds = generateSeeds(11, new Set(photoSeeds));
       renderBgSection();
     });
 
@@ -859,9 +862,135 @@ export function createSettingsPanel(container) {
     photoRow.appendChild(refreshBtn);
     bgGroup.appendChild(photoRow);
 
-    // ── Photo grid: 12 photos (2 rows × 6) ──
+    // ── Photo grid: 12 tiles in a 3×4 layout. The first tile is the custom
+    // image dropzone/add button (or the thumbnail of an uploaded image); the
+    // remaining 11 are stock photos. ──
     const photoGrid = document.createElement("div");
     photoGrid.className = "settings-bg-photo-grid";
+
+    // Hidden native file picker, triggered by the custom tile's add button.
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.className = "settings-bg-file-input";
+
+    // The custom tile: same footprint as a photo swatch. It is either the
+    // "add" affordance (blank --bg tile + plus) or, once an image is stored,
+    // that image's thumbnail with a hover-revealed remove control.
+    const customTile = document.createElement("div");
+    customTile.className =
+      "settings-bg-swatch settings-bg-custom" +
+      (currentBg.type === "custom" ? " selected" : "");
+
+    async function processCustomImage(file) {
+      if (!file) return;
+      customTile.classList.remove("drag-over", "upload-error");
+      if (!file.type.startsWith("image/")) {
+        customTile.classList.add("upload-error");
+        customTile.title = "Please choose an image file";
+        return;
+      }
+      customTile.classList.add("processing");
+      try {
+        await saveCustomBackground(file);
+        customBgUrl = await getCustomBackgroundUrl();
+        selectBg("custom", ""); // re-renders the section → tile shows the thumb
+      } catch {
+        customTile.classList.remove("processing");
+        customTile.classList.add("upload-error");
+        customTile.title = "Could not save image — try another file";
+      } finally {
+        fileInput.value = "";
+      }
+    }
+
+    async function removeCustomImage() {
+      await clearCustomBackground();
+      customBgUrl = null;
+      // "Start over": if the removed image was the active background, fall back
+      // to the default; otherwise just refresh the tile back to its add state.
+      if (currentBg.type === "custom") {
+        selectBg(DEFAULT_BACKGROUND.type, DEFAULT_BACKGROUND.value);
+      } else {
+        renderBgSection();
+      }
+    }
+
+    if (customBgUrl) {
+      // ── Filled state: thumbnail + hover-revealed remove (rotated plus). ──
+      customTile.classList.add("settings-bg-custom--filled");
+      customTile.setAttribute("role", "button");
+      customTile.tabIndex = 0;
+      customTile.setAttribute("aria-label", "Use custom image background");
+      customTile.title = "Custom image";
+
+      const thumb = document.createElement("img");
+      thumb.src = customBgUrl;
+      thumb.alt = "";
+      customTile.appendChild(thumb);
+
+      const selectCustom = () => selectBg("custom", "");
+      customTile.addEventListener("click", selectCustom);
+      customTile.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          selectCustom();
+        }
+      });
+
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "settings-bg-custom-remove"; // "+" rotated to "X" in CSS
+      removeBtn.setAttribute("aria-label", "Remove custom image");
+      removeBtn.title = "Remove custom image";
+      removeBtn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        removeCustomImage();
+      });
+      customTile.appendChild(removeBtn);
+    } else {
+      // ── Empty state: blank --bg tile + plus; add button and drop target. ──
+      customTile.classList.add("settings-bg-custom--empty");
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "settings-bg-custom-add";
+      addBtn.textContent = "+"; // same glyph as the new-tab buttons
+      addBtn.setAttribute("aria-label", "Add a custom image background");
+      addBtn.title = "Add custom image";
+      addBtn.addEventListener("click", () => fileInput.click());
+      customTile.appendChild(addBtn);
+
+      let dragDepth = 0;
+      customTile.addEventListener("dragenter", (event) => {
+        event.preventDefault();
+        dragDepth += 1;
+        customTile.classList.add("drag-over");
+      });
+      customTile.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "copy";
+        customTile.classList.add("drag-over");
+      });
+      customTile.addEventListener("dragleave", (event) => {
+        event.preventDefault();
+        dragDepth = Math.max(0, dragDepth - 1);
+        if (dragDepth === 0) customTile.classList.remove("drag-over");
+      });
+      customTile.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dragDepth = 0;
+        customTile.classList.remove("drag-over");
+        processCustomImage(event.dataTransfer.files?.[0]);
+      });
+    }
+
+    fileInput.addEventListener("change", () =>
+      processCustomImage(fileInput.files?.[0]),
+    );
+
+    photoGrid.appendChild(fileInput);
+    photoGrid.appendChild(customTile);
 
     for (const seed of photoSeeds) {
       const fullUrl = `https://picsum.photos/seed/${seed}/1920/1080`;
@@ -877,77 +1006,6 @@ export function createSettingsPanel(container) {
     }
 
     bgGroup.appendChild(photoGrid);
-
-    // ── Custom image drop zone ──
-    const uploadBtn = document.createElement("button");
-    uploadBtn.className =
-      "settings-bg-upload-btn" +
-      (currentBg.type === "custom" ? " selected" : "");
-    uploadBtn.textContent =
-      currentBg.type === "custom"
-        ? "✓ Custom image active — drop or click to replace"
-        : "Drop an image here or click to upload";
-
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = "image/*";
-    fileInput.className = "settings-bg-file-input";
-    async function processCustomImage(file) {
-      if (!file) return;
-      uploadBtn.classList.remove("drag-over", "upload-error");
-      if (!file.type.startsWith("image/")) {
-        uploadBtn.classList.add("upload-error");
-        uploadBtn.textContent = "Please choose an image file";
-        return;
-      }
-      uploadBtn.disabled = true;
-      uploadBtn.textContent = "Processing…";
-      try {
-        await saveCustomBackground(file);
-        customBgUrl = await getCustomBackgroundUrl();
-        selectBg("custom", "");
-      } catch {
-        uploadBtn.classList.add("upload-error");
-        uploadBtn.textContent = "Could not save image — try another file";
-      } finally {
-        uploadBtn.disabled = false;
-        fileInput.value = "";
-      }
-    }
-
-    fileInput.addEventListener("change", () =>
-      processCustomImage(fileInput.files?.[0]),
-    );
-    uploadBtn.addEventListener("click", () => fileInput.click());
-
-    let dragDepth = 0;
-    uploadBtn.addEventListener("dragenter", (event) => {
-      event.preventDefault();
-      if (uploadBtn.disabled) return;
-      dragDepth += 1;
-      uploadBtn.classList.add("drag-over");
-    });
-    uploadBtn.addEventListener("dragover", (event) => {
-      event.preventDefault();
-      if (uploadBtn.disabled) return;
-      event.dataTransfer.dropEffect = "copy";
-      uploadBtn.classList.add("drag-over");
-    });
-    uploadBtn.addEventListener("dragleave", (event) => {
-      event.preventDefault();
-      dragDepth = Math.max(0, dragDepth - 1);
-      if (dragDepth === 0) uploadBtn.classList.remove("drag-over");
-    });
-    uploadBtn.addEventListener("drop", (event) => {
-      event.preventDefault();
-      dragDepth = 0;
-      uploadBtn.classList.remove("drag-over");
-      if (uploadBtn.disabled) return;
-      processCustomImage(event.dataTransfer.files?.[0]);
-    });
-
-    bgGroup.appendChild(fileInput);
-    bgGroup.appendChild(uploadBtn);
 
     // ── Photo-only modifiers (transparency + blur), at the bottom of the
     // Background section. Shown only while a photo/custom background is
@@ -984,9 +1042,90 @@ export function createSettingsPanel(container) {
   refreshGroup.appendChild(refreshBtn);
   tabsSection.appendChild(refreshGroup);
 
+  // --- Emberstone Studio footer ---
+  // Two compact, side-by-side calls to action: the studio site (brand mark)
+  // and Ko-fi (coffee icon). Static markup only — no chrome.* calls, no click
+  // tracking — so it never contacts the network until the user explicitly
+  // follows a link. Sits directly above the Privacy & Data disclosure at the
+  // very bottom of the panel.
+  const emberstoneFooter = document.createElement("div");
+  emberstoneFooter.className = "settings-section settings-emberstone";
+
+  // Small muted label (same treatment as .settings-label elsewhere) so this
+  // footer has a name like every other section, without promoting it to a
+  // full bordered h3 heading — it's a quiet credit, not a config group.
+  const emberstoneLabel = document.createElement("span");
+  emberstoneLabel.className = "settings-label settings-emberstone-label";
+  emberstoneLabel.textContent = "Emberstone Studio";
+  emberstoneFooter.appendChild(emberstoneLabel);
+
+  const emberstoneLinks = document.createElement("div");
+  emberstoneLinks.className = "settings-emberstone-links";
+
+  // Native <a href target="_blank" rel="noopener noreferrer"> links — the same
+  // safe outbound-link pattern as the privacy-policy link above. They open in
+  // a new tab, keeping the new-tab/settings context intact, and are keyboard
+  // focusable with a visible focus ring from .settings-emberstone-link.
+  const emberstoneSiteLink = document.createElement("a");
+  emberstoneSiteLink.className = "settings-emberstone-link";
+  emberstoneSiteLink.href = "https://emberstone-studio.com";
+  emberstoneSiteLink.target = "_blank";
+  emberstoneSiteLink.rel = "noopener noreferrer";
+
+  const emberstoneLogo = document.createElement("img");
+  emberstoneLogo.className = "settings-emberstone-icon";
+  // Root-relative, matching how img/aurora.webp and the icon assets are
+  // referenced elsewhere. The SVG is a fixed multi-color mark (not theme
+  // adaptive), so one file serves both light and dark.
+  emberstoneLogo.src = "img/emberstone.svg";
+  // Decorative: the adjacent label already names the studio.
+  emberstoneLogo.alt = "";
+  emberstoneLogo.width = 22;
+  emberstoneLogo.height = 22;
+  emberstoneLogo.setAttribute("aria-hidden", "true");
+  emberstoneLogo.loading = "lazy";
+  // If the asset ever fails to load, hide the broken-image glyph gracefully.
+  emberstoneLogo.onerror = () => {
+    emberstoneLogo.classList.add("load-failed");
+  };
+
+  const emberstoneSiteLabel = document.createElement("span");
+  emberstoneSiteLabel.textContent = "See more from Emberstone Studio";
+
+  emberstoneSiteLink.append(emberstoneLogo, emberstoneSiteLabel);
+
+  const emberstoneCoffeeLink = document.createElement("a");
+  emberstoneCoffeeLink.className = "settings-emberstone-link";
+  emberstoneCoffeeLink.href = "https://ko-fi.com/emberstonestudio";
+  emberstoneCoffeeLink.target = "_blank";
+  emberstoneCoffeeLink.rel = "noopener noreferrer";
+
+  // Inline (not <img>) so `currentColor` recolors it with the button text,
+  // matching the THEME_ICONS pattern above — coffee.svg ships with no fill,
+  // so it would otherwise render black in dark mode.
+  const emberstoneCoffeeIcon = document.createElement("span");
+  emberstoneCoffeeIcon.className = "settings-emberstone-icon";
+  emberstoneCoffeeIcon.setAttribute("aria-hidden", "true");
+  emberstoneCoffeeIcon.innerHTML =
+    '<svg viewBox="0 0 640 640" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M184 48C170.7 48 160 58.7 160 72C160 110.9 183.4 131.4 199.1 145.1L200.2 146.1C216.5 160.4 224 167.9 224 184C224 197.3 234.7 208 248 208C261.3 208 272 197.3 272 184C272 145.1 248.6 124.6 232.9 110.9L231.8 109.9C215.5 95.7 208 88.1 208 72C208 58.7 197.3 48 184 48zM128 256C110.3 256 96 270.3 96 288L96 480C96 533 139 576 192 576L384 576C425.8 576 461.4 549.3 474.5 512L480 512C550.7 512 608 454.7 608 384C608 313.3 550.7 256 480 256L128 256zM480 448L480 320C515.3 320 544 348.7 544 384C544 419.3 515.3 448 480 448zM320 72C320 58.7 309.3 48 296 48C282.7 48 272 58.7 272 72C272 110.9 295.4 131.4 311.1 145.1L312.2 146.1C328.5 160.4 336 167.9 336 184C336 197.3 346.7 208 360 208C373.3 208 384 197.3 384 184C384 145.1 360.6 124.6 344.9 110.9L343.8 109.9C327.5 95.7 320 88.1 320 72z"/></svg>';
+
+  const emberstoneCoffeeLabel = document.createElement("span");
+  emberstoneCoffeeLabel.textContent = "Buy us a coffee";
+
+  emberstoneCoffeeLink.append(emberstoneCoffeeIcon, emberstoneCoffeeLabel);
+
+  emberstoneLinks.append(emberstoneSiteLink, emberstoneCoffeeLink);
+  emberstoneFooter.append(emberstoneLinks);
+
   // Keep the optional Privacy & Data disclosure last so primary settings
-  // remain immediately available.
-  panel.append(appearanceSection, searchSection, tabsSection, privacySection);
+  // remain immediately available; the Emberstone credit sits just above it.
+  panel.append(
+    appearanceSection,
+    searchSection,
+    tabsSection,
+    emberstoneFooter,
+    privacySection,
+  );
 
   container.appendChild(panel);
 
@@ -1009,17 +1148,20 @@ export function createSettingsPanel(container) {
       currentBg = saved.background ?? DEFAULT_BACKGROUND;
       photoAdjust = { ...DEFAULT_PHOTO_ADJUST, ...(saved.photoAdjust ?? {}) };
       toggleCheckbox.checked = groupByDomain;
+      // Resolve the stored custom image up front so its thumbnail shows in the
+      // custom tile even when a different background is currently active.
+      const background = currentBg;
+      const customUrlPromise = getCustomBackgroundUrl();
       if (currentBg.type === "custom") {
-        const background = currentBg;
-        const customUrlPromise = getCustomBackgroundUrl();
         applyAccentFromBackground(background, customUrlPromise);
-        customUrlPromise.then((url) => {
-          customBgUrl = url;
-          if (currentBg !== background) return;
-          applyBackground(background, customBgUrl);
-          renderBgSection();
-        });
       }
+      customUrlPromise.then((url) => {
+        customBgUrl = url;
+        if (currentBg === background && currentBg.type === "custom") {
+          applyBackground(background, customBgUrl);
+        }
+        renderBgSection();
+      });
       if (saved.localSearch) {
         localSearch = { ...localSearch, ...saved.localSearch };
       }

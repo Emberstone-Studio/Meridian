@@ -170,6 +170,12 @@ below):
   evicted, cleared, or removed with the extension or profile. Closing a tab
   deletes its cached thumbnail and search entry (including extracted metadata).
   You can clear all extension data through Chrome's controls.
+- **Outbound links in Settings** — the Settings panel's Emberstone Studio
+  footer contains two static links: the studio site
+  (`https://emberstone-studio.com`) and a Ko-fi donation page
+  (`https://ko-fi.com/emberstonestudio`). They do nothing until the user
+  explicitly clicks one, which opens that destination in a new tab. Meridian
+  makes no background request for them and adds no click tracking or analytics.
 - **No telemetry or backend** — Meridian has no Meridian-operated server, no
   analytics or advertising SDK, no account system, and no telemetry uploader.
 
@@ -303,7 +309,10 @@ Verified against the current source on the "Last updated" date:
   tabs (`background.js`); the extractor reads meta description + H1/H2 only
   (`utils/browserSearch.js`); favicons use the `_favicon` endpoint
   (`utils/favicon.js`); background photos use `picsum.photos` seeds
-  (`components/SettingsPanel.js`, 12 photos); `chrome.storage.sync` preference
+  (`components/SettingsPanel.js`, 12 photos); the Settings Emberstone Studio
+  footer adds two static outbound links (studio site + Ko-fi donation page)
+  that only navigate on explicit user click, with no click tracking or
+  analytics (`components/SettingsPanel.js`); `chrome.storage.sync` preference
   data can sync through the user's own Chrome Sync account. No backend/
   telemetry code exists.
 - **Terminology** — "workspace lanes," "local search," "thumbnails/screenshots,"

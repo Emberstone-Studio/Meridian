@@ -1,0 +1,62 @@
+{
+  "id": "add-background-transparency-blur-sliders-to-phot-0674",
+  "title": "Add background transparency/blur sliders to Photos settings",
+  "description": "Add two sliders (transparency and blur) to the settings Appearance panel, nested under the \"Photos\" background section only — they should not apply to or appear for Colors & Gradients backgrounds.\n\nBehavior:\n- Both sliders affect only photo backgrounds; hidden/disabled when a color/gradient background is active.\n- Transparency fades the photo toward the already-sampled accent color (the same color canvas-sampled for the UI accent), not a fixed #fff/#000 — this keeps background, accent, and fade all derived from one source. Keep black/white (light mode → #fff, dark mode → #000) as a manual fallback/toggle in case the sampled-color fade looks muddy at high transparency — designer wants to eyeball both before finalizing.\n- Blur uses standard CSS filter: blur().\n- Both sliders must preview live as the user drags — no reopening settings to see the result.\n- The accent-color canvas sampling itself should run once when the photo is selected/changed, then be cached — do NOT re-run pixel sampling on every slider tick. The sliders only interpolate opacity/blur against the cached sampled value, which is cheap and fine to update live.\n- Place the two sliders directly under the existing \"Photos\" section in the settings modal, visually nested/indented so it's clear they're modifiers of the current photo choice, not a standalone feature.\n\nContext: follows the aurora.webp default background task. Settings modal reference: img/meridian-screen5.png.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-28T18:43:07.761Z",
+  "updated_at": "2026-07-28T20:29:12.201Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-28T18:43:07.761Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-28T18:43:07.762Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-ce1718a8f66696f1c14e4956dd3940c9-4935f5aa",
+        "task_id": null
+      },
+      "task_id": "add-background-transparency-blur-sliders-to-phot-0674",
+      "content": "chat chat-ce1718a8f66696f1c14e4956dd3940c9-4935f5aa called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-28T18:43:25.616Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-28T18:43:26.774Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-28T18:54:46.743Z",
+      "type": "output",
+      "content": "## Background transparency + blur sliders (Photos-only)\n\nAdded two live-preview sliders (**Transparency** and **Blur**) plus a **fade-to-black/white** fallback toggle, nested/indented directly under the **Photos** section of the settings Appearance panel. They render only for image backgrounds and are absent for Colors & Gradients / None.\n\n### Behavior delivered\n- **Photo-only.** The nested control block is rendered only when a `photo` or `custom` (uploaded image) background is active; selecting any color/gradient/none background removes it and neutralizes the modifiers (`--photo-opacity:1`, `--photo-blur:0px`, fade `transparent`), so those backgrounds are untouched.\n- **Transparency fades toward the sampled accent.** The photo dissolves toward `var(--accent)` — the exact color already canvas-sampled for the UI accent — so background, accent, and fade all derive from one source. A manual **“Fade to black/white instead of accent”** toggle switches the wash to `#fff` (light) / `#000` (dark) via a theme-reactive `--photo-fade-bw` var, letting the designer eyeball both.\n- **Blur** uses standard CSS `filter: blur()`.\n- **Live preview.** Dragging either slider updates CSS custom properties immediately (no settings reopen). Values persist to `chrome.storage.sync` (`photoAdjust`) on gesture end, and cross-tab changes re-apply live.\n- **No re-sampling on slider ticks.** Pixel sampling (`applyAccentFromBackground`) runs once when the photo is selected/changed. Sliders only interpolate opacity/blur against the cached, live `--accent` var; the photoAdjust `onChanged` path re-applies CSS vars without ever re-sampling.\n\n### Implementation\n- **`meridian.css`** — Moved the base color to `html { background-color: var(--bg) }` (paint step 1 / canvas) and moved the wallpaper into two fixed, negative-z-index `body` pseudo-layers so photo blur/opacity never touch the foreground UI:\n  - `body::before` (z-index -2): the fade wash — `var(--photo-fade-color)`.\n  - `body::after` (z-index -1): the image/gradient with `opacity: var(--photo-opacity)` and `filter: blur(var(--photo-blur))`; its box is grown by `inset: calc(-2 * var(--photo-blur))` so blurred edges never reveal a gap.\n  - Added `--photo-fade-bw` (`#fff` light / `#000` dark) to all three theme blocks, plus `.settings-bg-photo-adjust` / `.settings-slider*` styles (left accent rail + tint to signal nesting).\n- **`components/SettingsPanel.js`** — Added `PHOTO_BLUR_MAX`, exported `DEFAULT_PHOTO_ADJUST` and `applyPhotoAdjustments(bg, adjust)` (pure interpolation, photo/custom only). Inside the panel: `photoAdjust` state loaded from storage, a `makeSlider()` helper with a live numeric readout, `buildPhotoAdjust()` (two sliders + fade toggle) appended under the photo grid in `renderBgSection` and shown only for image backgrounds, plus `previewPhotoAdjust()`/`persistPhotoAdjust()` (preview on `input`, persist on `change`). `selectBg` now applies adjustments on photo change.\n- **`meridian.js`** — Imported and applied `applyPhotoAdjustments` in `applyStoredAppearance` (fetches `photoAdjust` alongside theme/background), and added a `storage.onChanged` branch that re-interpolates the CSS vars against the current background without re-sampling.\n- Mirrored every change into `meridian-extension/` (packaged parity).\n\n### Verification\n- Full suite green: **126/126** (`node --test`), including `packagedParity` and `cssSeparation` (no direct `.style.x =` / embedded CSS; only `setProperty`).\n- Real Chrome headless render harness across 5 states confirmed: photo full (sharp wallpaper under sharp content), transparency fades toward accent, blur affects only the wallpaper with clean edges, black/white fallback fade, and gradient background rendering fully sharp/opaque (modifiers correctly inert).",
+      "attachment": "active/add-background-transparency-blur-sliders-to-phot-0674/add-background-transparency-blur-sliders-to-photos.md"
+    },
+    {
+      "timestamp": "2026-07-28T20:29:12.201Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": null,
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-07-28T18:43:25.680Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-02cf4b1150042cde1a66",
+  "agent_startup_started_at": "2026-07-28T18:43:26.748Z"
+}

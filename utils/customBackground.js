@@ -64,10 +64,49 @@ function idbGet() {
   );
 }
 
+function idbDelete() {
+  return openDb().then(
+    (db) =>
+      new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.objectStore(STORE).delete(KEY);
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => {
+          db.close();
+          reject(tx.error);
+        };
+      }),
+  );
+}
+
 // Persist the uploaded file's raw bytes. `blob` is the File from the picker.
 export async function saveCustomBackground(blob) {
   await idbPut(blob);
   // Drop any pre-IndexedDB copies so backends can't diverge.
+  try {
+    await chrome.storage.local.remove(LEGACY_KEY);
+  } catch {
+    /* ignore */
+  }
+  try {
+    localStorage.removeItem(LEGACY_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+// Forget the stored custom image entirely — used by the "remove / start over"
+// affordance. Clears the IndexedDB record, revokes any live object URL, and
+// drops the legacy copies so no backend can resurrect the deleted image.
+export async function clearCustomBackground() {
+  await idbDelete();
+  if (cachedObjectUrl) {
+    URL.revokeObjectURL(cachedObjectUrl);
+    cachedObjectUrl = null;
+  }
   try {
     await chrome.storage.local.remove(LEGACY_KEY);
   } catch {

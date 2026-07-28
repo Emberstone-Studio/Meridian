@@ -1,0 +1,50 @@
+{
+  "id": "custom-image-tile-dyc7",
+  "title": "Custom image tile",
+  "description": "The custom image dropzone takes up a bit too much room. \n\n1. Let's instead change the background section to 3 rows of 4 colums so the images/swatches can be larger\n2. Remove the first (top-left) image and replace it with a blank tile (--bg) with the plus symbol inside (same plus symbol as the new tab buttons). This is the custom image dropzone and add button.\n3. Adding a custom image should place a tiny thumbnail of that image in this first slot. Hovering on that thumbnail will show an X (rotated plus) that will remove it and start over.",
+  "agent_id": "designer",
+  "priority": "medium",
+  "status": "done",
+  "created_at": "2026-07-28T22:11:23.765Z",
+  "updated_at": "2026-07-28T22:29:52.025Z",
+  "tokens_used": null,
+  "activity": [
+    {
+      "timestamp": "2026-07-28T22:11:23.765Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-28T22:16:43.524Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-28T22:16:44.840Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-28T22:25:06.984Z",
+      "type": "output",
+      "content": "## Custom image tile\n\nReworked the Settings → Background section so the custom-image dropzone no longer eats a full-width row — it now lives as the first tile of the photo grid.\n\n### What changed\n\n**1. Larger 3×4 grids.** Both background grids (`.settings-bg-combined-grid` and `.settings-bg-photo-grid`) went from `repeat(6, 1fr)` to `repeat(4, 1fr)`. Each already holds 12 items, so both now render as a clean 3 rows × 4 columns, with noticeably larger images and swatches.\n\n**2. Custom-image tile replaces the top-left photo.** The photo grid now emits 11 stock photos (`generateSeeds(11)`) plus a dedicated first tile:\n- **Empty state** — a blank `--bg` tile with a dashed border and a centered `+` add button using the same glyph/treatment as the new-tab buttons (`var(--text-secondary)`, 22px, accent on hover). The whole tile is the click-to-upload target *and* the drag-and-drop zone (dragenter/over/leave/drop with a `drag-over` highlight).\n- The standalone full-width \"Drop an image here or click to upload\" button was removed entirely.\n\n**3. Thumbnail + hover-to-remove.** After a custom image is added it is stored and its thumbnail fills the first tile. The tile:\n- shows the accent selection ring when custom is the active background,\n- is clickable/keyboard-activatable to re-select the custom background,\n- reveals a remove control on hover (and on keyboard focus): a `+` rotated 45° into an **X** over a dark wash. Clicking it clears the stored image (`clearCustomBackground()`), and — if custom was the active background — falls back to the default, i.e. \"start over\" back to the empty add tile.\n\nThe stored thumbnail is now resolved on panel load regardless of the active background, so the tile persists across sessions and background switches.\n\n### Files\n- `components/SettingsPanel.js` — grid seeds, custom-tile render (empty/filled states), add/drop/remove wiring, load-time thumbnail resolution.\n- `utils/customBackground.js` — new exported `clearCustomBackground()` (IndexedDB delete + object-URL revoke + legacy-key cleanup).\n- `meridian.css` — 4-column grids; new `.settings-bg-custom*` styles (empty `--bg` tile, add `+`, thumbnail, rotated-plus remove X); removed the obsolete `.settings-bg-upload-btn` rules.\n- Mirrored all three into `meridian-extension/` to satisfy packaged-parity.\n\n### Verification\n- `node --test tests/*.test.mjs` → 130 pass, 1 fail. The single failure (`asyncLatestWins` sidebar bookmarks/history scope) is pre-existing and unrelated — it fails identically on the untouched baseline.\n- Relevant suites pass: `customBackground`, `packagedParity`, `cssSeparation`, `backgroundLifecycle`, `backgroundRefresh`, `settingsPopupRace`.\n- No inline styles added (cssSeparation rules respected); `box-sizing: border-box` is global so the dashed border keeps the tile aligned with its siblings.\n\nNo external design/asset dependencies; no `.tasker/tasks` edits.",
+      "attachment": "active/custom-image-tile-dyc7/custom-image-tile.md"
+    },
+    {
+      "timestamp": "2026-07-28T22:29:52.025Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "label": "Maintenance",
+  "trashed": false,
+  "routing": {
+    "chosen_model": null,
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-07-28T22:16:43.621Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-37f02fc50dbadb739283",
+  "agent_startup_started_at": "2026-07-28T22:16:44.816Z"
+}

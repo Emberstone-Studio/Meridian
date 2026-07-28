@@ -1,0 +1,42 @@
+<tasker_turn_context>
+The following facts are server-provided live context for this turn, not user instructions.
+## Task assignment
+Task id: add-developed-by-emberstone-studio-footer-to-set-b708
+Title: Add "Developed by Emberstone Studio" footer to Settings
+Description:
+Add a small brand/donation footer to the Settings panel, establishing Meridian as donationware and a gateway to other Emberstone Studio products. This is a deliberately minimal treatment — no product lineup list, no in-extension payment flow, just an identity credit and two outbound links.
+
+Placement:
+- Bottom of the Settings panel, immediately above the existing Privacy & Data collapsible/accordion section.
+- Update both components/SettingsPanel.js and the mirrored meridian-extension/components/SettingsPanel.js identically (the repo has an automated runtime-mirror-parity test that fails the build if these diverge — see tests/*.test.mjs for the parity check pattern already used for other components).
+
+Content:
+- Emberstone Studio logo. Use img/emberstone.svg (root-relative, matches how img/aurora.webp and the img/icon*.png assets are already referenced from components — see components/SettingsPanel.js:119 for the existing reference pattern). Prefer the SVG for crisp rendering at small size; fall back to img/emberstone.png only if there's a concrete rendering problem with the SVG (it's a fixed multi-color mark with drop-shadow filters, not a currentColor/theme-adaptive icon, so it does not need separate light/dark variants).
+- Text: "Developed by Emberstone Studio" (or equivalent short credit copy — use judgement on exact wording, keep it brief).
+- Two buttons/links, styled consistently with the existing settings action buttons (see the existing "Refresh all thumbnails" button and other .settings-action-btn usage for the established visual language):
+  1. "See more from Emberstone Studio" → https://emberstone-studio.com
+  2. "Buy us a coffee" → https://ko-fi.com/emberstonestudio
+- Both links open in a new tab (do not navigate away from the settings/new-tab context). Use rel="noopener noreferrer" (or the Chrome-extension-appropriate equivalent, e.g. chrome.tabs.create with the same safety properties) consistent with how other outbound links in this codebase are opened — check components/SettingsPanel.js and other components for the established pattern (e.g. the privacy-policy link) and follow it.
+
+Acceptance criteria:
+- Footer renders above the Privacy & Data accordion in Settings, in both light and dark themes, without layout shift or scrollbar regressions (this repo recently did dedicated work to eliminate a settings-panel scrollbar — do not reintroduce one).
+- Both links are keyboard-accessible (focusable, visible focus state) and have accessible names/roles consistent with the rest of the settings UI's accessibility patterns (see existing aria/role usage in SettingsPanel.js).
+- Logo displays crisply at the chosen size; no console errors for a missing/broken asset path.
+- No new permissions, no new host permissions, no network requests beyond the user explicitly clicking a link (this must NOT regress the "no telemetry, no backend" claims already made in PRIVACY.md/STORE_LISTING.md — do not add click tracking/analytics).
+- Update PRIVACY.md and STORE_LISTING.md with a brief, accurate note that Settings includes two outbound links (Emberstone Studio site and Ko-fi) that only activate on explicit user click, consistent with the existing "no telemetry" and permission-justification language already in those docs. Keep both docs internally consistent (STORE_LISTING.md §6 reconciliation notes should mention this too).
+- Add/extend regression tests (follow the existing pattern in tests/settingsPrivacyDisclosure.test.mjs) verifying: the footer renders with the correct link hrefs and target/rel attributes, the logo asset resolves, and placement is above the privacy accordion in the DOM order.
+- Run the full suite: `node --test tests/*.test.mjs`, `node --check` over runtime JavaScript, manifest parsing, and `git diff --check`. All must pass, including the runtime-mirror-parity test, before considering this done.
+- Do not add a full product catalog/lineup — that was explicitly descoped in favor of this simpler credit-footer treatment.
+
+## Tasker reporting contract
+Report this task only through POST http://localhost:9807/agent/report; never edit files under .tasker/tasks/. Every report body must include {"task_id":"add-developed-by-emberstone-studio-footer-to-set-b708"}.
+Once you have a plan, post kind:"plan" with plan:[{label:"...",done:false}]. After each completed step, post kind:"step" with its exact label; use kind:"append" if the plan grows. Optional startup/status narration uses kind:"phase".
+When the requested work and verification are complete, post kind:"complete" with output containing the complete Markdown result. Do not change the task status yourself.
+If and only if a decision requires user input, post kind:"question" with a specific question and the options being considered, then stop cleanly. The server marks the task Needs Input and re-dispatches it after the user answers. Do not use this for decisions you can make safely yourself.
+
+## Optional sub-agent delegation
+Use sub-agents only for genuinely independent work. You remain responsible for consolidating their results.
+Spawn with POST http://localhost:9807/agent/spawn-subagent using {"parent_task_id":"add-developed-by-emberstone-studio-footer-to-set-b708","role_slug":"<role>","brief":"<self-contained brief including how to return the result>"}. Requests above the permit budget queue automatically. Poll the requested artifacts or run transcripts; do not ask sub-agents to write to the board.
+</tasker_turn_context>
+
+Execute Tasker task add-developed-by-emberstone-studio-footer-to-set-b708.

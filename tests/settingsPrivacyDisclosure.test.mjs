@@ -129,9 +129,11 @@ test("the disclosure is a native collapsed details section at the bottom of sett
     source,
     /privacySummary\.textContent = "Privacy & Data";/,
   );
+  // The Emberstone credit footer sits between Tabs and Privacy, but Privacy
+  // & Data remains the last thing appended to the panel.
   assert.match(
     source,
-    /panel\.append\(appearanceSection, searchSection, tabsSection, privacySection\);/,
+    /panel\.append\(\s*appearanceSection,\s*searchSection,\s*tabsSection,\s*emberstoneFooter,\s*privacySection,?\s*\);/,
   );
   assert.doesNotMatch(source, /privacySection\.open\s*=\s*true/);
 });

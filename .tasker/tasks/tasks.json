@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 606,
+  "state_version": 661,
   "features": {
     "chat_pro": true
   },
@@ -268,6 +268,66 @@
       },
       "task_id": "review-entire-meridian-codebase-for-errors-184a",
       "content": "chat chat-91f4e4ea738eaeea30578075207f86d9-c42b102c called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-07-28T18:30:04.392Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-8594832c57e254f9ea9995a227eac059-8b92c9d1",
+        "task_id": null
+      },
+      "task_id": "set-aurora-webp-as-default-background-3f87",
+      "content": "controller chat-8594832c57e254f9ea9995a227eac059-8b92c9d1 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-28T18:43:07.762Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-ce1718a8f66696f1c14e4956dd3940c9-4935f5aa",
+        "task_id": null
+      },
+      "task_id": "add-background-transparency-blur-sliders-to-phot-0674",
+      "content": "chat chat-ce1718a8f66696f1c14e4956dd3940c9-4935f5aa called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-28T20:32:25.300Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-35c64bf3d5a993307d239a013ec03e16-9b585c2d",
+        "task_id": null
+      },
+      "task_id": "owner-only-chrome-web-store-release-follow-ups-8398",
+      "content": "controller chat-35c64bf3d5a993307d239a013ec03e16-9b585c2d called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-28T21:27:32.115Z",
+      "type": "actor",
+      "tool": "mcp__tasker__epic_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-86803e91-4440-4b06-8210-ab275fe6937f-707c2c92",
+        "task_id": null
+      },
+      "task_id": null,
+      "content": "controller chat-86803e91-4440-4b06-8210-ab275fe6937f-707c2c92 called mcp__tasker__epic_create"
+    },
+    {
+      "timestamp": "2026-07-28T21:27:50.395Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-86803e91-4440-4b06-8210-ab275fe6937f-707c2c92",
+        "task_id": null
+      },
+      "task_id": "add-developed-by-emberstone-studio-footer-to-set-b708",
+      "content": "controller chat-86803e91-4440-4b06-8210-ab275fe6937f-707c2c92 called mcp__tasker__task_create"
     }
   ],
   "execution_policy": {
@@ -331,6 +391,19 @@
       "id": "epic-chrome-web-store-release",
       "name": "Chrome Web Store Release",
       "order": 8
+    },
+    {
+      "id": "epic-monetization",
+      "name": "Monetization",
+      "description": "Donationware model: Ko-fi donations plus a gateway to other Emberstone Studio products.",
+      "order": 8
+    }
+  ],
+  "logs": [
+    {
+      "timestamp": "2026-07-28T22:11:23.766Z",
+      "task_id": "custom-image-tile-dyc7",
+      "message": "Task \"Custom image tile\" created in ready"
     }
   ],
   "tasks": [
@@ -699,6 +772,61 @@
       "agent_id": "coder",
       "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/thumbnails-add-unlimitedstorage-switch-capture-t-ec14/thumbnails-add-unlimitedstorage-switch-capture-t-ec14.json"
+    },
+    {
+      "id": "set-aurora-webp-as-default-background-3f87",
+      "title": "Set aurora.webp as default background",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-28T18:43:17.856Z",
+      "file": "active/set-aurora-webp-as-default-background-3f87/set-aurora-webp-as-default-background-3f87.json"
+    },
+    {
+      "id": "add-background-transparency-blur-sliders-to-phot-0674",
+      "title": "Add background transparency/blur sliders to Photos settings",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-28T20:29:12.201Z",
+      "file": "active/add-background-transparency-blur-sliders-to-phot-0674/add-background-transparency-blur-sliders-to-phot-0674.json"
+    },
+    {
+      "id": "owner-only-chrome-web-store-release-follow-ups-8398",
+      "title": "Owner-only Chrome Web Store release follow-ups",
+      "status": "backlog",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "updated_at": "2026-07-28T22:15:02.570Z",
+      "file": "active/owner-only-chrome-web-store-release-follow-ups-8398/owner-only-chrome-web-store-release-follow-ups-8398.json"
+    },
+    {
+      "id": "add-developed-by-emberstone-studio-footer-to-set-b708",
+      "title": "Add \"Developed by Emberstone Studio\" footer to Settings",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-07-28T21:48:08.637Z",
+      "file": "active/add-developed-by-emberstone-studio-footer-to-set-b708/add-developed-by-emberstone-studio-footer-to-set-b708.json"
+    },
+    {
+      "id": "custom-image-tile-dyc7",
+      "title": "Custom image tile",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "designer",
+      "tokens_used": null,
+      "updated_at": "2026-07-28T22:29:52.025Z",
+      "file": "active/custom-image-tile-dyc7/custom-image-tile-dyc7.json"
     }
   ]
 }

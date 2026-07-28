@@ -1,0 +1,63 @@
+{
+  "id": "add-developed-by-emberstone-studio-footer-to-set-b708",
+  "title": "Add \"Developed by Emberstone Studio\" footer to Settings",
+  "description": "Add a small brand/donation footer to the Settings panel, establishing Meridian as donationware and a gateway to other Emberstone Studio products. This is a deliberately minimal treatment — no product lineup list, no in-extension payment flow, just an identity credit and two outbound links.\n\nPlacement:\n- Bottom of the Settings panel, immediately above the existing Privacy & Data collapsible/accordion section.\n- Update both components/SettingsPanel.js and the mirrored meridian-extension/components/SettingsPanel.js identically (the repo has an automated runtime-mirror-parity test that fails the build if these diverge — see tests/*.test.mjs for the parity check pattern already used for other components).\n\nContent:\n- Emberstone Studio logo. Use img/emberstone.svg (root-relative, matches how img/aurora.webp and the img/icon*.png assets are already referenced from components — see components/SettingsPanel.js:119 for the existing reference pattern). Prefer the SVG for crisp rendering at small size; fall back to img/emberstone.png only if there's a concrete rendering problem with the SVG (it's a fixed multi-color mark with drop-shadow filters, not a currentColor/theme-adaptive icon, so it does not need separate light/dark variants).\n- Text: \"Developed by Emberstone Studio\" (or equivalent short credit copy — use judgement on exact wording, keep it brief).\n- Two buttons/links, styled consistently with the existing settings action buttons (see the existing \"Refresh all thumbnails\" button and other .settings-action-btn usage for the established visual language):\n  1. \"See more from Emberstone Studio\" → https://emberstone-studio.com\n  2. \"Buy us a coffee\" → https://ko-fi.com/emberstonestudio\n- Both links open in a new tab (do not navigate away from the settings/new-tab context). Use rel=\"noopener noreferrer\" (or the Chrome-extension-appropriate equivalent, e.g. chrome.tabs.create with the same safety properties) consistent with how other outbound links in this codebase are opened — check components/SettingsPanel.js and other components for the established pattern (e.g. the privacy-policy link) and follow it.\n\nAcceptance criteria:\n- Footer renders above the Privacy & Data accordion in Settings, in both light and dark themes, without layout shift or scrollbar regressions (this repo recently did dedicated work to eliminate a settings-panel scrollbar — do not reintroduce one).\n- Both links are keyboard-accessible (focusable, visible focus state) and have accessible names/roles consistent with the rest of the settings UI's accessibility patterns (see existing aria/role usage in SettingsPanel.js).\n- Logo displays crisply at the chosen size; no console errors for a missing/broken asset path.\n- No new permissions, no new host permissions, no network requests beyond the user explicitly clicking a link (this must NOT regress the \"no telemetry, no backend\" claims already made in PRIVACY.md/STORE_LISTING.md — do not add click tracking/analytics).\n- Update PRIVACY.md and STORE_LISTING.md with a brief, accurate note that Settings includes two outbound links (Emberstone Studio site and Ko-fi) that only activate on explicit user click, consistent with the existing \"no telemetry\" and permission-justification language already in those docs. Keep both docs internally consistent (STORE_LISTING.md §6 reconciliation notes should mention this too).\n- Add/extend regression tests (follow the existing pattern in tests/settingsPrivacyDisclosure.test.mjs) verifying: the footer renders with the correct link hrefs and target/rel attributes, the logo asset resolves, and placement is above the privacy accordion in the DOM order.\n- Run the full suite: `node --test tests/*.test.mjs`, `node --check` over runtime JavaScript, manifest parsing, and `git diff --check`. All must pass, including the runtime-mirror-parity test, before considering this done.\n- Do not add a full product catalog/lineup — that was explicitly descoped in favor of this simpler credit-footer treatment.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "epic": "epic-monetization",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-07-28T21:27:50.395Z",
+  "updated_at": "2026-07-28T21:48:08.637Z",
+  "activity": [
+    {
+      "timestamp": "2026-07-28T21:27:50.395Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-07-28T21:27:50.395Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-86803e91-4440-4b06-8210-ab275fe6937f-707c2c92",
+        "task_id": null
+      },
+      "task_id": "add-developed-by-emberstone-studio-footer-to-set-b708",
+      "content": "controller chat-86803e91-4440-4b06-8210-ab275fe6937f-707c2c92 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-07-28T21:29:03.480Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-07-28T21:29:04.718Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-07-28T21:34:59.859Z",
+      "type": "output",
+      "content": "## Summary\n\nAdded a minimal donationware credit footer � \"Developed by Emberstone Studio\" � to the bottom of the Settings panel, directly above the Privacy & Data accordion. It shows the Emberstone brand mark, a short credit line, and two outbound links (studio site + Ko-fi), with no product-lineup list and no in-extension payment flow, as scoped.\n\n## Changes\n\n**components/SettingsPanel.js** (and identical mirror `meridian-extension/components/SettingsPanel.js`)\n- New `emberstoneFooter` block appended between `tabsSection` and `privacySection`, so Privacy & Data remains last and the credit sits just above it.\n- Logo: `<img src=\"img/emberstone.svg\">` (root-relative, matching `img/aurora.webp`/icon references). Decorative � `alt=\"\"` + `aria-hidden=\"true\"` since the visible credit line already names the studio � with an `onerror` handler that hides a broken-image glyph (same pattern as the provider icons).\n- Two links as native `<a href target=\"_blank\" rel=\"noopener noreferrer\">` � the same safe outbound pattern as the existing privacy-policy link � styled with `.settings-action-btn`:\n  - \"See more from Emberstone Studio\" ? https://emberstone-studio.com\n  - \"Buy us a coffee\" ? https://ko-fi.com/emberstonestudio\n- Static markup only: no `chrome.*` calls, no click tracking/analytics, no network activity until the user clicks a link.\n\n**meridian.css** (and mirror `meridian-extension/meridian.css`)\n- Added `.settings-emberstone*` styles: centered logo/credit, full-width stacked link buttons reusing `.settings-action-btn`, centered labels, and a visible `:focus-visible` ring for keyboard users. The panel already hides its scrollbar (`scrollbar-width: none`), so no scrollbar regression is introduced. Theme-adaptive via existing `--text-secondary`/`--surface`/`--border`/`--accent` vars (works in light and dark).\n\n**img/emberstone.svg + img/emberstone.png** copied into `meridian-extension/img/` so the packaged extension resolves the asset (no console error for a missing path).\n\n**PRIVACY.md** � new bullet under \"Remaining network behavior\" noting the two Settings outbound links are inert until an explicit click, with no background request and no click tracking/analytics.\n\n**STORE_LISTING.md** � matching bullet in the �3 paste-ready disclosure block (kept adjacent to the \"No telemetry or backend\" claim) and a reconciliation note in �6, keeping both docs internally consistent. No new permissions or host permissions were added, so the \"no telemetry, no backend\" claims are preserved.\n\n## Tests\n- New `tests/settingsEmberstoneFooter.test.mjs` (follows the `settingsPrivacyDisclosure.test.mjs` extract-and-fake-DOM pattern): verifies the credit text and logo src/alt, both link hrefs + `target=\"_blank\"` + `rel=\"noopener noreferrer\"` + `.settings-action-btn` styling, DOM placement above the privacy accordion, that the logo asset resolves in both the source and packaged trees, and that the footer is mirrored into the packaged component.\n- Updated the placement assertion in `tests/settingsPrivacyDisclosure.test.mjs` for the new `panel.append(...)` order (Privacy still last).\n\n## Verification\n- `node --test tests/*.test.mjs`: **130 pass, 1 fail**. The single failure � `asyncLatestWins.test.mjs` \"sidebar bookmark and history controls switch the list scope\" � is **pre-existing and unrelated**: it extracts blocks from `meridian.js` (untouched here), and I confirmed it fails identically on the clean baseline with all my changes stashed. My new footer tests, the updated privacy test, and the runtime-mirror-parity test (`packagedParity`) all pass.\n- `node --check` passes on `components/SettingsPanel.js`, the mirror, `meridian.js`, and `background.js`.\n- Both manifests parse as valid JSON.\n- `git diff --check`: clean (no whitespace errors).\n\n## Notes\n- Descoped-as-requested: no product catalog/lineup, no payment flow, no analytics.\n- The pre-existing `asyncLatestWins` failure is outside this task scope; flagging it rather than modifying unrelated code.",
+      "attachment": "active/add-developed-by-emberstone-studio-footer-to-set-b708/add-developed-by-emberstone-studio-footer-to-setti.md"
+    },
+    {
+      "timestamp": "2026-07-28T21:48:08.637Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": null,
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-07-28T21:29:03.582Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-a3e3d4f30935bddd6e2f",
+  "agent_startup_started_at": "2026-07-28T21:29:04.695Z"
+}
