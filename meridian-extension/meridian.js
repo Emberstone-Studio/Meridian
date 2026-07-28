@@ -10,6 +10,7 @@ import {
   applyTheme,
   applyAccentFromBackground,
   applyBackground,
+  applyPhotoAdjustments,
   DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
 import { getCustomBackgroundUrl } from "./utils/customBackground.js";
@@ -55,12 +56,16 @@ async function applyStoredAppearance(backgroundOverride = null) {
   const generation = ++appearanceGeneration;
   let bg = backgroundOverride;
 
+  // Photo transparency/blur modifiers live alongside the background; fetch them
+  // here so a background change re-applies them against the new photo.
+  const { theme, background, photoAdjust } = await chrome.storage.sync.get([
+    "theme",
+    "background",
+    "photoAdjust",
+  ]);
+  if (generation !== appearanceGeneration) return;
+
   if (!bg) {
-    const { theme, background } = await chrome.storage.sync.get([
-      "theme",
-      "background",
-    ]);
-    if (generation !== appearanceGeneration) return;
     applyTheme(theme ?? "system");
     bg = background ?? DEFAULT_BACKGROUND;
   }
@@ -71,6 +76,7 @@ async function applyStoredAppearance(backgroundOverride = null) {
   const customUrl = customUrlPromise ? await customUrlPromise : null;
   if (generation !== appearanceGeneration) return;
   applyBackground(bg, customUrl);
+  applyPhotoAdjustments(bg, photoAdjust);
 }
 
 function setupLightbox() {
@@ -975,6 +981,16 @@ async function init() {
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.background) {
       applyStoredAppearance(changes.background.newValue ?? DEFAULT_BACKGROUND);
+    }
+    // A photo modifier change (e.g. from another tab) only re-interpolates the
+    // CSS vars against the current background — it never re-samples the photo.
+    if (area === "sync" && changes.photoAdjust && !changes.background) {
+      chrome.storage.sync.get("background").then(({ background }) => {
+        applyPhotoAdjustments(
+          background ?? DEFAULT_BACKGROUND,
+          changes.photoAdjust.newValue,
+        );
+      });
     }
     if (area === "sync" && changes.localSearch) {
       clearBrowserSearch();

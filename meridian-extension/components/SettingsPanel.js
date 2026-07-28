@@ -113,12 +113,56 @@ const GRADIENT_PRESETS = [
   },
 ];
 
-// Default background when the user hasn't chosen one (matches the "Ocean"
-// gradient preset so its swatch shows selected).
+// Default background when the user hasn't chosen one — the bundled aurora photo.
 export const DEFAULT_BACKGROUND = {
-  type: "gradient",
-  value: "linear-gradient(135deg,#0f2027,#203a43,#2c5364)",
+  type: "photo",
+  value: "img/aurora.webp",
 };
+
+// Photo-only appearance modifiers (transparency + blur + which color the photo
+// fades toward). They apply to image backgrounds only, never colors/gradients.
+const PHOTO_BLUR_MAX = 20;
+export const DEFAULT_PHOTO_ADJUST = {
+  transparency: 0, // % the photo fades toward the fade color (0 = full photo)
+  blur: 0, // px of CSS blur() on the photo
+  fade: "bw", // "bw" (light → #fff, dark → #000) | "accent" (sampled color)
+};
+
+// Only image backgrounds carry the transparency/blur modifiers.
+function isPhotoBackground(type) {
+  return type === "photo" || type === "custom";
+}
+
+function clampNumber(value, min, max, fallback) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+}
+
+// Translate the stored photo modifiers into the CSS custom properties the
+// wallpaper pseudo-layers read (see meridian.css). For non-photo backgrounds
+// the modifiers are neutralized so colors/gradients render untouched. This is
+// pure interpolation against already-derived values (the live --accent var and
+// the theme's black/white) — it never re-samples the photo's pixels, so it is
+// cheap enough to call on every slider tick.
+export function applyPhotoAdjustments(bg, adjust) {
+  const root = document.documentElement;
+  if (!bg || !isPhotoBackground(bg.type)) {
+    root.style.setProperty("--photo-opacity", "1");
+    root.style.setProperty("--photo-blur", "0px");
+    root.style.setProperty("--photo-fade-color", "transparent");
+    return;
+  }
+  const a = { ...DEFAULT_PHOTO_ADJUST, ...(adjust ?? {}) };
+  const transparency = clampNumber(a.transparency, 0, 100, 0);
+  const blur = clampNumber(a.blur, 0, PHOTO_BLUR_MAX, 0);
+  root.style.setProperty("--photo-opacity", String(1 - transparency / 100));
+  root.style.setProperty("--photo-blur", `${blur}px`);
+  root.style.setProperty(
+    "--photo-fade-color",
+    a.fade === "bw" ? "var(--photo-fade-bw)" : "var(--accent)",
+  );
+}
 
 function generateSeeds(count = 12, exclude = new Set()) {
   const seeds = new Set();
@@ -137,6 +181,7 @@ export function createSettingsPanel(container) {
   let currentBg = DEFAULT_BACKGROUND;
   let customBgUrl = null;
   let photoSeeds = generateSeeds();
+  let photoAdjust = { ...DEFAULT_PHOTO_ADJUST };
 
   const panel = document.createElement("div");
 
@@ -177,15 +222,15 @@ export function createSettingsPanel(container) {
     "show live thumbnails, and after an open tab finishes loading, reads " +
     "that page's meta description and heading (H1/H2) text to power local " +
     "open-tab search. Both happen automatically, without a separate " +
-    "prompt, as part of the Tabs and Search features below.";
+    "prompt, as part of the Tabs and Search features.";
 
   const privacyStorage = document.createElement("p");
   privacyStorage.className = "settings-privacy-text";
   privacyStorage.textContent =
     "This data is stored locally in your Chrome profile. Meridian has no " +
-    "server and never uploads it. Local Search below controls which " +
-    "sources are searchable, and Thumbnails below lets you trigger a " +
-    "manual refresh.";
+    "server and never uploads it. Local Search controls which " +
+    "sources are searchable, and Refresh all thumbnails lets you " +
+    "regenerate them on demand.";
 
   const privacyOptional = document.createElement("p");
   privacyOptional.className = "settings-privacy-text";
@@ -199,7 +244,7 @@ export function createSettingsPanel(container) {
   privacyLink.href = PRIVACY_POLICY_URL;
   privacyLink.target = "_blank";
   privacyLink.rel = "noopener noreferrer";
-  privacyLink.textContent = "Read Meridian's full privacy policy";
+  privacyLink.textContent = "Read the full privacy policy";
 
   privacyGroup.append(
     privacyIntro,
@@ -590,8 +635,125 @@ export function createSettingsPanel(container) {
     currentBg = { type, value };
     chrome.storage.sync.set({ background: currentBg });
     applyBackground(currentBg, customBgUrl);
+    // Accent (canvas pixel-sampling) runs once here, on the photo change — not
+    // on slider ticks. The modifiers below only reuse the cached --accent.
     applyAccentFromBackground(currentBg, customBgUrl);
+    applyPhotoAdjustments(currentBg, photoAdjust);
     renderBgSection();
+  }
+
+  // Live-preview the modifiers without persisting (cheap CSS-var writes only).
+  function previewPhotoAdjust() {
+    applyPhotoAdjustments(currentBg, photoAdjust);
+  }
+
+  // Persist on gesture end (slider release / toggle), not on every tick.
+  function persistPhotoAdjust() {
+    chrome.storage.sync.set({ photoAdjust: { ...photoAdjust } });
+  }
+
+  // Labeled range control with a live numeric readout.
+  function makeSlider(opts) {
+    const field = document.createElement("div");
+    field.className = "settings-slider-field";
+
+    const head = document.createElement("div");
+    head.className = "settings-slider-head";
+
+    const name = document.createElement("span");
+    name.className = "settings-slider-label";
+    name.textContent = opts.label;
+
+    const readout = document.createElement("span");
+    readout.className = "settings-slider-value";
+    readout.textContent = opts.format(opts.value);
+
+    head.append(name, readout);
+
+    const input = document.createElement("input");
+    input.type = "range";
+    input.className = "settings-slider";
+    input.min = String(opts.min);
+    input.max = String(opts.max);
+    input.step = String(opts.step);
+    input.value = String(opts.value);
+    input.setAttribute("aria-label", opts.label);
+    input.addEventListener("input", () => {
+      const v = Number(input.value);
+      readout.textContent = opts.format(v);
+      opts.onInput(v);
+    });
+    input.addEventListener("change", () => opts.onChange());
+
+    field.append(head, input);
+    return field;
+  }
+
+  // The nested block of photo-only modifiers. Rebuilt each render from the
+  // current photoAdjust state, so it always reflects the persisted values.
+  function buildPhotoAdjust() {
+    const wrap = document.createElement("div");
+    wrap.className = "settings-bg-photo-adjust";
+
+    wrap.appendChild(
+      makeSlider({
+        label: "Transparency",
+        min: 0,
+        max: 100,
+        step: 1,
+        value: photoAdjust.transparency,
+        format: (v) => `${v}%`,
+        onInput: (v) => {
+          photoAdjust.transparency = v;
+          previewPhotoAdjust();
+        },
+        onChange: persistPhotoAdjust,
+      }),
+    );
+
+    wrap.appendChild(
+      makeSlider({
+        label: "Blur",
+        min: 0,
+        max: PHOTO_BLUR_MAX,
+        step: 1,
+        value: photoAdjust.blur,
+        format: (v) => `${v}px`,
+        onInput: (v) => {
+          photoAdjust.blur = v;
+          previewPhotoAdjust();
+        },
+        onChange: persistPhotoAdjust,
+      }),
+    );
+
+    // Default fade is black/white; check this box to fade toward the
+    // sampled accent color instead.
+    const toggleRow = document.createElement("label");
+    toggleRow.className = "settings-toggle-row";
+
+    const toggle = document.createElement("input");
+    toggle.type = "checkbox";
+    toggle.className = "settings-toggle";
+    toggle.checked = photoAdjust.fade === "accent";
+    toggle.setAttribute(
+      "aria-label",
+      "Fade to the sampled accent color instead of black or white",
+    );
+
+    const toggleText = document.createElement("span");
+    toggleText.textContent = "Fade to accent color";
+
+    toggle.addEventListener("change", () => {
+      photoAdjust.fade = toggle.checked ? "accent" : "bw";
+      previewPhotoAdjust();
+      persistPhotoAdjust();
+    });
+
+    toggleRow.append(toggle, toggleText);
+    wrap.appendChild(toggleRow);
+
+    return wrap;
   }
 
   function makeSwatch(opts) {
@@ -623,7 +785,7 @@ export function createSettingsPanel(container) {
   function renderBgSection() {
     bgGroup
       .querySelectorAll(
-        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-upload-btn, .settings-bg-file-input",
+        ".settings-bg-sublabel-row, .settings-bg-combined-grid, .settings-bg-photo-grid, .settings-bg-photo-adjust, .settings-bg-upload-btn, .settings-bg-file-input",
       )
       .forEach((el) => el.remove());
 
@@ -785,6 +947,13 @@ export function createSettingsPanel(container) {
 
     bgGroup.appendChild(fileInput);
     bgGroup.appendChild(uploadBtn);
+
+    // ── Photo-only modifiers (transparency + blur), at the bottom of the
+    // Background section. Shown only while a photo/custom background is
+    // active; colors & gradients never carry these controls.
+    if (isPhotoBackground(currentBg.type)) {
+      bgGroup.appendChild(buildPhotoAdjust());
+    }
   }
 
   appearanceSection.appendChild(bgGroup);
@@ -827,6 +996,7 @@ export function createSettingsPanel(container) {
       "homepageUrl",
       "theme",
       "background",
+      "photoAdjust",
       "localSearch",
       "searchProvider",
     ])
@@ -836,6 +1006,7 @@ export function createSettingsPanel(container) {
       homepageUrl = saved.homepageUrl ?? "";
       currentTheme = saved.theme ?? "system";
       currentBg = saved.background ?? DEFAULT_BACKGROUND;
+      photoAdjust = { ...DEFAULT_PHOTO_ADJUST, ...(saved.photoAdjust ?? {}) };
       toggleCheckbox.checked = groupByDomain;
       if (currentBg.type === "custom") {
         const background = currentBg;

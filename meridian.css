@@ -25,6 +25,8 @@
   --transition: 150ms ease;
   --card-bg: rgba(255, 255, 255, 0.80);
   --card-blur: 3px;
+  /* Manual black/white photo-fade fallback (see --photo-fade-color): light. */
+  --photo-fade-bw: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,6 +42,7 @@
     --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
     --card-bg: rgba(44, 44, 46, 0.80);
     --card-blur: 8px;
+    --photo-fade-bw: #000000;
   }
 }
 
@@ -55,6 +58,7 @@ html[data-theme="dark"] {
   --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
   --card-bg: rgba(44, 44, 46, 0.80);
   --card-blur: 8px;
+  --photo-fade-bw: #000000;
 }
 
 body {
@@ -63,13 +67,45 @@ body {
     system-ui,
     -apple-system,
     sans-serif;
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* The base color lives on the root element (paint step 1, the canvas) so the
+   negative-z-index wallpaper pseudo-layers below paint ABOVE it; <body> is kept
+   transparent so its own background can't cover them. */
+html {
   background-color: var(--bg);
+}
+
+/* The wallpaper lives in two fixed pseudo-layers rather than directly on <body>
+   so the photo-only transparency/blur modifiers never touch the foreground UI.
+   ::before is the fade wash the photo dissolves toward (the sampled accent, or
+   a black/white fallback); ::after is the wallpaper image/gradient itself.
+   Photo modifiers are inert for colors/gradients: --photo-opacity stays 1 and
+   --photo-blur stays 0, so ::after fully covers the fade layer untouched. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+}
+
+body::before {
+  inset: 0;
+  z-index: -2;
+  background: var(--photo-fade-color, transparent);
+}
+
+body::after {
+  /* Grow the layer by the blur radius so blurred edges never reveal a gap. */
+  inset: calc(-2 * var(--photo-blur, 0px));
+  z-index: -1;
   background-image: var(--bg-image, none);
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  color: var(--text-primary);
-  min-height: 100vh;
+  opacity: var(--photo-opacity, 1);
+  filter: blur(var(--photo-blur, 0px));
 }
 
 html {
@@ -1366,7 +1402,7 @@ html {
   gap: 5px;
   padding: 9px 6px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   background: var(--bg);
   color: var(--text-secondary);
   font-size: 11px;
@@ -1415,7 +1451,7 @@ html {
   gap: 8px;
   padding: 12px 8px 10px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   background: var(--bg);
   color: var(--text-secondary);
   font-family: inherit;
@@ -1476,7 +1512,7 @@ html {
   gap: 6px;
   padding: 10px 4px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1px solid transparent;
   background: var(--bg);
   color: var(--text-secondary);
   font-family: inherit;
@@ -1610,7 +1646,7 @@ html {
 }
 
 .settings-bg-refresh:hover {
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: var(--surface-hover);
 }
 
 .settings-bg-upload-btn {
@@ -1638,7 +1674,7 @@ html {
 .settings-bg-upload-btn:hover:not(:disabled) {
   border-color: var(--accent);
   color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 6%, transparent);
+  background: var(--surface-hover);
 }
 
 .settings-bg-upload-btn.drag-over {
@@ -1666,4 +1702,58 @@ html {
 
 .settings-bg-file-input {
   display: none;
+}
+
+/* Photo-only modifiers, at the bottom of the Background section. Flush with
+   the rest of the section's swatch grids and dropzone — no box/indent, since
+   the "Transparency"/"Blur" labels already carry the sublabel styling that
+   ties them to this section. Only rendered while a photo/custom background
+   is active. */
+.settings-bg-photo-adjust {
+  margin-top: 12px;
+}
+
+.settings-slider-field {
+  margin-bottom: 14px;
+}
+
+.settings-slider-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.settings-slider-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.settings-slider-value {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.settings-slider::-webkit-slider-runnable-track {
+  border: none;
+}
+
+.settings-slider::-moz-range-track {
+  border: none;
+}
+
+.settings-bg-photo-adjust .settings-toggle-row {
+  padding: 6px 4px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
 }
