@@ -229,7 +229,7 @@ export function createSettingsPanel(container) {
   privacyStorage.textContent =
     "This data is stored locally in your Chrome profile. Meridian has no " +
     "server and never uploads it. Local Search controls which " +
-    "sources are searchable, and Refresh all thumbnails lets you " +
+    "sources are searchable, and Thumbnails lets you " +
     "regenerate them on demand.";
 
   const privacyOptional = document.createElement("p");
