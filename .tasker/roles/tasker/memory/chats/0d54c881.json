@@ -1,0 +1,11 @@
+{
+  "chatId": "0d54c881",
+  "title": "Debug chat session reconnection issue",
+  "summary": "**Summary:** User cannot reconnect to chat \"Release app to Chrome Web Store\" (id: `b33f33ec`). Reconnect button exists but does nothing. Root cause: the underlying privacy-doc prep task (`prep-privacy-md-for-publishing-at-emberstone-stu-dd8b`) was dispatched then trashed (`2026-08-06 12:43:24Z`) before completion, with no live agents currently running. That task was meant to adapt `PRIVACY.md` into `docs/privacy-meridian.md` for public publishing (strip internal Chrome Web Store disclosure section, adjust framing). A follow-up task, `owner-only-chrome-web-store-release-follow-ups-8398`, remains in backlog untouched. User clarified they're asking about the trashed task, not the chat itself. Next step: decide whether to restore and redispatch the stale trashed task or create a fresh one to produce the privacy doc.",
+  "agents": [
+    "tasker"
+  ],
+  "threadPath": ".tasker/chats/0d54c881",
+  "createdAt": "2026-08-06T20:25:09.021Z",
+  "updatedAt": "2026-08-06T20:32:29.551Z"
+}

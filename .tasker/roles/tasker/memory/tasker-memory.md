@@ -11,3 +11,4 @@
 - [224e1d5a] Set aurora.webp as default background (tasker, designer, 2026-07-28) → roles/tasker/memory/chats/224e1d5a.json
 - [6e97cbcf] Investigate p.settings-permission-status empty space (tasker, 2026-07-28) → roles/tasker/memory/chats/6e97cbcf.json
 - [b33f33ec] Release app to Chrome Web Store (tasker, 2026-08-06) → roles/tasker/memory/chats/b33f33ec.json
+- [0d54c881] Debug chat session reconnection issue (tasker, 2026-08-06) → roles/tasker/memory/chats/0d54c881.json
