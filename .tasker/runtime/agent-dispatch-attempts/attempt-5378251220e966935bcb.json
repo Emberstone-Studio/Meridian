@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "attemptId": "attempt-5378251220e966935bcb",
+  "status": "completed",
+  "spawnRequestedAt": "2026-08-06T14:58:55.390Z",
+  "updatedAt": "2026-08-06T15:07:45.155Z",
+  "taskId": "re-verify-candidate-hash-after-manifest-version-e85c",
+  "runId": "agent-re-verify-candidate-hash-after-manifest-version-e85c-9d7998c8638c",
+  "kind": "peer",
+  "roleSlug": "reviewer",
+  "resolvedDriver": "codex",
+  "requestedModel": "codex-gpt-5-6-sol",
+  "policyModel": "codex-gpt-5-6-sol",
+  "resolvedModel": "gpt-5.6-sol",
+  "failureStage": null,
+  "launcher": {
+    "type": "windows-supervisor",
+    "pid": 10164,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null
+  },
+  "agent": {
+    "pid": 11164,
+    "status": "exited",
+    "exitCode": 0,
+    "signal": null,
+    "error": null
+  },
+  "sessionHandshake": {
+    "status": "established",
+    "sessionId": "019fd795-a2b8-7272-a165-a4dea612ef63",
+    "waitingSince": "2026-08-06T14:58:55.575Z",
+    "establishedAt": "2026-08-06T14:59:01.381Z"
+  },
+  "stderrTail": "Reading additional input from stdin...\n2026-08-06T14:59:37.002982Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 1 seconds\nOutput:\nAt line:2 char:116\r\n+ ... $body = \"{\\\"task_id\\\":\\\"re-verify-candidate-hash-after-manifest-versi ...\r\n+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\nUnexpected token \r\n'task_id\\\":\\\"re-verify-candidate-hash-after-manifest-version-e85c\\\",\\\"kind\\\":\\\"plan\\\",\\\"plan\\\":[{\\\"label\\\":\\\"Confirm' \r\nin expression or statement.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : UnexpectedToken\r\n \r\n\n2026-08-06T14:59:37.115980Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 86 column 5\n2026-08-06T14:59:48.924034Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 86 column 5\n2026-08-06T15:00:01.467126Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 86 column 5\n2026-08-06T15:02:17.707433Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 4.3 seconds\nOutput:\n{\n  \"priorTreeHashReconstructed\": \"95886f471ae52e96f59bddba6e671dc2afa94daf76685357cef957709fb8d98c\",\n  \"candidateTreeHash\": \"e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e\",\n  \"extractedTreeHash\": \"e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e\",\n  \"candidateFileCount\": 53,\n  \"extractedFileCount\": 53,\n  \"matchedFileCount\": 53,\n  \"mismatchCount\": 0,\n  \"archiveName\": \"Meridian-1.2.0-069a7ea52b1640d69da3843ce1ffbc0e.zip\",\n  \"archiveSize\": 5569295,\n  \"archiveSha256\": \"f7c0b4be744550c6dfec12c1c17babfef613b022b5759521cf8a58f126ce788e\",\n  \"artifactRoot\": \"C:\\\\Users\\\\russp\\\\AppData\\\\Local\\\\Temp\\\\meridian-release-validation-807d7a49243a46228c0c7b8e79923c28\",\n  \"mismatches\": []\n}\n\n2026-08-06T15:02:39.122458Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 86 column 5\n2026-08-06T15:02:47.281957Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 86 column 5\n2026-08-06T15:03:09.152909Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 1.2 seconds\nOutput:\nForEach-Object : Method invocation failed because [System.IO.Path] does not contain a method named 'GetRelativePath'.\r\nAt line:5 char:70\r\n+ ... et-ChildItem -LiteralPath $rootPath -Recurse -File | ForEach-Object {\r\n+                                                          ~~~~~~~~~~~~~~~~\r\n    + CategoryInfo          : InvalidOperation: (:) [ForEach-Object], RuntimeException\r\n    + FullyQualifiedErrorId : MethodNotFound,Microsoft.PowerShell.Commands.ForEachObjectCommand\r\n \r\n\n2026-08-06T15:03:09.279874Z ERROR codex_models_manager::manager: failed to renew cache TTL: missing field `supports_reasoning_summaries` at line 86 column 5\n2026-08-06T15:03:58.803159Z ERROR codex_core::tools::router: error=Exit code: 1\nWall time: 1.6 seconds\nOutput:\n5674a8b Tasker dispatch baseline for re-verify-candidate-hash-after-manifest-version-e85c\nOLDER HASH RECORDS\r\n5674a8b Tasker dispatch baseline for re-verify-candidate-hash-after-manifest-version-e85c\r\nHASH SNIPPETS ACROSS HISTORY\r\nCOMMIT 5674a8bcd4d457ee97ebf479264e9695809ae114\r\n5674a8bcd4d457ee97ebf479264e9695809ae114:docs/release-validation.md:53:- Candidate directory tree SHA-256:\n5674a8bcd4d457ee97ebf479264e9695809ae114:docs/release-validation.md:60:- Extracted archive tree SHA-256:\n5674a8bcd4d457ee97ebf479264e9695809ae114:docs/release-validation.md:71:relative-path order. For each entry, the hasher receives the UTF-8 relative path,\n5674a8bcd4d457ee97ebf479264e9695809ae114:docs/release-validation.md:332:URL and re-extract the final archive to match candidate tree SHA-256\nCOMMIT f4e05ffab5b570cec5497246f1a962a50d0bbd07\r\nf4e05ffab5b570cec5497246f1a962a50d0bbd07:RELEASE_VALIDATION.md:37:- Candidate directory tree SHA-256:\nf4e05ffab5b570cec5497246f1a962a50d0bbd07:RELEASE_VALIDATION.md:43:- Extracted archive tree SHA-256:\nf4e05ffab5b570cec5497246f1a962a50d0bbd07:RELEASE_VALIDATION.md:49:relative-path order, appending the UTF-8 relative path, a NUL byte, the raw file\nf4e05ffab5b570cec5497246f1a962a50d0bbd07:RELEASE_VALIDATION.md:250:directory tree SHA-256 `5702e8ce…` above.\nCOMMIT d2809ae560f45a699683b2abd9477b53edbca26c\r\nd2809ae560f45a699683b2abd9477b53edbca26c:RELEASE_VALIDATION.md:29:- Candidate directory tree SHA-256:\nd2809ae560f45a699683b2abd9477b53edbca26c:RELEASE_VALIDATION.md:31:- Extracted archive tree SHA-256:\nCOMMIT 0e349ad63ceb823bdd731e1a1a9e7eb8574e7db0\r\n0e349ad63ceb823bdd731e1a1a9e7eb8574e7db0:RELEASE_VALIDATION.md:29:- Candidate directory tree SHA-256:\n0e349ad63ceb823bdd731e1a1a9e7eb8574e7db0:RELEASE_VALIDATION.md:31:- Extracted archive tree SHA-256:\nCOMMIT 204fb2f6a16724ebfcb1ac49c10bfe23dcc4febd\r\n204fb2f6a16724ebfcb1ac49c10bfe23dcc4febd:RELEASE_VALIDATION.md:29:- Candidate directory tree SHA-256:\n204fb2f6a16724ebfcb1ac49c10bfe23dcc4febd:RELEASE_VALIDATION.md:31:- Extracted archive tree SHA-256:\nCOMMIT 574830dcbdce80ff7f7621357cd6ccd4aa35e759\r\n574830dcbdce80ff7f7621357cd6ccd4aa35e759:RELEASE_VALIDATION.md:29:- Candidate directory tree SHA-256:\n574830dcbdce80ff7f7621357cd6ccd4aa35e759:RELEASE_VALIDATION.md:31:- Extracted archive tree SHA-256:\nCOMMIT 8af9acee2415a4dc561a2e3452d3eafeb523c815\r\nCOMMIT 57d107e8fa0f7a03a0a01381cd66721e92dcbfe8\r\n\n",
+  "transitions": [
+    {
+      "at": "2026-08-06T14:58:55.390Z",
+      "component": "dispatch",
+      "state": "created"
+    },
+    {
+      "at": "2026-08-06T14:58:55.495Z",
+      "component": "dispatch",
+      "state": "resolved"
+    },
+    {
+      "at": "2026-08-06T14:58:55.511Z",
+      "component": "launcher",
+      "state": "spawned",
+      "pid": 10164
+    },
+    {
+      "at": "2026-08-06T14:58:55.554Z",
+      "component": "launcher",
+      "state": "started",
+      "pid": 10164
+    },
+    {
+      "at": "2026-08-06T14:58:55.576Z",
+      "component": "agent",
+      "state": "spawned",
+      "pid": 11164
+    },
+    {
+      "at": "2026-08-06T14:58:55.579Z",
+      "component": "session_handshake",
+      "state": "waiting"
+    },
+    {
+      "at": "2026-08-06T14:59:01.382Z",
+      "component": "session_handshake",
+      "state": "established"
+    },
+    {
+      "at": "2026-08-06T15:07:45.139Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    },
+    {
+      "at": "2026-08-06T15:07:45.155Z",
+      "component": "agent",
+      "state": "exited",
+      "exitCode": 0,
+      "signal": null
+    }
+  ]
+}

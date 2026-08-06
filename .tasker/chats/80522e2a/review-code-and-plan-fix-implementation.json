@@ -504,5 +504,14 @@
   ],
   "sessionId": "4d35f81a-862a-46a2-b6fc-8b4468040dc2",
   "softSummary": "Task: bookmarks button + dropdown for top bar (`add-bookmarks-button-dropdown-panel-to-top-bar-082d`). Locked spec: round button in top bar; default view = flat Bookmarks Bar list; \"All Bookmarks\" toggle switches whole panel to the non-bar bookmarks; no in-panel search (main search already covers it); click-through uses existing new-tab-behavior setting (pinned mode → new tab, current-tab mode → navigate in place); favicons via local `_favicon` provider, not Google's service; `bookmarks` permission already in manifest.json (no collision with background-sync task's manifest edits).\n\nImplementation reviewed and found spec-compliant (`components/BookmarksButton.js`, `meridian.js`, `meridian.html`, `meridian.css`, build mirror in `meridian-extension/`). Four minor items flagged; user asked to fix items 1–3: scheme-aware navigation (chrome://, file:// now open via `chrome.tabs.create` in both modes), error handling around `getTree()` with new `renderMessage` fallback, and new tests (`tests/bookmarksButton.test.mjs`, suite now 12/12). Item 4 (a11y polish) deferred. Nothing committed yet; task still `in_review`.\n\nLatest request: change \"All Bookmarks\" view to show nested folder structure instead of flat list — not yet implemented, need to revise `BookmarksButton.js` rendering logic.",
-  "softSummaryAt": "2026-07-25T17:09:05.393Z"
+  "softSummaryAt": "2026-07-25T17:09:05.393Z",
+  "activeRole": "reviewer",
+  "sessionBindings": {
+    "reviewer": {
+      "sessionId": "4d35f81a-862a-46a2-b6fc-8b4468040dc2",
+      "cliSessionId": "4d35f81a-862a-46a2-b6fc-8b4468040dc2",
+      "connector": "claude",
+      "model": "claude-sonnet-5"
+    }
+  }
 }

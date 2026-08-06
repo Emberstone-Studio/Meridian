@@ -7422,5 +7422,14 @@
   ],
   "sessionId": "6183c680-329b-43e2-b579-927d0f6c2f17",
   "softSummary": "Session covers iterative visual/UX polish to Meridian's new-tab tiles, Settings panel, search bar, and workspace/group lane header, applied to root files with parallel edits mirrored into `meridian-extension/` (the running extension build) until scoping was corrected at session end. Main is now ahead of origin with commit `bb83e17` (12 source files, uncommitted `.tasker/` runtime left out).\n\nCompleted this session: settings scrollbar hidden via existing global pattern; search placeholder updated; \"Add a new group\" button removed; context menu suppresses tab lightbox; click-to-rename lane titles; inline-rename replacing `prompt` for \"Move to new group\"; clickable color dot for Chrome's 9 group colors; search-zone icons (magnifier/bookmarks/history/settings) made mutually exclusive with magnifier as \"off\" switch (deliberately left unlit when idle); \"Search <provider>\" result row restyled from native `<button>` chrome to plain `.result-row` styling; provider search now clears the search field via `searchBarApi.clearSearch()` on click, matching Enter-submit behavior.\n\nCorrection: user clarified `meridian-extension/` is the running extension, not a second source copy — no drift-checking needed. Reviewer task `review-entire-meridian-codebase-for-errors-184a` was corrected to scope **root source only** (`meridian.js`, `meridian.css`, `meridian.html`, `components/*`), read-only static review, no running/testing the extension, findings ranked by severity, no fixes.",
-  "softSummaryAt": "2026-07-25T22:43:34.896Z"
+  "softSummaryAt": "2026-07-25T22:43:34.896Z",
+  "activeRole": "designer",
+  "sessionBindings": {
+    "designer": {
+      "sessionId": "6183c680-329b-43e2-b579-927d0f6c2f17",
+      "cliSessionId": "6183c680-329b-43e2-b579-927d0f6c2f17",
+      "connector": "claude",
+      "model": "claude-opus-4-8"
+    }
+  }
 }

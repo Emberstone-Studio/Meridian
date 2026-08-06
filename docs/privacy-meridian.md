@@ -2,41 +2,34 @@
 
 Last updated: July 26, 2026
 
-This document describes the behavior of the Meridian source code in this
-repository. Meridian is a Chrome extension that runs in the user's browser. The
-repository does not contain a Meridian-operated backend, analytics SDK,
-advertising SDK, account system, or telemetry uploader. Chrome itself and the
-external services listed below may process requests according to their own
-settings and policies.
+Meridian is a Chrome extension that runs entirely in your browser. Meridian has
+no Meridian-operated backend, analytics SDK, advertising SDK, account system,
+or telemetry uploader. Chrome itself and the external services listed below
+may process requests according to their own settings and policies.
 
 ## Chrome Web Store Limited Use adherence
 
 Meridian's use of information received from Chrome APIs adheres to the
 [Chrome Web Store User Data Policy](https://developer.chrome.com/docs/webstore/program-policies/user-data-faq),
-including the Limited Use requirements. Specifically, for the source in this
-repository:
+including the Limited Use requirements:
 
 - Meridian accesses and processes tab data, page metadata, captured
   screenshots, and optional bookmarks/history **only to provide and improve the
   user-facing tab-management, local-search, personalization, and thumbnail
   features described below**, in response to user actions or automatic in-browser
   indexing.
-- Meridian **does not transfer this data to any Meridian-operated server**; the
-  repository contains no backend, account system, analytics SDK, advertising
-  SDK, or telemetry uploader. Data stays in the user's Chrome profile
-  (`chrome.storage.local`, `chrome.storage.sync`, and IndexedDB) except where the
-  user's own actions navigate the browser or contact the third-party services
-  listed under "Remaining network behavior."
+- Meridian **does not transfer this data to any Meridian-operated server**;
+  Meridian has no backend, account system, analytics SDK, advertising SDK, or
+  telemetry uploader. Data stays in your Chrome profile (`chrome.storage.local`,
+  `chrome.storage.sync`, and IndexedDB) except where your own actions navigate
+  the browser or contact the third-party services listed under "Remaining
+  network behavior."
 - Meridian **does not sell** user data, **does not use or transfer it for
   advertising, credit-scoring, or lending**, and **does not use it for purposes
   unrelated to the extension's single visible purpose**.
-- Meridian **does not allow humans to read** this data. No human at the
+- Meridian **does not allow humans to read** this data. No one at the
   publisher can read tab, metadata, screenshot, bookmark, or history data,
-  because none of it leaves the user's device to a publisher-controlled system.
-
-This statement describes the reviewed source only. The publisher must confirm
-the same guarantees hold for the exact archive uploaded to the Chrome Web Store
-and for the answers entered in the store dashboard.
+  because none of it leaves your device to a publisher-controlled system.
 
 ## Data the extension accesses
 
@@ -44,18 +37,16 @@ and for the answers entered in the store dashboard.
 | --- | --- | --- |
 | Open tabs and tab groups | Displays, searches, activates, closes, moves, groups, and restores tabs. This includes tab IDs, titles, URLs, domains, group membership, window IDs, and recent activation state. | A search index and workspace/UI state are stored in `chrome.storage.local`. |
 | Open-page metadata | After an open tab finishes loading, reads its meta description and H1/H2 heading text so local tab search can match page context beyond the title and URL. Meridian does not extract form input or other page-body text. Chrome blocks injection into privileged pages, which remain searchable by the tab data Chrome exposes. | Stored only in that tab's entry in the local search index in `chrome.storage.local`; refreshed after later page loads and removed when the tab closes or extension data is cleared. |
-| Bookmarks | After the user enables optional bookmark access, displays and searches bookmark titles, URLs, and folder names when the user opens or searches bookmark features. Disabled or ungranted access is not queried. | Results are used in memory; Meridian does not create a persistent copy of the bookmark tree. |
-| Browser history | After the user enables optional history access, searches history titles, URLs, and visit times when the user opens or searches history features. Disabled or ungranted access is not queried. | Results are used in memory; Meridian does not create a persistent history database. |
+| Bookmarks | After you enable optional bookmark access, displays and searches bookmark titles, URLs, and folder names when you open or search bookmark features. Disabled or ungranted access is not queried. | Results are used in memory; Meridian does not create a persistent copy of the bookmark tree. |
+| Browser history | After you enable optional history access, searches history titles, URLs, and visit times when you open or search history features. Disabled or ungranted access is not queried. | Results are used in memory; Meridian does not create a persistent history database. |
 | Screenshots/thumbnails | Captures the visible contents of active tabs after activation or page load, and during a user-requested full refresh. Automatic captures (after activation or page load) do not check the tab's URL first; Chrome's own `captureVisibleTab` API refuses privileged pages such as `chrome://`, the Chrome Web Store, and other extensions' pages, so those attempts fail and store nothing. A user-requested full refresh additionally skips `chrome://`, `chrome-extension://`, and `about:` tabs before switching to them, so it never focuses those tabs at all. Any other page — including one with sensitive content visible on screen — is captured the same way in both cases. | JPEG blobs are kept in IndexedDB in the extension's local origin; cache metadata and refresh markers are kept in `chrome.storage.local`. Older data-URL entries are migrated into IndexedDB. Storage targets roughly 200 entries and 50 MB, pruning the oldest thumbnails first when over target, but a thumbnail for a tab that is still open is never evicted to make room — actual usage can exceed the target while those tabs stay open. A display/decode error does not delete the stored blob. A tab's thumbnail is removed when that tab closes. |
-| Workspace and UI state | Stores custom workspace names and tab assignments, tab order, collapsed lanes/sidebar sections, the Meridian tab ID, the previous tab ID, and thumbnail cache metadata. | `chrome.storage.local` in the user's Chrome profile. |
-| Custom background image | Stores an image selected from the user's device. | IndexedDB in the extension's local origin. Older versions may have left a legacy copy in local extension storage or `localStorage`. |
-| Preferences | Stores theme, background selection, search provider, enabled local-search sources, new-tab behavior, optional homepage URL, and domain-grouping preference. | `chrome.storage.sync`. Chrome may sync these values through the user's signed-in Chrome profile, subject to the user's Chrome Sync settings. The uploaded custom image bytes and captured thumbnails are not placed in sync storage. |
+| Workspace and UI state | Stores custom workspace names and tab assignments, tab order, collapsed lanes/sidebar sections, the Meridian tab ID, the previous tab ID, and thumbnail cache metadata. | `chrome.storage.local` in your Chrome profile. |
+| Custom background image | Stores an image you select from your device. | IndexedDB in the extension's local origin. Older versions may have left a legacy copy in local extension storage or `localStorage`. |
+| Preferences | Stores theme, background selection, search provider, enabled local-search sources, new-tab behavior, optional homepage URL, and domain-grouping preference. | `chrome.storage.sync`. Chrome may sync these values through your signed-in Chrome profile, subject to your Chrome Sync settings — this means these preferences can travel to your other signed-in devices; it is not Meridian-operated syncing. The uploaded custom image bytes and captured thumbnails are not placed in sync storage. |
 
 Meridian uses the accessed data to provide its tab-management, search,
-personalization, and thumbnail features. Repository review found no code that
-sells this data, uses it for advertising, or uploads it to a
-Meridian-controlled service. This statement is limited to the reviewed source
-and is not a verification of any separately published build or store account.
+personalization, and thumbnail features. It does not sell this data, use it
+for advertising, or upload it to a Meridian-controlled service.
 
 ## Favicon handling
 
@@ -69,7 +60,7 @@ package instead of contacting a third-party fallback.
 ## Remaining network behavior
 
 Meridian does not make a background request to its own server, but its UI and
-user actions can contact external services:
+your actions can contact external services:
 
 - Search-provider icons are loaded from fixed icon URLs at Google,
   DuckDuckGo, Bing, and Brave. These fixed requests do not contain a visited
@@ -88,39 +79,38 @@ user actions can contact external services:
   normal browser navigation.
 - The Settings panel's Emberstone Studio footer shows two outbound links — the
   studio site (`https://emberstone-studio.com`) and a Ko-fi donation page
-  (`https://ko-fi.com/emberstonestudio`). Both are inert until the user
-  explicitly clicks one, which opens that destination in a new tab. Meridian
-  performs no background request for them and adds no click tracking or
-  analytics.
+  (`https://ko-fi.com/emberstonestudio`). Both are inert until you explicitly
+  click one, which opens that destination in a new tab. Meridian performs no
+  background request for them and adds no click tracking or analytics.
 - The code fetches the packaged Meridian SVG through
   `chrome.runtime.getURL`; that is an extension-local resource, not an Internet
   request.
 
-External requests above use HTTPS in the current source. The receiving service
-can observe normal request information such as the user's IP address and
-browser headers and applies its own privacy policy.
+External requests above use HTTPS. The receiving service can observe normal
+request information such as your IP address and browser headers and applies
+its own privacy policy.
 
 ## Permissions
 
-The manifests request these installed capabilities:
+Meridian requests these installed capabilities:
 
 - `tabs` and `tabGroups`: read tab titles and URLs and manage tabs and groups.
 - `storage` and `unlimitedStorage`: retain preferences, workspaces, search
   metadata, thumbnails, and custom backgrounds across local storage and
   IndexedDB. Thumbnail data can exceed the
   default storage quota, so `unlimitedStorage` lets the cache hold a useful
-  number of entries; code still targets roughly 200 entries / 50 MB and prunes
-  the oldest thumbnails first, but never evicts a still-open tab's thumbnail,
-  so usage can exceed that target while those tabs stay open.
+  number of entries; Meridian still targets roughly 200 entries / 50 MB and
+  prunes the oldest thumbnails first, but never evicts a still-open tab's
+  thumbnail, so usage can exceed that target while those tabs stay open.
 - `favicon`: use Chrome's packaged favicon provider.
 - `sidePanel`: provide the Meridian side-panel UI.
 - `scripting`: run the one-shot metadata extractor after an open tab finishes
-  loading. This remains installed because indexing happens automatically rather
+  loading. This is required because indexing happens automatically rather
   than from a user click; the extractor reads only the page's meta description
   and H1/H2 heading text.
 - `<all_urls>` host access: allow automatic visible-tab thumbnail capture after
   activation or page load, a user-requested full refresh, and the one-shot
-  metadata extractor after page load. This access remains installed because
+  metadata extractor after page load. This access is required because
   Chrome's click-scoped `activeTab` permission cannot authorize those automatic
   background actions. Automatic captures and the metadata extractor do not
   filter by URL in Meridian's code; privileged pages (`chrome://`,
@@ -130,8 +120,8 @@ The manifests request these installed capabilities:
   `chrome://`, `chrome-extension://`, and `about:` tabs in Meridian's own code
   before switching to them.
 
-`bookmarks` and `history` are optional permissions. Chrome prompts only when the
-user enables the matching Local Search setting or selects that search scope.
+`bookmarks` and `history` are optional permissions. Chrome prompts only when
+you enable the matching Local Search setting or select that search scope.
 Denial leaves the source off. Disabling the setting removes the grant, and
 revocation through Chrome also turns off the saved source and prevents further
 queries.
@@ -143,56 +133,14 @@ access failures and leaves the unavailable tab details or thumbnail empty.
 
 Most persistent data remains inside the extension's local or sync storage until
 it is replaced, evicted, manually cleared, or removed during extension or
-profile cleanup. Bookmark and history queries do not create a separate
-persistent copy. Closing a tab requests deletion of its cached thumbnail and
-tab-search entry, including extracted metadata. Users can also clear extension
-data through Chrome's site/extension data controls. Bookmark and history access
-can be removed from Meridian's Local Search settings or Chrome's extension
-controls.
+profile cleanup — it is not session data that deletes automatically. Bookmark
+and history queries do not create a separate persistent copy. Closing a tab
+requests deletion of its cached thumbnail and tab-search entry, including
+extracted metadata. You can also clear extension data through Chrome's
+site/extension data controls. Bookmark and history access can be removed from
+Meridian's Local Search settings or Chrome's extension controls.
 
-## Chrome Web Store disclosure checklist
-
-This checklist is intentionally not a claim that a Chrome Web Store submission
-has been reviewed or approved. The publisher should complete it against the
-exact release archive and the answers in the store dashboard.
-
-- [ ] Publish an accessible privacy-policy URL whose text matches the shipped
-      release and store listing.
-- [ ] Verify that the listing and in-product experience provide every prominent
-      disclosure and affirmative consent required for the release's data
-      handling; a privacy-policy link alone may not satisfy those requirements.
-- [ ] Disclose handling of browsing-history data, including open-tab,
-      bookmark, history, URL, title, and domain information.
-- [ ] Disclose handling of website content, including extracted metadata,
-      tab titles/URLs and captured visible-tab screenshots. The shipped
-      metadata extractor reads meta descriptions and H1/H2 heading text.
-- [ ] Evaluate and disclose user-activity data represented by tab activation,
-      previous-tab state, grouping, ordering, and workspace assignments.
-- [ ] Evaluate the uploaded custom background under the store's
-      user-provided-content categories.
-- [ ] Declare only the product-functionality and personalization purposes that
-      match the release, and independently confirm the store's limited-use,
-      sale, advertising, and human-access attestations.
-- [ ] Provide a current justification for every requested permission,
-      especially persistent `<all_urls>` and `scripting`, optional `history`
-      and `bookmarks`, visible-tab capture, and `unlimitedStorage`.
-- [ ] Verify that provider-icon and Picsum requests are reflected in the
-      disclosure and assess the current policies/terms of those services.
-- [ ] Perform a manual network audit of the packed release across the new-tab
-      page, side panel, settings, search, bookmark/history, missing-favicon,
-      and thumbnail-refresh flows.
-- [ ] Confirm that the release archive contains no unreviewed analytics,
-      telemetry, remote code, or other behavior absent from this repository
-      review.
-- [ ] Reconcile all store-form answers, data-use certifications, support
-      contact details, and retention/deletion statements with the publisher's
-      actual operational practices.
-
-Repository inspection alone cannot verify the Chrome Web Store dashboard,
-publisher practices, deployed policy URL, third-party policy changes, or that a
-published archive is byte-for-byte equivalent to this source.
-
-Publisher references:
+## References
 
 - [Chrome's Manifest V3 favicon endpoint](https://developer.chrome.com/docs/extensions/how-to/ui/favicons)
 - [Chrome Web Store program policies](https://developer.chrome.com/docs/webstore/program-policies/policies)

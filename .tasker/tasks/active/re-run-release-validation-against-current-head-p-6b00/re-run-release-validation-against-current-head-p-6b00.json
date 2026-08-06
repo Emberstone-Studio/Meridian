@@ -1,0 +1,73 @@
+{
+  "id": "re-run-release-validation-against-current-head-p-6b00",
+  "title": "Re-run release validation against current HEAD (post d2809ae changes)",
+  "description": "The last release validation (docs/release-validation.md) certified candidate commit d2809ae. Five more commits have since touched meridian-extension/ and are not covered by that \"Pass\" record:\n\n- d1ace2d Add Emberstone Studio footer, History quick-open, and popup sizing polish\n- 2d626f6 Trim redundant settings status text and sync scope chips with permissions\n- ee61850 Fix privacy disclosure copy to match Thumbnails control name\n- 55b9e0b Set aurora.webp as default background, add photo transparency/blur sliders\n- f4e05ff Wire in-product privacy link to the published policy, update release record\n\nPlus two small changes just made directly in this session (not yet committed):\n- components/SettingsPanel.js and meridian-extension/components/SettingsPanel.js: PRIVACY_POLICY_URL updated from \"https://emberstone-studio.com/docs/privacy/\" to \"https://emberstone-studio.com/docs/privacy/meridian\" (product-specific privacy page, replacing the generic one).\n- PRIVACY.md deleted; content moved/adapted to docs/privacy-meridian.md (public-facing version, stripped of the internal-only \"Chrome Web Store disclosure checklist\" section). RELEASE_VALIDATION.md moved to docs/release-validation.md, STORE_LISTING.md moved to docs/store-listing.md. Cross-references updated in README.md and between the docs.\n\nKnown pre-existing issue to investigate first: `node --test tests/asyncLatestWins.test.mjs` — \"sidebar bookmark and history controls switch the list scope\" fails (expected `[['bookmarks', true]]`, got `[]`). This reproduces on both the current tree AND the pre-d1ace2d baseline, so it is not caused by the recent commits or this session's doc/URL edits — but it must be fixed or explicitly triaged before this can be a clean \"Pass.\" Do not ship with an unexplained failing test.\n\nScope of work:\n1. Fix or triage the asyncLatestWins.test.mjs failure.\n2. Re-run the full automated release-check suite from docs/release-validation.md's \"Automated release checks\" section (node --test tests/*.test.mjs, node --check on all .js files, manifest JSON parsing, packagedParity test, git diff --check, git status --short) against current HEAD + the uncommitted doc/URL changes described above.\n3. Re-run the headed Chrome validation pass (or as much of it as feasible) covering the matrix in the existing docs/release-validation.md, paying particular attention to the NEW behavior since d2809ae: the Emberstone Studio footer, History quick-open, popup sizing, aurora.webp default background + transparency/blur sliders, and the in-product privacy policy link (should now open https://emberstone-studio.com/docs/privacy/meridian).\n4. Recompute the candidate directory tree SHA-256 for meridian-extension/ using the same method documented in docs/release-validation.md (SHA-256 over each file in case-sensitive relative-path order, appending UTF-8 relative path + NUL + raw bytes + NUL per entry).\n5. Rewrite docs/release-validation.md with the new candidate identity (new commit hash, new tree hash, new file count/list), a fresh Pass/Fail decision, and updated validation environment/date. Do not just patch the old hashes — regenerate the full record so it accurately reflects what was actually tested this run.\n6. Flag anything that should bump the manifest version (currently 1.1.0) given the scope of change — recommend but do not unilaterally change the version number without calling it out clearly in the report.\n\nOutput: updated docs/release-validation.md, plus a summary of what changed since the last validation, what was fixed, and current Pass/Fail status.",
+  "status": "in_review",
+  "priority": "high",
+  "label": "Release",
+  "agent_id": "reviewer",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-06T13:19:37.857Z",
+  "updated_at": "2026-08-06T13:41:07.847Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-06T13:19:37.857Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-06T13:19:37.857Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25",
+        "task_id": null
+      },
+      "task_id": "re-run-release-validation-against-current-head-p-6b00",
+      "content": "controller chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-06T13:19:44.046Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-06T13:19:46.947Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25",
+        "task_id": null
+      },
+      "task_id": "re-run-release-validation-against-current-head-p-6b00",
+      "content": "controller chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-06T13:41:07.843Z",
+      "type": "output",
+      "content": "# Release validation complete\n\n**Status: Pass.**\n\nUpdated `docs/release-validation.md` with a fully regenerated release record for candidate commit `970421f7eaf3a319e4696c23ac5714535617e6cc`.\n\n## Fix\n\nThe failing `asyncLatestWins.test.mjs` assertion was stale after `2d626f6` changed sidebar scope chips into pure filters. The test now correctly verifies that Bookmarks and History chip clicks do not request optional permissions. Isolated result: 5 passed, 0 failed.\n\n## Automated validation\n\n- Full Node suite: 131 passed, 0 failed, 0 skipped.\n- JavaScript syntax: 56 files checked, 0 failures.\n- Both manifests parse as version 1.1.0 / manifest_version 3.\n- Source/package parity: 35 pairs matched.\n- `git diff --check`: clean.\n- Final worktree changes are limited to `docs/release-validation.md` and `tests/asyncLatestWins.test.mjs`; `meridian-extension/` is unchanged.\n\n## Headed Chrome validation\n\nGoogle Chrome 151.0.7922.76 loaded the unpacked candidate in a fresh profile. The run verified:\n\n- New Tab override and live service worker.\n- Aurora default background.\n- Transparency/blur live preview and sync-storage persistence.\n- Emberstone Studio footer and safe outbound links.\n- Privacy link opens exactly `https://emberstone-studio.com/docs/privacy/meridian`.\n- History quick-open production component dispatches `chrome://history/`.\n- Viewport-capped popup sizing.\n- Search grouping, keyboard selection, Escape behavior, and Settings/search race.\n- Side-panel rendering and disabled-source chip visibility.\n- Thumbnail refresh response `{done:true}`.\n- Zero page/side-panel runtime exceptions, console errors, or log errors.\n\n## Candidate identity\n\n- Files: 53.\n- Candidate tree SHA-256: `0046de021282d5ce5382116c351d82854e2a8caa4f6620d13bfbd3460306af78`.\n- Extracted archive tree SHA-256: same.\n- Archive parity: 53 matched, 0 mismatches.\n- Archive SHA-256: `0b68d0e6d3ca9c49904880496b922ebee19e48a0a3c6655fdc12d0f69fd12c74`.\n\n## Version guidance\n\nRecommend bumping the manifest to **1.2.0** because the post-validation changes add multiple visible features. If 1.1.0 has already been uploaded or published, a higher version is mandatory. No manifest version was changed in this task; any version edit requires rerunning package identity and parity checks.",
+      "attachment": "active/re-run-release-validation-against-current-head-p-6b00/re-run-release-validation-against-current-head-pos.md",
+      "agent_run_id": "agent-re-run-release-validation-against-current-head-p-6b00-824a247cfd0e"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-06T13:19:42.684Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-a01a76ad164dfaec6112",
+  "agent_startup_started_at": "2026-08-06T13:19:43.825Z",
+  "role_docs": [
+    {
+      "role_slug": "reviewer",
+      "doc_path": "roles/reviewer/memory/tasks/re-run-release-validation-against-current-head-p-6b00.md",
+      "direction": "self",
+      "at": "2026-08-06T13:41:07.843Z"
+    }
+  ]
+}

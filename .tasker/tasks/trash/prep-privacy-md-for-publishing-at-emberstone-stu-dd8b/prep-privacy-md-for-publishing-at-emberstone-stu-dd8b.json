@@ -1,0 +1,87 @@
+{
+  "id": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+  "title": "Prep PRIVACY.md for publishing at emberstone-studio.com/docs/privacy/meridian",
+  "description": "PRIVACY.md already contains complete, Meridian-specific privacy content — Limited Use adherence, a full per-data-type table (tabs, page metadata, bookmarks, history, screenshots, workspace state, background image, preferences incl. the Chrome Sync caveat), favicon handling, remaining network behavior, permissions, accurate retention/deletion language, and a disclosure checklist. Do NOT write new privacy content from scratch — that would be redundant and risks drifting from the reconciled source of truth.\n\nThe only real gap: PRIVACY.md needs to go from \"repository doc\" to \"publishable page\" at https://emberstone-studio.com/docs/privacy/meridian.\n\nTask: produce a publish-ready version of PRIVACY.md as `docs/privacy-meridian.md`:\n1. Keep all substantive disclosures verbatim/near-verbatim — do not alter facts, permission justifications, or retention claims.\n2. Remove or clearly separate the \"Chrome Web Store disclosure checklist\" section (near the end, starting \"## Chrome Web Store disclosure checklist\") — that's an internal to-do list for the publisher, not end-user-facing privacy content, and shouldn't ship on the public page as-is. Either cut it or move it to a clearly-marked internal/appendix note that won't be pasted onto the live site.\n3. Adjust framing/intro lines that reference \"this repository\" / \"the reviewed source\" to read naturally as a standalone public policy page (still accurate — don't overclaim beyond what's verified).\n4. Keep the \"Publisher references\" section (external links) if useful for end users, or trim if too internal — use judgment.\n\nOutput: `docs/privacy-meridian.md`, ready for the user to copy/paste or convert to publish at the target URL. Do not attempt to publish it — that step is owner-only, outside this repo.",
+  "status": "ready",
+  "priority": "high",
+  "label": "Release",
+  "agent_id": "writer",
+  "trashed": true,
+  "trashed_at": "2026-08-06T12:43:24.839Z",
+  "created_at": "2026-08-06T12:42:31.750Z",
+  "updated_at": "2026-08-06T12:43:24.839Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-06T12:42:31.750Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-06T12:42:31.750Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25",
+        "task_id": null
+      },
+      "task_id": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+      "content": "controller chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-06T12:42:38.650Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-06T12:42:41.621Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25",
+        "task_id": null
+      },
+      "task_id": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+      "content": "controller chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-06T12:43:04.661Z",
+      "type": "moved",
+      "content": "Stopped by user — agent process tree killed; task returned to Ready"
+    },
+    {
+      "timestamp": "2026-08-06T12:43:17.740Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_stop",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25",
+        "task_id": null
+      },
+      "task_id": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+      "content": "controller chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25 called mcp__tasker__agent_stop"
+    },
+    {
+      "timestamp": "2026-08-06T12:43:24.839Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_trash",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25",
+        "task_id": null
+      },
+      "task_id": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+      "content": "controller chat-91170ef84ec00fe89e84a07520cc1f06-c7a7bc25 called mcp__tasker__task_trash"
+    }
+  ],
+  "routing": {
+    "chosen_model": null,
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-06T12:42:37.430Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-4decc42b44deb39c6981",
+  "agent_startup_started_at": "2026-08-06T12:42:38.620Z"
+}

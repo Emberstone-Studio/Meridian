@@ -1,0 +1,11 @@
+{
+  "chatId": "1cff25dd",
+  "title": "Make Chrome window background transparent",
+  "summary": "Meridian is a Manifest V3 Chrome extension overriding the new-tab page (`meridian.html`/`meridian.js`/`meridian.css`) and shipping a side panel (`components/sidebar.html`). User asked whether Meridian's background window could be made desktop-transparent (initially confused with a separate project, Tasker, a VS Code extension — clarified early). Established: true OS-level transparency isn't possible for either Tasker (webview inside VS Code's Electron window, no BrowserWindow control) or Meridian (Chrome page content can't punch through the browser compositor to the desktop). For Meridian, explained the existing in-page \"glass\" effect already implemented in `meridian.css` (lines 7-108, 531-533): layered wallpaper (`body::after`) + fade-wash (`body::before`) + `backdrop-filter: blur()` on card surfaces (`--card-bg`/`--card-blur`, light 3px/0.80 opacity, dark 8px/0.80 opacity). Discussed reading real OS wallpaper (no cross-platform API exists; would need native messaging host — overkill). Resolved: no new feature needed — Meridian's existing custom wallpaper upload path already serves as the \"mimic desktop\" mechanism, manually driven rather than auto-synced. No code changes made; purely explanatory conversation.",
+  "agents": [
+    "designer"
+  ],
+  "threadPath": ".tasker/chats/1cff25dd",
+  "createdAt": "2026-08-01T19:57:22.740Z",
+  "updatedAt": "2026-08-01T20:08:04.755Z"
+}

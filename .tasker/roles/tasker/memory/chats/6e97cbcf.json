@@ -1,0 +1,11 @@
+{
+  "chatId": "6e97cbcf",
+  "title": "Investigate p.settings-permission-status empty space",
+  "summary": "Working on the Meridian browser extension (root files plus a synced `meridian-extension/` mirror). Investigated `p.settings-permission-status` in `SettingsPanel.js` (line ~427) — an empty `<p>` reserving `min-height: 16px` via `meridian.css` (~line 1071) even when no message was set. Traced its `textContent` logic (lines ~444-467) to a single branch covering enable-success, enable-denied, and disable cases; determined only the `denied`/error case is meaningful (denial comes from Chrome's optional-permissions prompt being declined, throwing outside a user gesture, or enterprise policy blocking it). User decided: only set text on denial/error, and collapse the paragraph via CSS `:empty { display: none }` instead of reserving space.\n\nAlso fixed: search-bar bookmarks/history scope chips didn't respect Settings toggles — clicking a hidden-should-be chip silently re-enabled the permission checkbox. Added `syncScopeButtons()` in `meridian.js` and `components/sidebar.js` to hide chips for disabled sources (via `settings-changed` event / `chrome.storage.onChanged`), fall back active scope to `all` if hidden, and removed chip click handlers' now-unused `setLocalSearchSourceEnabled` calls/imports.\n\nAll changes applied to both `components/SettingsPanel.js`/`sidebar.js`/`meridian.js`/`meridian.css` and the `meridian-extension/` mirror, kept in sync. Syntax sanity-checked. Next: manual verification in browser (toggling settings, checking chip visibility/behavior) not yet done.",
+  "agents": [
+    "tasker"
+  ],
+  "threadPath": ".tasker/chats/6e97cbcf",
+  "createdAt": "2026-07-28T21:01:42.128Z",
+  "updatedAt": "2026-07-28T21:21:39.511Z"
+}

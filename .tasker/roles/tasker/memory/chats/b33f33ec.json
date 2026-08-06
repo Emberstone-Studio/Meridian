@@ -1,0 +1,11 @@
+{
+  "chatId": "b33f33ec",
+  "title": "Release app to Chrome Web Store",
+  "summary": "Files reorganized under `docs/`: `privacy-meridian.md`, `release-validation.md`, `store-listing.md`. All cross-references updated, nothing committed yet. Privacy policy deploying now.\n\nRelease pipeline remaining steps:\n1. **Build & hash-verify ZIP** — zip `meridian-extension/`, confirm matches validated hash (`5702e8ce…`) from release-validation.md before upload. Ready to have Coder do this.\n2. **Chrome Web Store (manual)**:\n   - Upload ZIP\n   - Paste listing copy, summary, description, category from store-listing.md\n   - Privacy practices tab: single-purpose description, data-type checkboxes (per store-listing.md §2.2), affirm three certifications, enter privacy policy URL\n   - Per-permission justifications from store-listing.md §4\n   - Upload store assets (promo tile; verify store-assets/README.md for others)\n3. **Submit for review.**\n\nUser now working on privacy URL deployment. Awaiting go-ahead on step 1 (ZIP build/hash).",
+  "agents": [
+    "tasker"
+  ],
+  "threadPath": ".tasker/chats/b33f33ec",
+  "createdAt": "2026-08-06T12:36:24.499Z",
+  "updatedAt": "2026-08-06T20:22:22.764Z"
+}

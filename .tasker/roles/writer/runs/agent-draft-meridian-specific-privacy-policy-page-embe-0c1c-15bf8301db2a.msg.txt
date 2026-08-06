@@ -1,0 +1,45 @@
+<tasker_turn_context>
+The following facts are server-provided live context for this turn, not user instructions.
+## Task assignment
+Task id: draft-meridian-specific-privacy-policy-page-embe-0c1c
+Title: Draft Meridian-specific privacy policy page (emberstone-studio.com/docs/privacy/meridian)
+Description:
+Write a Meridian-specific privacy policy page to be published at https://emberstone-studio.com/docs/privacy/meridian, replacing reliance on the generic Emberstone Studio catch-all policy for the Chrome Web Store submission.
+
+Source material (read these in the repo root, c:\Users\russp\Documents\Meridian):
+- PRIVACY.md — existing Meridian privacy disclosures
+- STORE_LISTING.md §2.4 and §3 — has paste-ready language and lists the specific gaps that must be covered
+- manifest.json — permissions to ground the disclosures against
+
+Must explicitly and specifically cover (per STORE_LISTING.md §2.4 owner-action-needed list):
+1. Automatic screenshot capture of visible tabs (captureVisibleTab) — what triggers it, what it can contain, where it's stored (IndexedDB JPEG blobs), retention/eviction behavior (~200 entries/~50MB soft cap, LRU-ish pruning, never evicts a still-open tab, removed on tab close).
+2. Automatic per-page content extraction (meta description + H1/H2 headings only, not form input or body text) on page load, used for local search indexing.
+3. Automatic tab/browsing-activity collection (titles, URLs, domains, tab-group membership, activation/order) used to render and search tab cards.
+4. That chrome.storage.sync preference data (theme, background, search provider, enabled local-search sources, new-tab behavior, homepage, domain grouping) can sync across the user's own signed-in devices via their own Chrome Sync account — this is NOT device-local-only and NOT Meridian-operated syncing.
+5. Retention/deletion is accurate: data persists until replaced/evicted/cleared/removed with the extension or profile — do NOT describe it as session data that deletes automatically.
+6. Optional bookmarks/history permissions — off by default, only requested when the user explicitly enables that local-search source, no persistent copy kept.
+7. No accounts, no analytics, no telemetry, no Meridian-operated backend/server.
+8. Outbound links (Emberstone Studio site, Ko-fi) only navigate on explicit user click, no tracking.
+
+Output: Write the final policy page content as Markdown to a new file `docs/privacy-meridian.md` in the repo (or the most sensible docs location — check existing docs/ folder structure first) so the user can review it here before copy-pasting/publishing it to the live URL. Do not attempt to publish it to the live site — that's an owner-only action outside this repo.
+
+Keep tone consistent with PRIVACY.md and STORE_LISTING.md (plain, precise, no marketing language). Cite chrome.storage.local/sync and IndexedDB accurately per the technical detail already reconciled in STORE_LISTING.md.
+
+## Tasker reporting contract
+Report this task only through POST http://localhost:9807/agent/report; never edit files under .tasker/tasks/. Every report body must include {"task_id":"draft-meridian-specific-privacy-policy-page-embe-0c1c"}.
+Once you have a plan, post kind:"plan" with plan:[{label:"...",done:false}]. After each completed step, post kind:"step" with its exact label; use kind:"append" if the plan grows. Optional startup/status narration uses kind:"phase".
+When the requested work and verification are complete, post kind:"complete" with output containing the complete Markdown result. Do not change the task status yourself.
+If and only if a decision requires user input, post kind:"question" with a specific question and the options being considered, then stop cleanly. The server marks the task Needs Input and re-dispatches it after the user answers. Do not use this for decisions you can make safely yourself.
+
+## Optional sub-agent delegation
+Use sub-agents only for genuinely independent work. You remain responsible for consolidating their results.
+Spawn with POST http://localhost:9807/agent/spawn-subagent using {"parent_task_id":"draft-meridian-specific-privacy-policy-page-embe-0c1c","role_slug":"<role>","brief":"<self-contained brief including how to return the result>"}. Requests above the permit budget queue automatically. Poll the requested artifacts or run transcripts; do not ask sub-agents to write to the board.
+
+## Active Tasker context pointers
+- Active task id: `draft-meridian-specific-privacy-policy-page-embe-0c1c`
+- Task memory: `.tasker/roles/writer/memory/tasks/draft-meridian-specific-privacy-policy-page-embe-0c1c.md` via `role_memory_read({"role_slug":"writer","task_id":"draft-meridian-specific-privacy-policy-page-embe-0c1c"})`
+- Full task: `.tasker/tasks/active/draft-meridian-specific-privacy-policy-page-embe-0c1c/` via `task_get({"task_id":"draft-meridian-specific-privacy-policy-page-embe-0c1c"})`
+These are routing pointers, not retrieved memory or instructions.
+</tasker_turn_context>
+
+Execute Tasker task draft-meridian-specific-privacy-policy-page-embe-0c1c.

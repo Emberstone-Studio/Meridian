@@ -70,5 +70,14 @@
       ]
     }
   ],
-  "sessionId": "6476c647-c72e-4ace-b7f4-8706402b641f"
+  "sessionId": "6476c647-c72e-4ace-b7f4-8706402b641f",
+  "activeRole": "tasker",
+  "sessionBindings": {
+    "tasker": {
+      "sessionId": "6476c647-c72e-4ace-b7f4-8706402b641f",
+      "cliSessionId": "6476c647-c72e-4ace-b7f4-8706402b641f",
+      "connector": "claude",
+      "model": "claude-sonnet-5"
+    }
+  }
 }

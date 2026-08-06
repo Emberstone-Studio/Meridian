@@ -140,6 +140,38 @@
       "finalCommit": "60360b62c7043e5f5bf035123440a176bc53fdb2",
       "preserveReason": "Task agent exited without a completion report.",
       "snapshotError": null
+    },
+    "fe77a8e2f1d64fca": {
+      "id": "fe77a8e2f1d64fca",
+      "taskId": "draft-meridian-specific-privacy-policy-page-embe-0c1c",
+      "root": "C:\\Users\\russp\\Documents\\Meridian",
+      "path": "C:\\Users\\russp\\AppData\\Local\\Temp\\tasker-task-worktrees\\2b13ff41ffe7\\draft-meridian-specific-privacy-policy-page-embe-fe77a8e2f1d64fca",
+      "isolated": true,
+      "branch": "tasker/task/draft-meridian-specific-privacy-policy-page-embe-fe77a8e2f1d64fca",
+      "baseCommit": "c3b80b32a5fceb2260f8c884abe35e66d30ea0af",
+      "state": "preserved",
+      "createdAt": "2026-08-06T12:39:53.185Z",
+      "updatedAt": "2026-08-06T12:41:41.208Z",
+      "completionReport": null,
+      "finalCommit": "a713a375f008eea5a97f32b0acb64a8bdcf70148",
+      "preserveReason": "Task agent exited without a completion report.",
+      "snapshotError": null
+    },
+    "4f267b64e3b1977f": {
+      "id": "4f267b64e3b1977f",
+      "taskId": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+      "root": "C:\\Users\\russp\\Documents\\Meridian",
+      "path": "C:\\Users\\russp\\AppData\\Local\\Temp\\tasker-task-worktrees\\2b13ff41ffe7\\prep-privacy-md-for-publishing-at-emberstone-stu-4f267b64e3b1977f",
+      "isolated": true,
+      "branch": "tasker/task/prep-privacy-md-for-publishing-at-emberstone-stu-4f267b64e3b1977f",
+      "baseCommit": "b7fc6d771301fc9639fa8cb237186de39724e753",
+      "state": "preserved",
+      "createdAt": "2026-08-06T12:42:38.615Z",
+      "updatedAt": "2026-08-06T12:43:07.849Z",
+      "completionReport": null,
+      "finalCommit": "b7fc6d771301fc9639fa8cb237186de39724e753",
+      "preserveReason": "Task agent exited without a completion report.",
+      "snapshotError": null
     }
   }
 }

@@ -1767,5 +1767,14 @@
   ],
   "sessionId": "8867a9cd-41dd-4dc6-a1e0-f3dcddd16367",
   "softSummary": "Settings modal cleanup completed across mirrored file pairs (`components/SettingsPanel.js`/`meridian-extension/components/SettingsPanel.js`, `meridian.css`/`meridian-extension/meridian.css`).\n\nFinal state: after a hover-color detour where the assistant mistakenly normalized only newly-touched controls to an accent tint via a new `--accent-hover` token, the user corrected this — all Settings modal hover surfaces (toggle rows, action button, theme buttons, behavior cards, provider cards, Refresh, Custom Image dropzone) now use `var(--surface-hover)`, matching main-page buttons; `--accent-hover` token fully removed. Base border on `.settings-theme-btn`, `.settings-behavior-card`, `.settings-provider-card` changed to `1px solid transparent` (invisible but reserves space, avoiding layout shift on `.selected` accent border). Privacy & Data copy: both \"below\" references removed; sentence now reads \"...and Refresh all thumbnails lets you regenerate them on demand.\" The actual \"Thumbnails\" section heading was mistakenly renamed to \"Refresh all thumbnails\" then correctly reverted back to \"Thumbnails\" — only the copy paragraph changed, not the heading. All changes confirmed byte-identical between root and extension copies. Awaiting next instruction.",
-  "softSummaryAt": "2026-07-28T20:25:03.380Z"
+  "softSummaryAt": "2026-07-28T20:25:03.380Z",
+  "activeRole": "designer",
+  "sessionBindings": {
+    "designer": {
+      "sessionId": "8867a9cd-41dd-4dc6-a1e0-f3dcddd16367",
+      "cliSessionId": "8867a9cd-41dd-4dc6-a1e0-f3dcddd16367",
+      "connector": "claude",
+      "model": "claude-claude-sonnet-5"
+    }
+  }
 }

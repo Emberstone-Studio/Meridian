@@ -299,13 +299,13 @@ test("sidebar bookmark and history controls switch the list scope", async () => 
 
   await bookmarkButton.listeners.click();
   assert.equal(input.placeholder, "Search bookmarks");
-  assert.deepEqual(requestedPermissions, [["bookmarks", true]]);
+  assert.deepEqual(requestedPermissions, []);
   assert.deepEqual(searchedScopes, []);
   assert.deepEqual(treeRenders, ["Bookmarks Bar"]);
 
   await historyButton.listeners.click();
   assert.equal(input.placeholder, "Search history");
-  assert.deepEqual(requestedPermissions.at(-1), ["history", true]);
+  assert.deepEqual(requestedPermissions, []);
   assert.deepEqual(searchedScopes, []);
   assert.deepEqual(historyLoads, [""]);
   assert.deepEqual(renderedSections, ["History"]);

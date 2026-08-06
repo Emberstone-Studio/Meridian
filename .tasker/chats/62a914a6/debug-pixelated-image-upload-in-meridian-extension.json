@@ -1874,5 +1874,14 @@
   ],
   "sessionId": "3c0a2278-ae0c-469b-adf9-6ab0ac187efb",
   "softSummary": "The Meridian browser extension review (branch `review/security-correctness-fixes`) reached `main`: the \"pixelated custom background\" fix went through several iterations before landing correctly. Final working solution: raw file bytes stored in IndexedDB (`utils/customBackground.js`, new), rendered via `URL.createObjectURL(blob)` for `--bg-image` CSS, avoiding base64 data-URL inflation that had caused an 18MB upload to fail silently (previously via `localStorage`'s ~5MB cap, then via an oversized inline `data:` URL that Chrome wouldn't apply). Committed as `9ba2852` (5 files, +230/−109), verified by user in-browser. User then asked to commit `.tasker/` and merge to `main`. Complication: local `main` was stale (`76eaa90`) vs `origin/main`'s merged commit `e61bc78`; a live Tasker server was continuously rewriting tracked `.tasker/` files, causing a `git checkout main` to abort mid-command. Resolved by stashing `.tasker/` changes, force-moving `main` to `e61bc78` (identical to current branch, so switch was a no-op), and popping the stash — no real conflicts (verified via `git diff --check` and `--diff-filter=U`, one flagged \"conflict marker\" was a false positive from chat-transcript JSON content). Final state: on `main`, up to date with `origin/main`, live `.tasker/` working-tree state preserved, `meridian-extension/` build dir still untracked. Flagged two open follow-ups for the user: (1) future branch switches may keep hitting the live-server race, same workaround applies; (2) offered to `.gitignore`/`git rm --cached` volatile `.tasker/runtime/` and `roles/*/runs/` paths to stop constant churn — awaiting user decision.",
-  "softSummaryAt": "2026-07-25T05:58:13.872Z"
+  "softSummaryAt": "2026-07-25T05:58:13.872Z",
+  "activeRole": "reviewer",
+  "sessionBindings": {
+    "reviewer": {
+      "sessionId": "3c0a2278-ae0c-469b-adf9-6ab0ac187efb",
+      "cliSessionId": "3c0a2278-ae0c-469b-adf9-6ab0ac187efb",
+      "connector": "claude",
+      "model": "claude-opus-4-8"
+    }
+  }
 }

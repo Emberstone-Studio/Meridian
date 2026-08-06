@@ -1326,5 +1326,14 @@
   ],
   "sessionId": "019f9f7d-7330-75d3-abfe-a7343ad90180",
   "softSummary": "Meridian extension release-readiness review concluded with 3 tasks approved (capture-race fix, stale-index cleanup, promo tile), 3 sent back (lazy-refresh investigation, privacy policy/disclosures, CI checks), 2 held pending (in-product notice, final validation) — board now 25 Done, 3 Ready, 2 In Review. User requested a run order: (1) lazy-refresh investigation, (2) privacy policy/disclosures, (3) CI checks, then publish PRIVACY.md, approve in-product notice, bump version/build final ZIP, and rerun final Chrome validation last. User then asked to move the in-product privacy disclosure from top of Settings to a bottom expandable section; agent first only updated task requirements (not code), user pushed back that the actual running extension hadn't changed, and agent corrected course — actually editing both source and `meridian-extension/` so Privacy & Data now sits at the bottom of Settings, collapsed by default, expandable via accessible control. All 113 tests pass; user must reload the extension in Chrome and refresh the Meridian tab. User just asked \"How did the tasks go?\" — awaiting agent's status check on the 3 Ready tasks' execution.",
-  "softSummaryAt": "2026-07-27T00:13:53.136Z"
+  "softSummaryAt": "2026-07-27T00:13:53.136Z",
+  "activeRole": "reviewer",
+  "sessionBindings": {
+    "reviewer": {
+      "sessionId": "019f9f7d-7330-75d3-abfe-a7343ad90180",
+      "cliSessionId": "019f9f7d-7330-75d3-abfe-a7343ad90180",
+      "connector": "codex",
+      "model": "codex-gpt-5-6-sol"
+    }
+  }
 }

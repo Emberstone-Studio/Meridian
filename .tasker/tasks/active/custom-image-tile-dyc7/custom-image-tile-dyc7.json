@@ -6,7 +6,7 @@
   "priority": "medium",
   "status": "done",
   "created_at": "2026-07-28T22:11:23.765Z",
-  "updated_at": "2026-07-28T22:29:52.025Z",
+  "updated_at": "2026-07-28T22:34:25.732Z",
   "tokens_used": null,
   "activity": [
     {
@@ -39,9 +39,8 @@
   "label": "Maintenance",
   "trashed": false,
   "routing": {
-    "chosen_model": null,
-    "rationale": "Direct Run Now dispatch to assigned role",
-    "decided_by": "run-now",
+    "rationale": "Free execution inherits Tasker's model (claude-claude-sonnet-5)",
+    "decided_by": "free-execution-driver",
     "decided_at": "2026-07-28T22:16:43.621Z",
     "auto_router_mode": null
   },

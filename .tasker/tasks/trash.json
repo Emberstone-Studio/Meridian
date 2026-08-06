@@ -1,4 +1,27 @@
 {
   "version": 3,
-  "tasks": []
+  "tasks": [
+    {
+      "id": "draft-meridian-specific-privacy-policy-page-embe-0c1c",
+      "title": "Draft Meridian-specific privacy policy page (emberstone-studio.com/docs/privacy/meridian)",
+      "status": "ready",
+      "trashed": true,
+      "trashed_at": "2026-08-06T12:42:08.539Z",
+      "priority": "high",
+      "agent_id": "writer",
+      "updated_at": "2026-08-06T12:42:00.094Z",
+      "file": "trash/draft-meridian-specific-privacy-policy-page-embe-0c1c/draft-meridian-specific-privacy-policy-page-embe-0c1c.json"
+    },
+    {
+      "id": "prep-privacy-md-for-publishing-at-emberstone-stu-dd8b",
+      "title": "Prep PRIVACY.md for publishing at emberstone-studio.com/docs/privacy/meridian",
+      "status": "ready",
+      "trashed": true,
+      "trashed_at": "2026-08-06T12:43:24.839Z",
+      "priority": "high",
+      "agent_id": "writer",
+      "updated_at": "2026-08-06T12:43:24.839Z",
+      "file": "trash/prep-privacy-md-for-publishing-at-emberstone-stu-dd8b/prep-privacy-md-for-publishing-at-emberstone-stu-dd8b.json"
+    }
+  ]
 }

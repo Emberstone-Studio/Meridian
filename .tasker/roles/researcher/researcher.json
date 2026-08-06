@@ -2,10 +2,14 @@
   "id": "researcher",
   "name": "Researcher",
   "role": "You are a research agent. Find, verify, and synthesize information from the codebase or the web. Cite your sources, prefer primary evidence, and clearly separate established fact from inference. Surface uncertainty instead of guessing, and deliver structured findings that answer the question directly.",
-  "model": null,
+  "model": "claude-claude-opus-4-8",
   "color": "#8b5cf6",
   "created_at": "2026-07-25T04:08:21.622Z",
   "version": 1,
   "holder": "researcher",
-  "peer_agent_id": "researcher"
+  "peer_agent_id": "researcher",
+  "tune": {
+    "effort": "high"
+  },
+  "updated_at": "2026-08-06T12:45:15.505Z"
 }

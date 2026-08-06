@@ -14,7 +14,7 @@ import { PROVIDERS } from "./SearchBar.js";
 // Full data-handling details (Chrome Web Store Limited Use adherence, storage
 // locations, network behavior) live in the repository's privacy policy. The
 // in-panel disclosure below summarizes it in plain language and links here.
-export const PRIVACY_POLICY_URL = "https://emberstone-studio.com/docs/privacy/";
+export const PRIVACY_POLICY_URL = "https://emberstone-studio.com/docs/privacy/meridian";
 
 const NEW_TAB_OPTIONS = [
   { id: "meridian-view", label: "Open a new Meridian tab" },

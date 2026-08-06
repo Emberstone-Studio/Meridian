@@ -2924,5 +2924,14 @@
   ],
   "sessionId": "019f9b9d-983f-7c22-a489-f19d057161f8",
   "softSummary": "Meridian codebase review (task 184a) complete; permissions/release-validation tasks approved. Feature work chain: web search header, CSS cleanup (`bdd65d6`), resetGridFilter fix, pinned-aware link opening, auto-focus on tab activation, omnibox URL recognition, \"Open all in group\" bookmark button (71 tests), drag-and-drop freeze fix (removed forced-layout animation, blocked mid-drag storage rebuilds, 76 tests). New-Tab focus-stealing workaround confirmed infeasible (Chrome reserves address-bar focus per Chrome docs) and removed — 64 tests. Created three sequential tasks: keyboard selection navigation (done), accessible combobox/listbox semantics (returned to `ready` for aria-expanded bug at SearchBar.js:114-122/SearchPopup.js:31-32, then reworked), real Chrome smoke test (done). Fixed separate high-severity Settings-popup race via request-generation invalidation (78 tests). Toolbar icon dark-mode contrast issue diagnosed — adaptive logic existed but only initialized from side panel; fixed by moving into shared utility initialized from both main page and side panel, syncing to prefers-color-scheme — 81 tests pass, both extension copies updated. **Open now:** user asked to review the just-finished combobox/listbox rework follow-up task — not yet started.",
-  "softSummaryAt": "2026-07-26T15:40:02.778Z"
+  "softSummaryAt": "2026-07-26T15:40:02.778Z",
+  "activeRole": "reviewer",
+  "sessionBindings": {
+    "reviewer": {
+      "sessionId": "019f9b9d-983f-7c22-a489-f19d057161f8",
+      "cliSessionId": "019f9b9d-983f-7c22-a489-f19d057161f8",
+      "connector": "codex",
+      "model": "codex-gpt-5-6-sol"
+    }
+  }
 }

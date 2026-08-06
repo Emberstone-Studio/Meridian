@@ -48,13 +48,13 @@ unstaged changes, staged changes, and committed branch changes relative to
 
 ## Privacy
 
-See [PRIVACY.md](PRIVACY.md) for the extension's data handling, local and sync
-storage, thumbnail capture, network behavior, permissions, the Chrome Web Store
-Limited Use adherence statement, and the disclosure checklist.
+See [docs/privacy-meridian.md](docs/privacy-meridian.md) for the extension's
+data handling, local and sync storage, thumbnail capture, network behavior,
+permissions, and the Chrome Web Store Limited Use adherence statement.
 
 Publisher-facing Chrome Web Store submission copy — the listing description,
 Privacy Practices answers, per-permission justifications, and owner-only
-follow-ups — lives in [STORE_LISTING.md](STORE_LISTING.md).
+follow-ups — lives in [docs/store-listing.md](docs/store-listing.md).
 
 ---
 
