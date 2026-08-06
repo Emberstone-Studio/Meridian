@@ -30,7 +30,7 @@
 **Tags:** Release
 **Summary:** The failing asyncLatestWins.test.mjs assertion was stale after 2d626f6 changed sidebar scope chips into pure filters. The test now correctly verifies that Bookmarks and History chip clicks do not request optional permissions. Isolated…
 **Key decisions:** 
-**Status:** in_review
+**Status:** done
 **Last updated:** 2026-08-06
 
 ### re-verify-candidate-hash-after-manifest-version-e85c
@@ -38,6 +38,6 @@
 **Tags:** Release
 **Summary:** Status: Pass.
 **Key decisions:** 
-**Status:** in_review
+**Status:** done
 **Last updated:** 2026-08-06
 

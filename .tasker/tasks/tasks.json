@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 702,
+  "state_version": 707,
   "features": {
     "chat_pro": true
   },
@@ -538,6 +538,1948 @@
       "message": "Task \"Custom image tile\" created in ready"
     }
   ],
+  "models": [
+    {
+      "model_id": "antigravity-claude-opus-4-6-thinking-claude-opus-4-6-thinking",
+      "display_name": "claude-opus-4-6-thinking  Claude Opus 4.6 (Thinking)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-opus-4-6-thinking  Claude Opus 4.6 (Thinking)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-claude-sonnet-4-6-claude-sonnet-4-6-thinking",
+      "display_name": "claude-sonnet-4-6         Claude Sonnet 4.6 (Thinking)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-sonnet-4-6         Claude Sonnet 4.6 (Thinking)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-1-pro-high-gemini-3-1-pro-high",
+      "display_name": "gemini-3.1-pro-high       Gemini 3.1 Pro (High)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.1-pro-high       Gemini 3.1 Pro (High)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-1-pro-low-gemini-3-1-pro-low",
+      "display_name": "gemini-3.1-pro-low        Gemini 3.1 Pro (Low)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.1-pro-low        Gemini 3.1 Pro (Low)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-5-flash-high-gemini-3-5-flash-high",
+      "display_name": "gemini-3.5-flash-high     Gemini 3.5 Flash (High)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.5-flash-high     Gemini 3.5 Flash (High)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-5-flash-low-gemini-3-5-flash-low",
+      "display_name": "gemini-3.5-flash-low      Gemini 3.5 Flash (Low)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.5-flash-low      Gemini 3.5 Flash (Low)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-5-flash-medium-gemini-3-5-flash-medium",
+      "display_name": "gemini-3.5-flash-medium   Gemini 3.5 Flash (Medium)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.5-flash-medium   Gemini 3.5 Flash (Medium)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-6-flash-high-gemini-3-6-flash-high",
+      "display_name": "gemini-3.6-flash-high     Gemini 3.6 Flash (High)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.6-flash-high     Gemini 3.6 Flash (High)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": true,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-6-flash-low-gemini-3-6-flash-low",
+      "display_name": "gemini-3.6-flash-low      Gemini 3.6 Flash (Low)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.6-flash-low      Gemini 3.6 Flash (Low)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gemini-3-6-flash-medium-gemini-3-6-flash-medium",
+      "display_name": "gemini-3.6-flash-medium   Gemini 3.6 Flash (Medium)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gemini-3.6-flash-medium   Gemini 3.6 Flash (Medium)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity-gpt-oss-120b-medium-gpt-oss-120b-medium",
+      "display_name": "gpt-oss-120b-medium       GPT-OSS 120B (Medium)",
+      "provider": "Google",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Antigravity controller with built-in tool access",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-oss-120b-medium       GPT-OSS 120B (Medium)",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Antigravity controller with built-in tool access"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [
+          "generate_image"
+        ],
+        "output_capabilities": [
+          "image_generation"
+        ]
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "antigravity",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "antigravity",
+      "display_name": "Antigravity CLI Default",
+      "provider": "Google",
+      "tier": "balanced",
+      "api": {
+        "endpoint": null,
+        "model_string": "antigravity",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Google Antigravity CLI account default"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium"
+      },
+      "cli_tool": true,
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "antigravity",
+      "runtime": null,
+      "last_updated": "2026-07-20",
+      "connected": true
+    },
+    {
+      "model_id": "bob-bob",
+      "display_name": "Bob Shell",
+      "provider": "IBM",
+      "tier": "balanced",
+      "display_tier": null,
+      "ui_desc": "IBM's agentic coding CLI",
+      "api": {
+        "endpoint": null,
+        "model_string": "bob",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "IBM's agentic coding CLI"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "output_limit": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "supports_reasoning": false,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [],
+        "default_effort": null,
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "bob",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": true,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": false,
+      "driver_inventory_source": "manifest-static",
+      "handshake_verified": true,
+      "connected": true
+    },
+    {
+      "model_id": "bob",
+      "display_name": "Bob Shell",
+      "provider": "IBM",
+      "tier": "balanced",
+      "api": {
+        "endpoint": null,
+        "model_string": "bob",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "IBM's agentic coding CLI"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium"
+      },
+      "cli_tool": true,
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "bob",
+      "runtime": null,
+      "last_updated": "2026-08-04",
+      "connected": true
+    },
+    {
+      "model_id": "claude-claude-fable-5",
+      "display_name": "Claude Fable 5",
+      "provider": "Anthropic",
+      "tier": "balanced",
+      "display_tier": "balanced",
+      "ui_desc": "Balanced Claude model for general-purpose agent work",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-fable-5",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Balanced Claude model for general-purpose agent work"
+        ],
+        "avoid": [],
+        "context_window": 1000000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "max"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "claude",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "claude-fable",
+        "version": [
+          5
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "anthropic",
+        "model_string": "claude-fable-5",
+        "release_date": "2026-06-07",
+        "last_updated": "2026-06-09",
+        "knowledge": null,
+        "cost": {
+          "input": 10,
+          "output": 50,
+          "cache_read": 1,
+          "cache_write": 12.5
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "claude-claude-haiku-4-5",
+      "display_name": "Claude Haiku 4.5",
+      "provider": "Anthropic",
+      "tier": "balanced",
+      "display_tier": "fast",
+      "ui_desc": "Fast Claude Code tasks and lightweight agent work",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-haiku-4-5",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Fast Claude Code tasks and lightweight agent work"
+        ],
+        "avoid": [],
+        "context_window": 200000,
+        "output_limit": 64000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "claude",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "claude-haiku",
+        "version": [
+          4,
+          5
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "anthropic",
+        "model_string": "claude-haiku-4-5",
+        "release_date": "2025-10-15",
+        "last_updated": "2025-10-15",
+        "knowledge": "2025-02-28",
+        "cost": {
+          "input": 1,
+          "output": 5,
+          "cache_read": 0.1,
+          "cache_write": 1.25
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "claude-claude-opus-4-8",
+      "display_name": "Claude Opus 4.8",
+      "provider": "Anthropic",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "Deep reasoning, review, and complex multi-step work",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-opus-4-8",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Deep reasoning, review, and complex multi-step work"
+        ],
+        "avoid": [],
+        "context_window": 1000000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "medium",
+          "high",
+          "max"
+        ],
+        "default_effort": "high",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "claude",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": true,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "claude-opus",
+        "version": [
+          4,
+          8
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "anthropic",
+        "model_string": "claude-opus-4-8",
+        "release_date": "2026-05-28",
+        "last_updated": "2026-05-28",
+        "knowledge": "2026-01",
+        "cost": {
+          "input": 5,
+          "output": 25,
+          "cache_read": 0.5,
+          "cache_write": 6.25
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "claude-claude-sonnet-5",
+      "display_name": "Claude Sonnet 5",
+      "provider": "Anthropic",
+      "tier": "balanced",
+      "display_tier": "coding",
+      "ui_desc": "Balanced Claude Code agentic coding and general task execution",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-sonnet-5",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Balanced Claude Code agentic coding and general task execution"
+        ],
+        "avoid": [],
+        "context_window": 1000000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "max"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "claude",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "claude-sonnet",
+        "version": [
+          5
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "anthropic",
+        "model_string": "claude-sonnet-5",
+        "release_date": "2026-06-29",
+        "last_updated": "2026-06-30",
+        "knowledge": "2026-01-31",
+        "cost": {
+          "input": 2,
+          "output": 10,
+          "cache_read": 0.2,
+          "cache_write": 2.5
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "claude-fable-5",
+      "display_name": "Claude Fable 5",
+      "provider": "Anthropic",
+      "tier": "balanced",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-fable-5",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Balanced Claude model for general-purpose agent work"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium"
+      },
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "claude",
+      "runtime": null,
+      "last_updated": "2026-07-20",
+      "display_tier": "balanced",
+      "ui_desc": "Everyday Claude model for general chat and agentic work",
+      "connected": true
+    },
+    {
+      "model_id": "claude-haiku-4-5",
+      "display_name": "Claude Haiku 4.5",
+      "provider": "Anthropic",
+      "tier": "fast",
+      "api": {
+        "endpoint": null,
+        "model_string": "claude-haiku-4-5",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Fast Claude Code tasks and lightweight agent work"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium"
+      },
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "claude",
+      "runtime": null,
+      "last_updated": "2026-07-20",
+      "display_tier": "fast",
+      "ui_desc": "Quick, low-cost Claude for lightweight agents and responsive chat",
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-3-codex-spark",
+      "display_name": "GPT-5.3-Codex-Spark",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "fast",
+      "ui_desc": "This specialized model runs rapid code generation and review.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.3-codex-spark",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Ultra-fast coding model."
+        ],
+        "avoid": [],
+        "context_window": 128000,
+        "output_limit": 32000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "default_effort": "high",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt-codex-spark",
+        "version": [
+          5.3
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.3-codex-spark",
+        "release_date": "2026-02-05",
+        "last_updated": "2026-02-05",
+        "knowledge": "2025-08-31",
+        "cost": {
+          "input": 1.75,
+          "output": 14,
+          "cache_read": 0.175
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-4-mini",
+      "display_name": "GPT-5.4-Mini",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "fast",
+      "ui_desc": "Small, fast, and cost-efficient model for simpler coding tasks.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.4-mini",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Small, fast, and cost-efficient model for simpler coding tasks."
+        ],
+        "avoid": [],
+        "context_window": 400000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt-mini",
+        "version": [
+          5.4
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.4-mini",
+        "release_date": "2026-03-17",
+        "last_updated": "2026-03-17",
+        "knowledge": "2025-08-31",
+        "cost": {
+          "input": 0.75,
+          "output": 4.5,
+          "cache_read": 0.075
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-4",
+      "display_name": "GPT-5.4",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "balanced",
+      "ui_desc": "Strong model for everyday coding.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.4",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Strong model for everyday coding."
+        ],
+        "avoid": [],
+        "context_window": 1050000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt",
+        "version": [
+          5.4
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.4",
+        "release_date": "2026-03-05",
+        "last_updated": "2026-03-05",
+        "knowledge": "2025-08-31",
+        "cost": {
+          "input": 2.5,
+          "output": 15,
+          "cache_read": 0.25,
+          "tiers": [
+            {
+              "input": 5,
+              "output": 22.5,
+              "cache_read": 0.5,
+              "tier": {
+                "type": "context",
+                "size": 272000
+              }
+            }
+          ],
+          "context_over_200k": {
+            "input": 5,
+            "output": 22.5,
+            "cache_read": 0.5
+          }
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-5",
+      "display_name": "GPT-5.5",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "This flagship model solves advanced math and reasoning challenges.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.5",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Frontier model for complex coding, research, and real-world work."
+        ],
+        "avoid": [],
+        "context_window": 1050000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt",
+        "version": [
+          5.5
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.5",
+        "release_date": "2026-04-23",
+        "last_updated": "2026-04-23",
+        "knowledge": "2025-12-01",
+        "cost": {
+          "input": 5,
+          "output": 30,
+          "cache_read": 0.5,
+          "tiers": [
+            {
+              "input": 10,
+              "output": 45,
+              "cache_read": 1,
+              "tier": {
+                "type": "context",
+                "size": 272000
+              }
+            }
+          ],
+          "context_over_200k": {
+            "input": 10,
+            "output": 45,
+            "cache_read": 1
+          }
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-6-luna",
+      "display_name": "GPT-5.6-Luna",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "fast",
+      "ui_desc": "This fast agentic model automates repository edits and refactoring.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.6-luna",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Fast and affordable agentic coding model."
+        ],
+        "avoid": [],
+        "context_window": 1050000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt-luna",
+        "version": [
+          5.6
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.6-luna",
+        "release_date": "2026-07-09",
+        "last_updated": "2026-07-09",
+        "knowledge": "2026-02-16",
+        "cost": {
+          "input": 0.2,
+          "output": 1.2,
+          "cache_read": 0.02,
+          "cache_write": 0.25,
+          "tiers": [
+            {
+              "input": 0.4,
+              "output": 1.8,
+              "cache_read": 0.04,
+              "cache_write": 0.5,
+              "tier": {
+                "type": "context",
+                "size": 272000
+              }
+            }
+          ],
+          "context_over_200k": {
+            "input": 0.4,
+            "output": 1.8,
+            "cache_read": 0.04,
+            "cache_write": 0.5
+          }
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-6-sol",
+      "display_name": "GPT-5.6-Sol",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "deep_thinking",
+      "ui_desc": "This premier coding model handles complex software engineering tasks.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.6-sol",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Latest frontier agentic coding model."
+        ],
+        "avoid": [],
+        "context_window": 1050000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max",
+          "ultra"
+        ],
+        "default_effort": "low",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": true,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt-sol",
+        "version": [
+          5.6
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.6-sol",
+        "release_date": "2026-07-09",
+        "last_updated": "2026-07-09",
+        "knowledge": "2026-02-16",
+        "cost": {
+          "input": 5,
+          "output": 30,
+          "cache_read": 0.5,
+          "cache_write": 6.25,
+          "tiers": [
+            {
+              "input": 10,
+              "output": 45,
+              "cache_read": 1,
+              "cache_write": 12.5,
+              "tier": {
+                "type": "context",
+                "size": 272000
+              }
+            }
+          ],
+          "context_over_200k": {
+            "input": 10,
+            "output": 45,
+            "cache_read": 1,
+            "cache_write": 12.5
+          }
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex-gpt-5-6-terra",
+      "display_name": "GPT-5.6-Terra",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "display_tier": "balanced",
+      "ui_desc": "This balanced coding model supports everyday software development workflows.",
+      "api": {
+        "endpoint": null,
+        "model_string": "gpt-5.6-terra",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "Balanced agentic coding model for everyday work."
+        ],
+        "avoid": [],
+        "context_window": 1050000,
+        "output_limit": 128000,
+        "supports_multimodal": true,
+        "supports_tool_use": true,
+        "supports_reasoning": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium",
+        "effort_levels": [
+          "low",
+          "medium",
+          "high",
+          "xhigh",
+          "max",
+          "ultra"
+        ],
+        "default_effort": "medium",
+        "internal_tools": [],
+        "output_capabilities": []
+      },
+      "prompting": {
+        "responds_best_to": "",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "driver-model-list",
+      "manifest_provider": "codex",
+      "last_updated": "2026-08-06",
+      "selectable": true,
+      "cli_tool": false,
+      "internal_tool": false,
+      "driver_model_default": false,
+      "driver_inventory_verified": true,
+      "driver_inventory_source": "live",
+      "handshake_verified": true,
+      "lineage": {
+        "family": "gpt-terra",
+        "version": [
+          5.6
+        ]
+      },
+      "catalog": {
+        "source": "models.dev",
+        "provider_key": "openai",
+        "model_string": "gpt-5.6-terra",
+        "release_date": "2026-07-09",
+        "last_updated": "2026-07-09",
+        "knowledge": "2026-02-16",
+        "cost": {
+          "input": 2,
+          "output": 12,
+          "cache_read": 0.2,
+          "cache_write": 2.5,
+          "tiers": [
+            {
+              "input": 4,
+              "output": 18,
+              "cache_read": 0.4,
+              "cache_write": 5,
+              "tier": {
+                "type": "context",
+                "size": 272000
+              }
+            }
+          ],
+          "context_over_200k": {
+            "input": 4,
+            "output": 18,
+            "cache_read": 0.4,
+            "cache_write": 5
+          }
+        },
+        "synced_at": "2026-08-06"
+      },
+      "connected": true
+    },
+    {
+      "model_id": "codex",
+      "display_name": "Codex CLI Default",
+      "provider": "OpenAI",
+      "tier": "balanced",
+      "api": {
+        "endpoint": null,
+        "model_string": "codex",
+        "auth": "handled by provider CLI",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "OpenAI Codex CLI transport"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "medium"
+      },
+      "cli_tool": true,
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "codex",
+      "runtime": null,
+      "last_updated": "2026-07-20",
+      "connected": true
+    },
+    {
+      "model_id": "ollama-mistral-latest",
+      "display_name": "Mistral",
+      "provider": "Ollama",
+      "tier": "balanced",
+      "api": {
+        "endpoint": "http://localhost:11434/v1",
+        "model_string": "mistral:latest",
+        "auth": "none (self-hosted local runtime)",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "General use (live-detected model)"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "low"
+      },
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "opencode-onprem",
+      "runtime": "ollama",
+      "runtime_capabilities": [
+        "completion",
+        "tools"
+      ],
+      "last_updated": "2026-08-06",
+      "display_tier": "balanced",
+      "ui_desc": "General-purpose model for everyday chat and reasoning",
+      "connected": true
+    }
+  ],
   "tasks": [
     {
       "id": "add-accessible-combobox-and-listbox-semantics-to-a370",
@@ -823,6 +2765,28 @@
       "file": "active/prevent-stale-sidebar-search-and-auto-accent-asy-c041/prevent-stale-sidebar-search-and-auto-accent-asy-c041.json"
     },
     {
+      "id": "re-run-release-validation-against-current-head-p-6b00",
+      "title": "Re-run release validation against current HEAD (post d2809ae changes)",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "reviewer",
+      "updated_at": "2026-08-06T20:31:15.788Z",
+      "file": "active/re-run-release-validation-against-current-head-p-6b00/re-run-release-validation-against-current-head-p-6b00.json"
+    },
+    {
+      "id": "re-verify-candidate-hash-after-manifest-version-e85c",
+      "title": "Re-verify candidate hash after manifest version bump to 1.2.0",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "reviewer",
+      "updated_at": "2026-08-06T20:31:28.283Z",
+      "file": "active/re-verify-candidate-hash-after-manifest-version-e85c/re-verify-candidate-hash-after-manifest-version-e85c.json"
+    },
+    {
       "id": "refreshallthumbnails-restore-active-tab-even-if-23bb",
       "title": "refreshAllThumbnails: restore active tab even if capture throws mid-loop",
       "status": "done",
@@ -959,28 +2923,6 @@
       "agent_id": "coder",
       "updated_at": "2026-07-26T21:37:31.098Z",
       "file": "active/thumbnails-add-unlimitedstorage-switch-capture-t-ec14/thumbnails-add-unlimitedstorage-switch-capture-t-ec14.json"
-    },
-    {
-      "id": "re-run-release-validation-against-current-head-p-6b00",
-      "title": "Re-run release validation against current HEAD (post d2809ae changes)",
-      "status": "in_review",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "high",
-      "agent_id": "reviewer",
-      "updated_at": "2026-08-06T13:41:07.847Z",
-      "file": "active/re-run-release-validation-against-current-head-p-6b00/re-run-release-validation-against-current-head-p-6b00.json"
-    },
-    {
-      "id": "re-verify-candidate-hash-after-manifest-version-e85c",
-      "title": "Re-verify candidate hash after manifest version bump to 1.2.0",
-      "status": "in_review",
-      "trashed": false,
-      "trashed_at": null,
-      "priority": "high",
-      "agent_id": "reviewer",
-      "updated_at": "2026-08-06T15:07:45.828Z",
-      "file": "active/re-verify-candidate-hash-after-manifest-version-e85c/re-verify-candidate-hash-after-manifest-version-e85c.json"
     }
   ]
 }
