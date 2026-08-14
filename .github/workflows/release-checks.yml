@@ -59,6 +59,12 @@ jobs:
           }
           NODE
 
+      # `.tasker/` is excluded from every invocation below. It holds machine-written
+      # Tasker board state and agent transcripts, which embed captured command text
+      # with real trailing spaces and are rewritten by the Tasker server — so the
+      # repository cannot durably keep them clean, and failing the build on them
+      # says nothing about the extension. This check exists to police hand-written
+      # source; .gitattributes keeps that source LF-normalized.
       - name: Check committed changes for whitespace errors
         shell: bash
         env:
@@ -74,7 +80,7 @@ jobs:
           case "$EVENT_NAME" in
             pull_request)
               echo "Checking pull request changes: $PR_BASE_SHA...$PR_HEAD_SHA"
-              git diff --check "$PR_BASE_SHA...$PR_HEAD_SHA"
+              git diff --check "$PR_BASE_SHA...$PR_HEAD_SHA" -- . ':!.tasker'
               ;;
             push)
               if [[ "$PUSH_AFTER_SHA" == "$zero_sha" ]]; then
@@ -86,15 +92,15 @@ jobs:
               if [[ "$before" == "$zero_sha" ]]; then
                 default_branch="origin/$DEFAULT_BRANCH"
                 echo "Checking new branch changes: $default_branch...$PUSH_AFTER_SHA"
-                git diff --check "$default_branch...$PUSH_AFTER_SHA"
+                git diff --check "$default_branch...$PUSH_AFTER_SHA" -- . ':!.tasker'
                 exit 0
               fi
 
               echo "Checking pushed changes: $before..$PUSH_AFTER_SHA"
-              git diff --check "$before" "$PUSH_AFTER_SHA"
+              git diff --check "$before" "$PUSH_AFTER_SHA" -- . ':!.tasker'
               ;;
             workflow_dispatch)
               echo "Checking the latest commit at HEAD."
-              git diff --check HEAD^ HEAD
+              git diff --check HEAD^ HEAD -- . ':!.tasker'
               ;;
           esac

@@ -1,0 +1,15 @@
+# Normalize line endings to LF in the repository, regardless of the editor or
+# platform that wrote the file. Without this, an editor saving CRLF rewrites
+# every line of a file, which buries real changes in whitespace churn and trips
+# the `git diff --check` step in .github/workflows/release-checks.yml — the CR
+# is reported as trailing whitespace on every line.
+* text=auto eol=lf
+
+# Binary formats must never be line-ending converted. Several of these legitimately
+# contain the CR LF byte pair inside compressed data, and "normalizing" it corrupts
+# the file.
+*.png   binary
+*.webp  binary
+*.woff2 binary
+*.zip   binary
+*.ai    binary

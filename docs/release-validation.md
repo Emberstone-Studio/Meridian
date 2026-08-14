@@ -2,20 +2,25 @@
 
 ## Decision
 
-**Pass — the Meridian candidate identified below is release-ready from a
-repository, package-integrity, and headed-browser perspective.**
+**Partial — the candidate below passes repository and package-integrity checks.
+The headed-browser leg is NOT satisfied for this package and must be re-run
+before publishing.**
 
-The full deterministic suite still passes, the source/package parity check is
-green, and the regenerated ZIP extracts to the exact candidate tree hash. The
-prior full validation's fresh headed Google Chrome 151 profile loaded the New Tab
-override and exercised the new and previously release-critical behavior with zero
-page or side-panel runtime exceptions, console errors, or log errors.
+Repackaged August 14, 2026 at commit `e349c07`. The deterministic suite passes
+(133/133), source/package parity is green, and the regenerated ZIP extracts to
+the exact candidate tree hash.
 
-This record layers a version-bump-only re-verification on that prior full
-validation. No headed Chrome pass was repeated because
-`git diff 970421f7eaf3a319e4696c23ac5714535617e6cc..5674a8bcd4d457ee97ebf479264e9695809ae114 -- manifest.json meridian-extension/manifest.json`
-changes only the two manifest `version` strings from `1.1.0` to `1.2.0`; no
-functional candidate file changed.
+The headed-Chrome result recorded further down this document belongs to an
+earlier candidate and **does not carry forward**. The previous record was
+allowed to inherit that pass because its only diff was the two manifest
+`version` strings. That reasoning does not apply here: `e349c07` changes
+runtime behavior — accent derivation is now suppressed for the shipped
+wallpaper, photo-blur defaults are seeded per background, the bundled Rubik
+webfont and a new default wallpaper were added, and unreferenced image assets
+were removed. Those are exactly the kinds of changes a headed pass exists to
+catch.
+
+**Re-run the headed Chrome validation against this package before submission.**
 
 The prior `asyncLatestWins.test.mjs` failure was a stale test expectation. Commit
 `2d626f6` intentionally made the sidebar Bookmarks and History chips pure filters
@@ -50,33 +55,43 @@ contains:
   `meridian-extension/manifest.json` now declare `1.2.0`. Relative to the prior
   validated candidate `970421f`, those two version strings are the complete
   runtime/package diff.
+- Repackage `e349c07`: brand accent default (`#2ed8b0`) with the shipped
+  wallpaper brand-locked so its dominant hue no longer overrides the accent;
+  per-background photo-blur seeding; bundled Rubik webfont and `train.webp`
+  default wallpaper; removal of unreferenced image assets and the packaged
+  store screenshots; store-listing document rewritten. **This is a functional
+  change set — see the Decision section on the lapsed headed-browser leg.**
 
 ## Candidate identity
 
 - Manifest version: **1.2.0** (`manifest_version` 3)
 - Validated worktree base commit:
-  `5674a8bcd4d457ee97ebf479264e9695809ae114`
+  `e349c07425cfd6c1f5450b48eab02b62497c4a1b`
 - Candidate content commit:
-  `5674a8bcd4d457ee97ebf479264e9695809ae114`
+  `e349c07425cfd6c1f5450b48eab02b62497c4a1b`
 - Tracked candidate directory: `meridian-extension`
-- Candidate file count: **53**
+- Candidate file count: **48**
 - Candidate directory tree SHA-256:
-  `e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`
+  `48be965f13bc5d9e68ef58261bb1899a8456b6cc9e2352bed2ada087cb611020`
 - Validation archive:
-  `Meridian-1.2.0-069a7ea52b1640d69da3843ce1ffbc0e.zip`
-- Validation archive size: **5,569,295 bytes**
+  `Meridian-1.2.0-48be965f13bc5d9e68ef58261bb1899a.zip`
+- Validation archive size: **340,967 bytes**
 - Validation archive SHA-256:
-  `f7c0b4be744550c6dfec12c1c17babfef613b022b5759521cf8a58f126ce788e`
+  `3423b3accfebb1cf8b3fa0412390dc412bd426130eb5c6080397a20e0e60b607`
 - Extracted archive tree SHA-256:
-  `e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`
-- Per-file archive parity: **53 files matched, 0 mismatches**.
+  `48be965f13bc5d9e68ef58261bb1899a8456b6cc9e2352bed2ada087cb611020`
+- Per-file archive parity: **48 files matched, 0 mismatches**.
 
-The prior full validation covered `970421f`. The scoped diff from that commit to
-`5674a8b` contains only `"version": "1.1.0"` changing to
-`"version": "1.2.0"` in the source and packaged manifests; within
-`meridian-extension`, `manifest.json` is the only changed file. At this follow-up's
-completion, only this regenerated record is modified in the worktree, so the
-shipped candidate directory is exactly the committed tree identified above.
+The candidate directory dropped from 53 files to 48: `Meridian.ai`,
+`chrome.svg`, `edge.svg`, `emberstone.png` and four packaged store screenshots
+were removed as unreferenced, while `train.webp` and three bundled `fonts/`
+entries were added. Archive size fell from 5,569,295 to 340,967 bytes, since
+the store screenshots were being shipped inside the package despite only ever
+being uploaded to the dashboard.
+
+Note that `fonts/Rubik-OFL.txt` is now a candidate file. Rubik is bundled under
+SIL OFL 1.1, and that license text must ship with it — do not prune it from the
+package.
 
 The directory hash is SHA-256 over every candidate file in case-sensitive
 relative-path order. For each entry, the hasher receives the UTF-8 relative path,
@@ -104,13 +119,11 @@ components/WorkspaceLane.js
 components/sidebar.css
 components/sidebar.html
 components/sidebar.js
-img/Meridian.ai
+fonts/Rubik-OFL.txt
+fonts/Rubik-latin-ext.woff2
+fonts/Rubik-latin.woff2
 img/Meridian.svg
-img/aurora.webp
-img/chrome.svg
 img/coffee.svg
-img/edge.svg
-img/emberstone.png
 img/emberstone.svg
 img/favicon.svg
 img/icon-source.svg
@@ -118,10 +131,7 @@ img/icon128.png
 img/icon16.png
 img/icon32.png
 img/icon48.png
-img/meridian-screen1.png
-img/meridian-screen2.png
-img/meridian-screen3.png
-img/meridian-screen4.png
+img/train.webp
 manifest.json
 meridian.css
 meridian.html
@@ -181,16 +191,18 @@ git status --short
 
 Results:
 
-- Prior isolated correction check: **5 passed, 0 failed**.
-- Full Node suite: **131 passed, 0 failed, 0 skipped**.
+Results (re-run August 14, 2026 against `e349c07`):
+
+- Full Node suite: **133 passed, 0 failed, 0 skipped**.
 - Runtime JavaScript syntax: **56 files checked, 0 failures**.
 - Manifest parsing: **2 parsed**, both version `1.2.0` and
   `manifest_version` 3.
-- Runtime source/package parity: **35 file pairs matched, 0 mismatches**.
-- Archive extraction parity: **53 files matched, 0 mismatches**.
-- `git diff --check`: clean.
-- `git status --short`: only `docs/release-validation.md` is modified by this
-  follow-up; no candidate file is modified.
+- Runtime source/package parity: **48 file pairs matched, 0 mismatches**
+  (every candidate file compared byte-for-byte against its repository-root
+  counterpart, not just the JavaScript).
+- Archive extraction parity: **48 files matched, 0 mismatches**; the extracted
+  tree hash equals the candidate tree hash exactly.
+- `git status --short`: no candidate file is modified.
 
 Node emitted `MODULE_TYPELESS_PACKAGE_JSON` performance warnings while importing
 ES modules from this package-less test repository. These warnings were already
