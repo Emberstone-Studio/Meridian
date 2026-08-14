@@ -1,32 +1,38 @@
 const TOOLBAR_ICON_SIZES = [16, 32];
-const LIGHT_TOOLBAR_COLOR = "#1c1c1e";
-const DARK_TOOLBAR_COLOR = "#f5f5f7";
+const BRAND_DISC = "#2ed8b0";
+const LIGHT_TOOLBAR_DISC = "#198a70";
+const DARK_TOOLBAR_DISC = BRAND_DISC;
 
-/* The toolbar mark is monochrome rather than brand mint on purpose. The browser
-   toolbar is chrome we don't control, it sits beside a dozen other extension
-   icons at 16px, and #2ed8b0 is only 1.67:1 on a light toolbar — the mark would
-   dissolve. Recolouring per scheme is what keeps it legible on both.
+/* Chrome exposes exactly ONE action icon. chrome.action.setIcon repaints it
+   everywhere the action appears — the toolbar, the puzzle-piece overflow menu,
+   the pinned list — so there is no arrangement where the toolbar gets one
+   treatment and the menu another. Whatever this returns is what the user sees
+   in all of them. That is why the mark stays on-brand here rather than
+   monochrome: a monochrome toolbar icon also means a monochrome icon in the
+   extensions menu, where it sits in a list of competitors' colour marks and
+   reads as unbranded.
 
-   This imposes two constraints on img/Meridian.svg, which the file cannot
-   restate itself (see below):
+   What genuinely has to adapt is lightness, not hue. Brand mint is 9.46:1
+   against dark chrome but only 1.67:1 against a light toolbar, where the disc
+   silhouette dissolves. So the mark keeps the brand hue in both and darkens to
+   #198a70 on light chrome: 3.92:1 against the toolbar, with the ink counter
+   still 3.38:1 inside the disc — both clear the 3:1 that non-text contrast
+   asks for. This is the same rule the UI applies to --accent: one hue,
+   lightness per surface.
 
-     1. The root element must carry a plain fill attribute, because the regex
-        below rewrites exactly that. The circle must NOT declare its own fill —
-        it inherits from the root. Do not reach for currentColor: that resolves
-        against the `color` property, which nothing here sets, so the mark would
-        render black on a dark toolbar.
-     2. Keep that file free of XML comments. The regex takes the FIRST match in
-        the document, so a comment mentioning an SVG open tag hijacks it — the
-        comment gets rewritten and the real root fill is left untouched, which
-        silently produces a near-black icon on dark chrome. */
+   The artwork is img/icon-source.svg, the same ink-counter master the manifest
+   PNGs render from, so the toolbar, the overflow menu, the extensions page and
+   the Web Store all show one mark. Only the disc fill is rewritten; the counter
+   is a stroked path in brand ink and is never recoloured. Comments are stripped
+   before the rewrite so prose in the artwork can never capture the match. */
 export function recolorToolbarSvg(svgText, isDark) {
-  const color = isDark ? DARK_TOOLBAR_COLOR : LIGHT_TOOLBAR_COLOR;
-  return svgText.replace(/<svg\b([^>]*)>/, (svg, attributes) => {
-    if (/\bfill=/.test(attributes)) {
-      return svg.replace(/\bfill=(["']).*?\1/, `fill="${color}"`);
-    }
-    return `<svg fill="${color}"${attributes}>`;
-  });
+  const disc = isDark ? DARK_TOOLBAR_DISC : LIGHT_TOOLBAR_DISC;
+  return svgText
+    .replace(/<!--[\s\S]*?-->/g, "")
+    .replace(
+      new RegExp(`(<circle\\b[^>]*\\bfill=)(["'])${BRAND_DISC}\\2`, "i"),
+      (match, prefix, quote) => `${prefix}${quote}${disc}${quote}`,
+    );
 }
 
 async function renderIconImageData(svgText) {
@@ -65,7 +71,7 @@ async function renderIconImageData(svgText) {
 
 export async function updateToolbarIcon(isDark) {
   try {
-    const svgUrl = chrome.runtime.getURL("img/Meridian.svg");
+    const svgUrl = chrome.runtime.getURL("img/icon-source.svg");
     const svgText = await fetch(svgUrl).then((response) => response.text());
     const imageData = await renderIconImageData(
       recolorToolbarSvg(svgText, isDark),

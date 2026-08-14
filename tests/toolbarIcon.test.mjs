@@ -4,11 +4,25 @@ import test from "node:test";
 
 import { recolorToolbarSvg } from "../utils/toolbarIcon.js";
 
-const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path /></svg>';
+const svg =
+  '<svg xmlns="http://www.w3.org/2000/svg">' +
+  '<circle cx="64" cy="64" r="52" fill="#2ed8b0"/>' +
+  '<path stroke="#0d2f28" /></svg>';
 
-test("toolbar SVG uses explicit contrasting colors for both browser modes", () => {
-  assert.match(recolorToolbarSvg(svg, false), /fill="#1c1c1e"/);
-  assert.match(recolorToolbarSvg(svg, true), /fill="#f5f5f7"/);
+// One action icon serves the toolbar AND the extensions overflow menu, so the
+// mark stays in the brand hue for both and only shifts lightness to survive a
+// light toolbar. A monochrome result here would be a white mark in the menu.
+test("the toolbar mark keeps the brand hue and adapts lightness per scheme", () => {
+  assert.match(recolorToolbarSvg(svg, false), /fill="#198a70"/);
+  assert.match(recolorToolbarSvg(svg, true), /fill="#2ed8b0"/);
+
+  for (const isDark of [false, true]) {
+    assert.match(
+      recolorToolbarSvg(svg, isDark),
+      /stroke="#0d2f28"/,
+      "the ink counter is never recoloured",
+    );
+  }
 });
 
 test("Meridian and the side panel both initialize adaptive toolbar icons", async () => {
@@ -89,7 +103,7 @@ test("static manifest icons carry their own contrast and match the package", asy
 // keeps the previously cached icon, so a shipped-but-invalid file is
 // indistinguishable from one that never shipped.
 test("shipped icon SVGs are well-formed XML", async () => {
-  for (const name of ["favicon.svg", "icon-source.svg", "Meridian.svg"]) {
+  for (const name of ["favicon.svg", "icon-source.svg"]) {
     for (const directory of ["..", "../meridian-extension"]) {
       const svg = await readFile(
         new URL(`${directory}/img/${name}`, import.meta.url),
@@ -109,25 +123,28 @@ test("shipped icon SVGs are well-formed XML", async () => {
   }
 });
 
-test("the toolbar mark stays rewritable by recolorToolbarSvg", async () => {
-  const markUrl = new URL("../img/Meridian.svg", import.meta.url);
-  const mark = await readFile(markUrl, "utf8");
-
-  // recolorToolbarSvg rewrites the FIRST <svg ...> in the document, so a comment
-  // mentioning an SVG open tag would hijack the rewrite and leave the real root
-  // fill untouched — a near-black icon on dark chrome.
-  assert.doesNotMatch(mark, /<!--[\s\S]*<svg[\s\S]*?-->/);
-
-  for (const [isDark, expected] of [
-    [false, "#1c1c1e"],
-    [true, "#f5f5f7"],
-  ]) {
-    const root = recolorToolbarSvg(mark, isDark).match(/<svg[^>]*>/)[0];
-    assert.match(root, new RegExp(`fill="${expected}"`));
-    assert.equal(
-      (root.match(/fill=/g) ?? []).length,
-      1,
-      "the root must carry exactly one fill for the rewrite to be unambiguous",
+// The toolbar renders the same master the manifest PNGs do, so a change to that
+// artwork's disc fill silently stops the per-scheme rewrite from matching and
+// ships a mint icon onto light chrome at 1.67:1. Pin the contract.
+test("the shipped master stays rewritable by recolorToolbarSvg", async () => {
+  for (const directory of ["..", "../meridian-extension"]) {
+    const mark = await readFile(
+      new URL(`${directory}/img/icon-source.svg`, import.meta.url),
+      "utf8",
     );
+
+    for (const [isDark, expected] of [
+      [false, "#198a70"],
+      [true, "#2ed8b0"],
+    ]) {
+      const recoloured = recolorToolbarSvg(mark, isDark);
+      const circle = recoloured.match(/<circle[^>]*>/)[0];
+      assert.match(circle, new RegExp(`fill="${expected}"`), directory);
+      assert.doesNotMatch(
+        recoloured,
+        /<!--/,
+        "comments are stripped so prose cannot capture the rewrite",
+      );
+    }
   }
 });

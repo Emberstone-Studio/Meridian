@@ -50,7 +50,17 @@
   --border: #d2d2d2;
   --text-primary: #1a1a1a;
   --text-secondary: #6b6b6b;
-  --accent: hsl(197 100% 40%);
+  /* The side panel sits beside the new tab, often on screen at the same time,
+     so it has to carry the same brand hue — a different accent here reads as a
+     different product. It takes the brand DEFAULT rather than the wallpaper
+     solver's derived accent, because the panel never shows the wallpaper and a
+     hue borrowed from an image the user cannot see has nothing to harmonize
+     with. Lightness is per-surface for the reason spelled out in meridian.css:
+     #2ed8b0 is 1.51:1 on the light surface, so light mode darkens the same hue
+     to 32% (#198a70, 3.56:1) and dark mode carries the brand exactly. */
+  --accent-hue: 166;
+  --accent-sat: 69%;
+  --accent: hsl(var(--accent-hue) var(--accent-sat) 32%);
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --radius-sm: 4px;
   --transition: 150ms ease;
@@ -64,7 +74,7 @@
     --border: #3a3a3c;
     --text-primary: #f5f5f7;
     --text-secondary: #98989d;
-    --accent: hsl(197 100% 52%);
+    --accent: hsl(var(--accent-hue) var(--accent-sat) 51%); /* brand #2ed8b0 exactly */
     --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 }

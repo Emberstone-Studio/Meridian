@@ -1,5 +1,12 @@
-<!-- Raster master for icon16/32/48/128.png (manifest "icons" + "default_icon").
-     Render with: inkscape -w N -h N img/icon-source.svg -o img/iconN.png
+<!-- The one Meridian mark. Raster master for icon16/32/48/128.png (manifest
+     "icons" + "default_icon"), and the artwork utils/toolbarIcon.js rasterises
+     for the browser action, which is the same icon Chrome shows in the
+     extensions overflow menu. Render with:
+     inkscape -w N -h N img/icon-source.svg -o img/iconN.png
+
+     The disc fill below is rewritten per colour scheme at runtime (mint on dark
+     chrome, a darker step of the same hue on light chrome). Keep it a literal
+     hex on the circle element, or that rewrite silently stops matching.
 
      Ink counter, not a knockout. These PNGs are composited over backgrounds we
      cannot predict: the extensions page, the Web Store grid, the puzzle-piece
