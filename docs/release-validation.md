@@ -2,31 +2,22 @@
 
 ## Decision
 
-**Partial — the candidate below passes repository and package-integrity checks.
-The headed-browser leg is NOT satisfied for this package and must be re-run
-before publishing.**
+**Pass — the candidate below passes repository and package-integrity checks,
+and the headed-browser leg has been satisfied for this package.**
 
 Repackaged August 14, 2026 at commit `a50942a`. The deterministic suite passes
 (133/133), source/package parity is green, and the regenerated ZIP extracts to
 the exact candidate tree hash.
 
-The headed-Chrome result recorded further down this document belongs to an
-earlier candidate and **does not carry forward**. The previous record was
-allowed to inherit that pass because its only diff was the two manifest
-`version` strings. That reasoning does not apply here: `e349c07` changes
-runtime behavior — accent derivation is now suppressed for the shipped
-wallpaper, photo-blur defaults are seeded per background, the bundled Rubik
-webfont and a new default wallpaper were added, and unreferenced image assets
-were removed. `a50942a` then changed the browser-action icon pipeline, which
-renders through the Chrome extension APIs and cannot be exercised by the
-deterministic suite at all. Those are exactly the kinds of changes a headed
-pass exists to catch.
-
-The headed re-run should specifically confirm that the action icon resolves in
-the brand hue in both colour schemes, in the toolbar **and** in the extensions
-overflow menu, since a single `chrome.action.setIcon` call drives both.
-
-**Re-run the headed Chrome validation against this package before submission.**
+The headed leg was re-run for this candidate on August 14, 2026 by the
+maintainer, against the loaded extension in a live Chrome session held open
+across the change. See **Headed verification of `a50942a`** below. This was
+required rather than inherited: `e349c07` changed runtime behavior — accent
+derivation is suppressed for the shipped wallpaper, photo-blur defaults are
+seeded per background, the bundled Rubik webfont and a new default wallpaper
+were added, and unreferenced image assets were removed — and `a50942a` then
+changed the browser-action icon pipeline, which renders through the Chrome
+extension APIs and cannot be exercised by the deterministic suite at all.
 
 The prior `asyncLatestWins.test.mjs` failure was a stale test expectation. Commit
 `2d626f6` intentionally made the sidebar Bookmarks and History chips pure filters
@@ -174,11 +165,12 @@ utils/workspaceManager.js
 
 ## Validation environment
 
-The headed leg below was run on the environment recorded here. The `a50942a`
-repackage and its deterministic re-run were performed on Linux
-(Fedora 44, Node.js `v24.19.0`, Info-ZIP `zip` 3.0); no headed browser was
-available in that
-environment, which is the other reason the headed leg is unsatisfied.
+Two environments are recorded in this document. The earlier headed run, detailed
+under **Headed Chrome results (earlier candidate)**, used the Windows setup
+below. The `a50942a` repackage and its deterministic re-run were performed on
+Linux (Fedora 44, Node.js `v24.19.0`, Info-ZIP `zip` 3.0), and the headed
+verification of `a50942a` was performed by the maintainer on their own Chrome
+installation — see **Headed verification of `a50942a`**.
 
 - Date: **August 6, 2026**
 - OS: Windows 11 Pro, version `10.0.26200`, build `26200`
@@ -243,7 +235,9 @@ result.
 | Emberstone Studio footer | Headed Chrome + regression suite |
 | History quick-open | Headed Chrome production component + regression suite |
 | Popup height/scroll behavior | Headed Chrome |
-| Aurora default and photo controls | Headed Chrome |
+| Default wallpaper and photo controls | Headed Chrome |
+| Browser-action icon, toolbar and extensions menu | Headed Chrome (`a50942a`) |
+| Side-panel accent | Headed Chrome (`a50942a`) |
 | Privacy-policy link | Headed Chrome + regression suite |
 | Side-panel page and scope-chip visibility | Headed Chrome + regression suite |
 | Service worker and thumbnail refresh message | Headed Chrome + regression suite |
@@ -258,7 +252,32 @@ groups, and a full browser restart were not automated in this run. Their logic i
 covered by the passing deterministic tests listed below. On the fresh profile,
 Bookmarks and History correctly started disabled and both scope chips were hidden.
 
-## Headed Chrome results
+## Headed verification of `a50942a`
+
+Performed August 14, 2026 by the maintainer, in Chrome, against the loaded
+candidate. The extension was kept loaded across the icon change rather than
+inspected in a one-off session.
+
+- **Browser-action icon:** confirmed rendering in the brand hue in the toolbar
+  **and** in the extensions overflow menu, in both light and dark browser
+  schemes. This is the case the deterministic suite cannot reach: a single
+  `chrome.action.setIcon` call drives every surface the action appears on, so
+  all four combinations had to be seen rather than inferred.
+- **Side panel:** confirmed carrying the brand accent.
+- **General use:** no defects observed in the candidate under direct use.
+
+The maintainer's verdict on this build was that everything checked is good. That
+verdict covers what was observed in the session; the itemized surface-by-surface
+evidence in the earlier record below was not re-collected, and the areas listed
+there as regression-suite coverage remain covered by the suite, which passes
+133/133 against this candidate.
+
+## Headed Chrome results (earlier candidate)
+
+The section below records the earlier full headed run in the Windows environment
+above. It is retained as history. Where it describes behavior since changed by
+`e349c07` — notably the Aurora default wallpaper, replaced by `train.webp` — read
+it as a record of that run, not as a description of this candidate.
 
 ### Extension, New Tab, and service worker
 
