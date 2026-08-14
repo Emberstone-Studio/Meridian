@@ -6,7 +6,7 @@
 The headed-browser leg is NOT satisfied for this package and must be re-run
 before publishing.**
 
-Repackaged August 14, 2026 at commit `e349c07`. The deterministic suite passes
+Repackaged August 14, 2026 at commit `433f072`. The deterministic suite passes
 (133/133), source/package parity is green, and the regenerated ZIP extracts to
 the exact candidate tree hash.
 
@@ -66,9 +66,9 @@ contains:
 
 - Manifest version: **1.2.0** (`manifest_version` 3)
 - Validated worktree base commit:
-  `e349c07425cfd6c1f5450b48eab02b62497c4a1b`
+  `433f07296d5e2821919929ee8d2a07138ac23895`
 - Candidate content commit:
-  `e349c07425cfd6c1f5450b48eab02b62497c4a1b`
+  `433f07296d5e2821919929ee8d2a07138ac23895`
 - Tracked candidate directory: `meridian-extension`
 - Candidate file count: **48**
 - Candidate directory tree SHA-256:
