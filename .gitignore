@@ -1,2 +1,7 @@
 .claude/
 *.zip
+
+# Legacy Tasker machine-local runtime paths (current versions use ~/.tasker/).
+.tasker/runtime/
+.tasker/logs/
+.tasker/roles/*/runs/

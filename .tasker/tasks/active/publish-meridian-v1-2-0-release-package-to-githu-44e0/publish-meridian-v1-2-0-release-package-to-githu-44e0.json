@@ -1,0 +1,71 @@
+{
+  "id": "publish-meridian-v1-2-0-release-package-to-githu-44e0",
+  "title": "Publish Meridian v1.2.0 release package to GitHub",
+  "description": "Repo: https://github.com/Emberstone-Studio/Meridian.git (origin already configured, cwd is the repo root).\n\nContext: `docs/release-validation.md` documents a fully validated 1.2.0 candidate (commit `5674a8bcd4d457ee97ebf479264e9695809ae114` — object still exists in the local object DB though unreachable from any branch). Current `HEAD` (7a2028c) already has identical `manifest.json` / `meridian-extension` content to that validated candidate (confirmed via `git diff` — no differences). GitHub currently only has releases up to v1.1.0; v1.2.0 was validated but never tagged/published.\n\nDo NOT bump any version numbers — 1.2.0 is already correct and already validated. This task is purely: rebuild the package and publish the GitHub release.\n\nSteps:\n1. Confirm working tree state matches expectations: `manifest.json` and `meridian-extension/manifest.json` both report version `1.2.0`.\n2. Rebuild the release archive from the `meridian-extension` directory (53 files, per the candidate file list in `docs/release-validation.md`). Follow the same method the doc describes (directory tree SHA-256 over UTF-8 relative path + NUL + raw bytes + NUL, in case-sensitive path order) to verify your rebuilt tree hash matches the documented `e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`. Note: the exact ZIP file hash is NOT expected to reproduce (timestamps/layout differ) — only the extracted directory tree hash must match.\n3. Run the automated release checks listed in `docs/release-validation.md` (\"Automated release checks\" section) against current HEAD: `node --test tests/*.test.mjs`, JS syntax check on all tracked .js files, manifest JSON parse check, `node --test tests/packagedParity.test.mjs`, `git diff --check`, `git status --short`.\n4. If there are pre-existing unrelated uncommitted changes in the working tree (e.g. `.tasker/` board files, `.github/workflows/release-checks.yml`, `.gitignore`), leave them uncommitted/untouched — do not include them in the release commit or tag.\n5. Tag the current HEAD commit as `v1.2.0` (annotated tag) and push the tag to origin.\n6. Create a GitHub release via `gh release create v1.2.0 <path-to-zip> --repo Emberstone-Studio/Meridian --title \"Meridian v1.2.0\" --notes <appropriate release notes>` — draft release notes from the \"Changes since the previous validation\" section of `docs/release-validation.md` (footer, History quick-open, custom-image tile polish, search-popup sizing, privacy copy/link updates, aurora.webp default background, blur/fade controls) and any other user-facing changes since v1.1.0 you find in git log.\n7. Report back: the final directory tree hash, whether it matched the documented one, the automated check results, the tag, and the published release URL.\n\nIf the rebuilt directory tree hash does NOT match the documented one, STOP before tagging/publishing and report the mismatch instead — do not publish an unverified package.",
+  "status": "done",
+  "priority": "high",
+  "label": "Release",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-14T16:55:41.718Z",
+  "updated_at": "2026-08-14T19:52:22.972Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-14T16:55:41.718Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-14T16:55:41.718Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-90ff3f7a630f9479aa724e64a2c82f26-648fb228",
+        "task_id": null
+      },
+      "task_id": "publish-meridian-v1-2-0-release-package-to-githu-44e0",
+      "content": "controller chat-90ff3f7a630f9479aa724e64a2c82f26-648fb228 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-14T16:55:46.800Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-08-14T16:55:47.031Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-14T17:01:47.766Z",
+      "type": "output",
+      "content": "## Meridian v1.2.0 published\n\n- Release: https://github.com/Emberstone-Studio/Meridian/releases/tag/v1.2.0\n- Annotated tag: `v1.2.0` → `7a2028c582b220de2ab5cbef0aa8f42a813de46d`\n- Asset: `Meridian-v1.2.0.zip` (5,565,865 bytes)\n- ZIP SHA-256: `f737958f6a64a8292afa5dd4af0ff8286cab0400ac028898048eb10773572478`\n- Packaged file count: 53\n- Extracted directory tree SHA-256: `e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`\n- Documented hash match: **Yes**\n- Hosted asset verification: downloaded from GitHub after publication; 53 files and the same extracted tree hash\n\n## Automated checks\n\n- Full Node suite: **131 passed, 0 failed, 0 skipped**\n- JavaScript syntax: **56 files checked, 0 failures**\n- Manifests: **2 parsed**, both version `1.2.0`, manifest version 3\n- Packaged parity: **1 passed, 0 failed**\n- `git diff --check`: clean\n- `git status --short`: clean\n\nThe Linux Tasker checkout contained mixed line endings, while the validated hash records the Windows CRLF checkout form. The release was staged with the validated checkout normalization; the staged tree, locally extracted archive, and re-downloaded GitHub asset all matched the authoritative documented hash. The Tasker-generated dispatch-baseline commit was excluded from the tag; the tag targets the task's explicitly identified release commit `7a2028c`, whose manifest and packaged extension have no content diff from validated candidate `5674a8b`.",
+      "attachment": "active/publish-meridian-v1-2-0-release-package-to-githu-44e0/publish-meridian-v1-2-0-release-package-to-github.md",
+      "agent_run_id": "agent-publish-meridian-v1-2-0-release-package-to-githu-44e0-8372c2439545"
+    },
+    {
+      "timestamp": "2026-08-14T19:52:22.972Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-14T16:55:46.872Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-1cb5791a0109650ab8ee",
+  "agent_startup_started_at": "2026-08-14T16:55:47.017Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/publish-meridian-v1-2-0-release-package-to-githu-44e0.md",
+      "direction": "self",
+      "at": "2026-08-14T17:01:47.766Z"
+    }
+  ]
+}

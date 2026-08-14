@@ -8,6 +8,32 @@
     <link rel="stylesheet" href="meridian.css" />
   </head>
   <body>
+    <!-- Shared mask: the knocked-out M, defined once for every .mark on the
+         page. Referenced by --mark-mask in meridian.css; the counter path is
+         duplicated as a stroked <path class="counter"> inside each mark so the
+         light theme can fill it instead of knocking it out. -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <mask
+          id="meridian-m"
+          maskUnits="userSpaceOnUse"
+          x="0"
+          y="0"
+          width="128"
+          height="128"
+        >
+          <rect width="128" height="128" fill="#fff" />
+          <path
+            d="M44 84V44l20 24 20-24v40"
+            fill="none"
+            stroke="#000"
+            stroke-width="13"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </mask>
+      </defs>
+    </svg>
     <div id="app">
       <div id="search-zone">
         <div id="search-bar"></div>

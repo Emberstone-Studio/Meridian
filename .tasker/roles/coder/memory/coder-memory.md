@@ -142,3 +142,11 @@
 **Status:** done
 **Last updated:** 2026-07-28
 
+### publish-meridian-v1-2-0-release-package-to-githu-44e0
+**Title:** Publish Meridian v1.2.0 release package to GitHub
+**Tags:** Release
+**Summary:** Release: https://github.com/Emberstone-Studio/Meridian/releases/tag/v1.2.0
+**Key decisions:** 
+**Status:** done
+**Last updated:** 2026-08-14
+

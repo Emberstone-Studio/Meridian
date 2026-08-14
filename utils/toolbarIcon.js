@@ -2,6 +2,23 @@ const TOOLBAR_ICON_SIZES = [16, 32];
 const LIGHT_TOOLBAR_COLOR = "#1c1c1e";
 const DARK_TOOLBAR_COLOR = "#f5f5f7";
 
+/* The toolbar mark is monochrome rather than brand mint on purpose. The browser
+   toolbar is chrome we don't control, it sits beside a dozen other extension
+   icons at 16px, and #2ed8b0 is only 1.67:1 on a light toolbar — the mark would
+   dissolve. Recolouring per scheme is what keeps it legible on both.
+
+   This imposes two constraints on img/Meridian.svg, which the file cannot
+   restate itself (see below):
+
+     1. The root element must carry a plain fill attribute, because the regex
+        below rewrites exactly that. The circle must NOT declare its own fill —
+        it inherits from the root. Do not reach for currentColor: that resolves
+        against the `color` property, which nothing here sets, so the mark would
+        render black on a dark toolbar.
+     2. Keep that file free of XML comments. The regex takes the FIRST match in
+        the document, so a comment mentioning an SVG open tag hijacks it — the
+        comment gets rewritten and the real root fill is left untouched, which
+        silently produces a near-black icon on dark chrome. */
 export function recolorToolbarSvg(svgText, isDark) {
   const color = isDark ? DARK_TOOLBAR_COLOR : LIGHT_TOOLBAR_COLOR;
   return svgText.replace(/<svg\b([^>]*)>/, (svg, attributes) => {

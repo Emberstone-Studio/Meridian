@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meridian — marquee promo tile 1400x560</title>
+<style>
+  /* Fonts resolve from the repo root, two levels up from store-assets/src/.
+     If the wordmark renders in a generic sans, this path is wrong: with
+     font-display the miss is silent and simply keeps the fallback forever. */
+  @font-face {
+    font-family: "Rubik";
+    src: url("../../fonts/Rubik-latin.woff2") format("woff2-variations");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: block;
+  }
+
+  :root {
+    --brand: #2ed8b0;
+    --ground: #1c1c1e;
+    --surface: #2c2c2e;
+    --border: #3a3a3c;
+    --fg: #f5f5f7;
+    --muted: #98989d;
+  }
+
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 1400px; height: 560px;
+    background: var(--ground);
+    font-family: "Rubik", system-ui, sans-serif;
+    display: grid; grid-template-columns: 1fr 1fr;
+    align-items: center;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  /* ---- left: identity ---- */
+  .identity { padding: 0 0 0 96px; }
+
+  /* Tight viewBox: the disc spans 12..116 of a 128 box, so the full frame
+     carries 9.4% transparent padding per side. Flex sizes the box, not the
+     ink, so that padding would silently widen the gap beside the mark. */
+  .lockup { display: flex; align-items: center; gap: 26px; }
+  .mark { display: block; flex-shrink: 0; }
+
+  /* Always caps, weight 500, .14em. letter-spacing appends its space after the
+     FINAL letter too; the negative margin cancels that phantom trailing gap. */
+  .wordmark {
+    font-weight: 500; font-size: 68px; line-height: 1;
+    text-transform: uppercase; letter-spacing: .14em; margin-right: -.14em;
+    color: var(--fg);
+  }
+
+  .tagline {
+    margin: 30px 0 0 4px;
+    font-weight: 400; font-size: 25px; line-height: 1;
+    letter-spacing: .05em; color: var(--muted);
+  }
+
+  /* ---- right: the lane spine, abstracted ----
+     Deliberately not a screenshot. These are the product's own spatial
+     primitives (a colored spine per tab group, cards hanging off it) reduced
+     to blocks with no text, so the tile reads as brand art rather than as
+     simulated UI. Brand mint is the Ungrouped lane; grouped lanes keep their
+     own Chrome tab-group color, exactly as in the app. */
+  .lanes {
+    display: flex; flex-direction: column; gap: 26px;
+    padding: 0 96px 0 40px;
+  }
+  .lane { display: flex; flex-direction: column; gap: 13px; }
+  .lane-header { display: flex; align-items: center; gap: 11px; }
+  .dot {
+    width: 18px; height: 18px; border-radius: 50%; box-sizing: border-box;
+    background: var(--ground); border: 5px solid var(--group-color);
+    flex-shrink: 0;
+  }
+  .lane-label {
+    height: 9px; border-radius: 4px; background: var(--muted); opacity: .5;
+  }
+  .lane-body { position: relative; padding-left: 34px; }
+  /* The dot is the header's first child, so it spans x=0..18 with its centre at
+     9. left:6 + width:6 puts the spine's centre at 9 exactly — both integers,
+     so it lands on the pixel grid without a half-pixel seam. */
+  .lane-body::before {
+    content: ""; position: absolute; left: 6px; top: -14px; bottom: 12px;
+    width: 6px; border-radius: 0 0 3px 3px;
+    background: var(--group-color); opacity: .55;
+  }
+  .cards { display: flex; gap: 13px; }
+  .card {
+    height: 52px; border-radius: 10px;
+    background: var(--surface); border: 1px solid #46464a;
+  }
+</style>
+</head>
+<body>
+
+  <div class="identity">
+    <div class="lockup">
+      <!-- Dark ground, so the M is a true knockout: an actual hole, with the
+           disc reading 9.37:1 against #1c1c1e. -->
+      <svg class="mark" viewBox="12 12 104 104" width="112" height="112" aria-hidden="true">
+        <mask id="meridian-m">
+          <rect width="128" height="128" fill="#fff"/>
+          <path d="M44 84V44l20 24 20-24v40" fill="none" stroke="#000"
+                stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+        </mask>
+        <circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/>
+      </svg>
+      <span class="wordmark">Meridian</span>
+    </div>
+    <p class="tagline">Spatial tab command center</p>
+  </div>
+
+  <div class="lanes">
+    <div class="lane" style="--group-color: var(--brand)">
+      <div class="lane-header">
+        <i class="dot"></i><i class="lane-label" style="width:104px"></i>
+      </div>
+      <div class="lane-body"><div class="cards">
+        <i class="card" style="width:150px"></i>
+        <i class="card" style="width:150px"></i>
+        <i class="card" style="width:150px"></i>
+      </div></div>
+    </div>
+
+    <div class="lane" style="--group-color:#8ab4f8">
+      <div class="lane-header">
+        <i class="dot"></i><i class="lane-label" style="width:88px"></i>
+      </div>
+      <div class="lane-body"><div class="cards">
+        <i class="card" style="width:150px"></i>
+        <i class="card" style="width:150px"></i>
+      </div></div>
+    </div>
+
+    <div class="lane" style="--group-color:#f28b82">
+      <div class="lane-header">
+        <i class="dot"></i><i class="lane-label" style="width:72px"></i>
+      </div>
+      <div class="lane-body"><div class="cards">
+        <i class="card" style="width:150px"></i>
+        <i class="card" style="width:150px"></i>
+        <i class="card" style="width:150px"></i>
+      </div></div>
+    </div>
+  </div>
+
+</body>
+</html>

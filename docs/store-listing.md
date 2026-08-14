@@ -1,184 +1,94 @@
-# Meridian — Chrome Web Store submission copy
+# Meridian — Chrome Web Store listing copy
 
-Last updated: July 26, 2026
+Last updated: August 14, 2026
 
-Publisher-facing copy for the Chrome Web Store listing, the **Privacy
-practices** tab, and the per-permission justification fields. It is derived from
-the source in this repository (manifest, `background.js`, `utils/`, and
-`components/`) and reconciled with `docs/privacy-meridian.md` and `README.md`.
+Paste-ready values for the Web Store dashboard fields.
 
-> **Owner action required.** Everything here is draft copy for review. It is not
-> a submission and does not certify anything in the Chrome Web Store dashboard.
-> Paste each block into the matching dashboard field, confirm it against the
-> exact archive you upload, and complete the owner-only follow-ups at the end of
-> this document. Items marked **[OWNER-ONLY — NOT DONE]** were not and cannot be
-> performed from the repository.
+**The description fields are plain text — Markdown does not render.** Copy the
+blocks below exactly, including the `•` characters. Do not convert them to
+Markdown.
 
 ---
 
-## 1. Store listing
-
-### Name
+## Name
 Meridian
 
-### Summary (short description, ≤132 characters)
-Spatial tab command center — a visual new-tab page that turns your open tabs
-into searchable thumbnail cards.
+## Summary (short description, max 132 — this is 109)
 
-### Category (suggested)
-Workflow & Planning (or Productivity)
+```
+Spatial tab command center — a visual new-tab page that turns your open tabs into searchable thumbnail cards.
+```
 
-### Detailed description
-Meridian replaces your new-tab page with a spatial command center for your open
-tabs.
+## Category
+Workflow & Planning
 
-Your tabs appear as live thumbnail cards, organized into workspace lanes that
-map to Chrome tab groups or to custom groups you create in Meridian. Drag to
-reorder tabs within and across groups, collapse lanes you are not using, and
-hover a card to open a full-size preview with the tab's title and URL.
+## Description
 
-**Features**
-- **Tab cards & workspace lanes** — every open tab as a live thumbnail, grouped
-  into collapsible lanes with drag-and-drop reordering.
-- **Local search** — instantly find open tabs by title, URL, domain, and page
-  context. Bookmark and history search are optional and off until you turn them
-  on.
-- **Multi-engine web search** — search with Google, DuckDuckGo, Bing, or Brave
-  from the top of every new-tab page; your choice is remembered.
-- **Theming & backgrounds** — Light, Dark, or System theme; solid colors,
-  gradient presets, curated Picsum photos, or your own uploaded image.
-- **Tab organization** — optionally cluster ungrouped tabs by domain.
-- **Flexible new-tab behavior** — open a fresh Meridian view, return to a pinned
-  Meridian tab, or load a custom homepage.
-- **Keyboard-first** — jump to Meridian, move between tabs and lanes, focus
-  search, and create groups without the mouse.
+```
+Meridian replaces your new-tab page with a spatial command center for your open tabs.
 
-**Privacy**
-Meridian runs entirely in your browser. It has no accounts, no analytics, and no
-Meridian-operated server. Your tab, page, screenshot, bookmark, and history data
-stays in your Chrome profile. Full details are in the extension's privacy policy.
+Your tabs appear as live thumbnail cards, organized into workspace lanes that map to Chrome tab groups or to custom groups you create in Meridian. Drag to reorder tabs within and across groups, collapse lanes you are not using, and hover a card to open a full-size preview with the tab's title and URL.
+
+FEATURES
+
+• Tab cards and workspace lanes — every open tab as a live thumbnail, grouped into collapsible lanes with drag-and-drop reordering.
+• Local search — instantly find open tabs by title, URL, domain, and page context.
+• Side panel — open Meridian's search from Chrome's side panel with the toolbar icon, without leaving the page you are on.
+• Bookmarks and history panel — reach bookmarks and recent history from a dropdown in the top bar, with site icons and one-click open. Both sources are optional and stay off until you turn them on.
+• Multi-engine web search — search with Google, DuckDuckGo, Bing, or Brave from the top of every new-tab page; your choice is remembered.
+• Theming and backgrounds — Light, Dark, or System theme; solid colors, gradient presets, curated photos, or your own uploaded image.
+• Tab organization — optionally cluster ungrouped tabs by domain.
+• Flexible new-tab behavior — open a fresh Meridian view, return to a pinned Meridian tab, or load a custom homepage.
+• Keyboard-first — jump to Meridian, move between tabs and lanes, focus search, and create groups without the mouse.
+
+PRIVACY
+
+Meridian runs entirely in your browser. It has no accounts, no analytics, and no Meridian-operated server. Your tab, page, screenshot, bookmark, and history data stays in your Chrome profile. Full details are in the extension's privacy policy.
+```
+
+## Support URL
+`https://emberstone-studio.com/`
+
+## Privacy policy URL
+`https://emberstone-studio.com/docs/privacy/meridian`
+
+Publish `docs/privacy-meridian.md` there first — the in-product Settings link
+already points to it.
+
+## Graphics
+In `store-assets/`: 5 screenshots (1280×800), promo tile (440×280), marquee
+(1400×560). Icon is `img/icon128.png`.
 
 ---
 
-## 2. Privacy practices tab
+# Privacy tab
 
-### 2.1 Single purpose (single-purpose description field)
+## Single purpose
 Meridian is a new-tab replacement that helps users view, search, and organize
 their open browser tabs as a visual, spatial workspace. Every permission and
 data access exists to render tabs as searchable thumbnail cards, to search local
 browser data the user opts into, and to personalize the new-tab surface.
 
-### 2.2 Data types collected or used
-Declare the following categories in the dashboard. All are used **on-device for
-the extension's features**; none are transferred to a Meridian-operated server.
+## Data types — check these three
+- **Web browsing activity** — tab titles, URLs, domains, group membership,
+  activation state; plus bookmarks/history only if the user enables them.
+- **Website content** — meta description and H1/H2 text read after page load,
+  and JPEG screenshots of active tabs for thumbnails.
+- **User activity** — tab activation, grouping, ordering, workspace assignments.
 
-| Dashboard data type | Applies? | What it covers in Meridian |
-| --- | --- | --- |
-| **Web browsing activity** | Yes | Open tab titles, URLs, domains, tab-group membership, window IDs, tab activation/previous-tab state, and — only if the user enables them — bookmark and browsing-history entries used for local search. |
-| **Website content** | Yes | Per-tab meta-description and H1/H2 heading text read after a page finishes loading, and JPEG screenshots of the visible area of active tabs captured for thumbnails/previews. Screenshots can contain whatever is on screen at capture time. |
-| **User activity** | Yes (recommended) | Tab activation, previous-tab tracking, grouping, ordering, and workspace assignments that drive the UI. Disclosed here because reviewers may treat this interaction/usage state as user-activity data. |
-| Personally identifiable information | No | Not collected. |
-| Health information | No | Not collected. |
-| Financial and payment information | No | Not collected. |
-| Authentication information | No | Not collected. |
-| Personal communications | No | Not collected. |
-| Location | No | Not collected. |
+Everything else (PII, health, financial, authentication, communications,
+location) is **No**.
 
-> The user's **uploaded custom background image** and **preferences** (theme,
-> background choice, search provider, enabled local-search sources, new-tab
-> behavior, optional homepage URL, domain-grouping) are user-provided content
-> stored on the device. Preferences sync through the user's own Chrome Sync if
-> enabled; the uploaded image bytes and captured screenshots are never placed in
-> sync storage. Map these to the dashboard's user-content categories as the
-> current form requires.
+## Certifications — check all three
+Confirm against the uploaded archive first.
 
-### 2.3 Data usage certifications
-Based on the reviewed source, the publisher should be able to affirm all three
-required certifications — **confirm each against the uploaded archive before
-checking the box:**
-
-- ☑ I do **not** sell or transfer user data to third parties outside of the
-  approved use cases.
-- ☑ I do **not** use or transfer user data for purposes unrelated to my item's
-  single purpose.
-- ☑ I do **not** use or transfer user data to determine creditworthiness or for
-  lending purposes.
-
-### 2.4 Privacy policy URL
-`https://emberstone-studio.com/docs/privacy/meridian`
-
-Meridian-specific policy text lives in `docs/privacy-meridian.md` in this
-repository. **[OWNER ACTION STILL NEEDED]** Publish that content at the URL
-above before entering it in the dashboard, then confirm the live page matches
-`docs/privacy-meridian.md`.
+- ☑ Not sold to third parties outside approved use cases.
+- ☑ Not used or transferred for purposes unrelated to the single purpose.
+- ☑ Not used to determine creditworthiness or for lending.
 
 ---
 
-## 3. Data handling disclosure (paste-ready listing block)
-
-Meridian processes the following **locally in your browser** to provide its
-features. Most of it stays in on-device storage; preferences are the exception
-and can sync through your own Chrome Sync account (see "Local & sync storage"
-below):
-
-- **Browsing activity** — open tab titles, URLs, domains, tab-group membership,
-  and tab activation/order, used to display, search, and manage your tabs. A
-  local search index and workspace/UI state are stored in `chrome.storage.local`.
-- **Website content** — after a page loads, Meridian reads its meta description
-  and H1/H2 headings so local search can match page context beyond the title and
-  URL. It does not read form input or other page-body text.
-- **Screenshots** — Meridian captures the visible area of active tabs after tab
-  activation or page load, and during a user-requested full refresh that cycles
-  eligible tabs. Automatic captures (activation/page load) do not filter by URL
-  in Meridian's code — Chrome's `captureVisibleTab` API itself refuses
-  `chrome://`, Chrome Web Store, and other extensions' pages, so only those
-  attempts fail; any other page, including one with sensitive content on
-  screen, is captured. The full refresh additionally skips `chrome://`,
-  `chrome-extension://`, and `about:` tabs in Meridian's own code before
-  switching to them. Screenshots are stored as JPEG blobs in extension-local
-  IndexedDB; cache metadata and refresh markers use `chrome.storage.local`.
-  Storage targets roughly 200 entries / ~50 MB and
-  prunes the oldest thumbnails first, but a still-open tab's thumbnail is never
-  evicted to make room, so usage can exceed that target while those tabs stay
-  open. A tab's thumbnail is removed when the tab closes.
-- **Local & sync storage** — preferences (theme, background, search provider,
-  enabled local-search sources, new-tab behavior, optional homepage, domain
-  grouping) are stored in `chrome.storage.sync`. If the user has Chrome Sync
-  turned on, Chrome syncs this data through the user's own Google/Chrome
-  account to their other signed-in devices, subject to the user's Chrome Sync
-  settings — it is not Meridian-operated syncing. Workspaces, search metadata,
-  thumbnails, the Meridian/previous tab IDs, and an uploaded custom background
-  image stay in `chrome.storage.local` / IndexedDB and are not synced.
-- **Optional bookmarks & history** — off by default. Meridian requests bookmark
-  or history access only when you enable that source in Settings → Local Search
-  or select its search scope, and queries it only to show local-search results.
-  It keeps no separate persistent copy; revoking access turns the source off.
-- **External requests** — search-provider icons load from fixed Google,
-  DuckDuckGo, Bing, and Brave icon URLs (these contain no visited URL); favicons
-  resolve through Chrome's packaged `_favicon` provider (not Google S2); the
-  background settings load photo previews and selected photos from
-  `picsum.photos` by seed. Starting a web search, opening a result, or choosing a
-  custom homepage navigates your browser to that destination normally.
-- **Retention & deletion** — data persists in local/sync storage until replaced,
-  evicted, cleared, or removed with the extension or profile. Closing a tab
-  deletes its cached thumbnail and search entry (including extracted metadata).
-  You can clear all extension data through Chrome's controls.
-- **Outbound links in Settings** — the Settings panel's Emberstone Studio
-  footer contains two static links: the studio site
-  (`https://emberstone-studio.com`) and a Ko-fi donation page
-  (`https://ko-fi.com/emberstonestudio`). They do nothing until the user
-  explicitly clicks one, which opens that destination in a new tab. Meridian
-  makes no background request for them and adds no click tracking or analytics.
-- **No telemetry or backend** — Meridian has no Meridian-operated server, no
-  analytics or advertising SDK, no account system, and no telemetry uploader.
-
----
-
-## 4. Permission justifications
-
-Paste each string into the matching "why do you need this permission?" field.
-
-### Required permissions
+# Permission justifications
 
 **`tabs`**
 Read tab titles, URLs, domains, and group/window membership and act on tabs
@@ -197,10 +107,10 @@ IndexedDB, so settings and layout survive across sessions.
 
 **`unlimitedStorage`**
 Screenshot thumbnails are stored as JPEG blobs in IndexedDB and can exceed the
-default storage quota. `unlimitedStorage` lets the local thumbnail cache hold enough
-entries to be useful. Code targets roughly 200 entries / ~50 MB and prunes the
-oldest thumbnails first when over that target, but never evicts a thumbnail for
-a tab that is still open — so actual usage can exceed the target while those
+default storage quota. `unlimitedStorage` lets the local thumbnail cache hold
+enough entries to be useful. Code targets roughly 200 entries / ~50 MB and prunes
+the oldest thumbnails first when over that target, but never evicts a thumbnail
+for a tab that is still open — so actual usage can exceed the target while those
 tabs stay open.
 
 **`favicon`**
@@ -233,8 +143,6 @@ The separate, user-requested full refresh does explicitly skip `chrome://`,
 `chrome-extension://`, and `about:` tabs in Meridian's code before switching to
 them. Meridian makes no network request to a Meridian server.
 
-### Optional permissions (requested only on demand)
-
 **`bookmarks`** *(optional)*
 Requested only when the user enables bookmark search in Settings → Local Search
 or selects the bookmark scope. Used to read bookmark titles, URLs, and folder
@@ -249,63 +157,16 @@ or revoking it leaves the feature off.
 
 ---
 
-## 5. Owner-only follow-ups (NOT performed from this repository)
+# Before you submit
 
-These require the publisher's Chrome Web Store dashboard, hosting, and
-operational knowledge. **None have been done here — do not mark them complete
-until actually performed:**
+- Publish the privacy policy at the URL above.
+- Answer the **trader** declaration. Declaring trader publishes your address and
+  phone on the listing. The Ko-fi link in Settings bears on this.
+- Upload the current screenshots — the ones in `store-assets/` were replaced.
+- `manifest.json`'s `description` is "Spatial tab command center" (26 chars) and
+  does not match the summary above. Pick one.
+- The Details tab (version, size, languages, developer) fills itself from the
+  package and your account. Nothing to write.
 
-- **[OWNER-ONLY — NOT DONE]** Publish `docs/privacy-meridian.md`'s content at
-  `https://emberstone-studio.com/docs/privacy/meridian`, the URL the in-product
-  Settings disclosure now links to (see §2.4). The Meridian-specific text is
-  ready in the repository; only the live publish step remains.
-- **[OWNER-ONLY — NOT DONE]** Enter and submit the single-purpose description,
-  data-type selections, and the three data-usage certifications in the dashboard.
-- **[OWNER-ONLY — NOT DONE]** Confirm each permission justification against the
-  exact uploaded archive and paste it into the dashboard field.
-- **[OWNER-ONLY — NOT DONE]** Verify prominent-disclosure / affirmative-consent
-  requirements for screenshot capture and optional bookmarks/history are met in
-  the listing and in-product experience (a policy link alone may not suffice).
-- **[OWNER-ONLY — NOT DONE]** Perform a manual network audit of the packed
-  release (new-tab, side panel, settings, search, bookmark/history,
-  missing-favicon, thumbnail-refresh flows) and confirm no analytics, telemetry,
-  or remote code beyond this repository.
-- **[OWNER-ONLY — NOT DONE]** Review the current `picsum.photos` and
-  search-provider policies/terms, and Chrome's favicon-endpoint guidance, for
-  ongoing accuracy.
-- **[OWNER-ONLY — NOT DONE]** Reconcile support-contact details, retention/
-  deletion statements, and all store-form answers with actual operational
-  practice.
-
----
-
-## 6. Reconciliation notes
-
-Verified against the current source on the "Last updated" date:
-
-- **Manifest ↔ copy** — required permissions (`tabs`, `tabGroups`, `storage`,
-  `unlimitedStorage`, `scripting`, `sidePanel`, `favicon`), optional
-  (`bookmarks`, `history`), and host access (`<all_urls>`) each have a
-  justification above. The repository root manifest and `meridian-extension/`
-  manifest are identical.
-- **Runtime ↔ copy** — screenshots are JPEG blobs in IndexedDB after
-  `captureVisibleTab` (quality 72) and bounded resizing; a display failure keeps
-  the stored blob and marks it for replacement on a later natural activation;
-  the cache targets a soft ~200 entries / ~50 MB, pruning the oldest thumbnails
-  first but never evicting a still-open tab's thumbnail, and always evicting on
-  tab close (`utils/thumbnailCache.js`); automatic capture (activation/page
-  load) does not filter by URL in code and relies on Chrome's own
-  `captureVisibleTab`/`scripting` restrictions, while the user-requested full
-  refresh explicitly skips `chrome://`, `chrome-extension://`, and `about:`
-  tabs (`background.js`); the extractor reads meta description + H1/H2 only
-  (`utils/browserSearch.js`); favicons use the `_favicon` endpoint
-  (`utils/favicon.js`); background photos use `picsum.photos` seeds
-  (`components/SettingsPanel.js`, 12 photos); the Settings Emberstone Studio
-  footer adds two static outbound links (studio site + Ko-fi donation page)
-  that only navigate on explicit user click, with no click tracking or
-  analytics (`components/SettingsPanel.js`); `chrome.storage.sync` preference
-  data can sync through the user's own Chrome Sync account. No backend/
-  telemetry code exists.
-- **Terminology** — "workspace lanes," "local search," "thumbnails/screenshots,"
-  and "optional bookmarks/history" are used consistently in `README.md`,
-  `docs/privacy-meridian.md`, and this document.
+Data-handling detail lives in `docs/privacy-meridian.md` — that's the policy
+content, not listing copy.

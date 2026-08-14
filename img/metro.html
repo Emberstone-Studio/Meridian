@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Meridian — Rubik + #2ed8b0</title>
+
+<style>
+  /* Rubik, bundled locally — no network request, which matters because this
+     surface repaints on every new tab. Variable 300–900 in two subsets: 35KB
+     latin + 19KB latin-ext, and latin-ext only downloads if a tab title
+     actually contains one of its codepoints.
+
+     font-display: optional is deliberate. `swap` would show system-ui first
+     and then visibly jump to Rubik — on every single new tab. `optional`
+     gives the font a ~100ms window and, if it isn't ready, keeps the fallback
+     for that paint and never swaps. After first load it's disk-cached and
+     effectively always ready: you get Rubik with zero layout shift.
+
+     Rubik is SIL OFL 1.1 — free to bundle and redistribute in the extension. */
+  @font-face {
+    font-family: "Rubik";
+    src: url("../fonts/Rubik-latin.woff2") format("woff2-variations");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: optional;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+      U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+      U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+  @font-face {
+    font-family: "Rubik";
+    src: url("../fonts/Rubik-latin-ext.woff2") format("woff2-variations");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: optional;
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+      U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+      U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+      U+A720-A7FF;
+  }
+
+  :root {
+    /* Brand is fixed. --accent stays wallpaper-derived; they are not the same
+       token and must not be merged, or the logo changes hue with the wallpaper. */
+    --brand:#2ed8b0;      /* FILL only — 1.67:1 on light, never text/hairlines */
+    --brand-ink:#0d2f28;  /* the only safe foreground ON --brand (7.95:1)      */
+    --radius:8px; --radius-sm:4px; --transition:150ms ease;
+    --font-ui:"Rubik",system-ui,-apple-system,sans-serif;
+  }
+  .on-light {
+    --fg:#1a1a1a; --muted:#6b6b6b; --surface:#eaeaea;
+    --border:#d2d2d2; --card-bg:rgba(255,255,255,.8); --ground:#f5f5f5;
+  }
+  .on-dark {
+    --fg:#f5f5f7; --muted:#98989d; --surface:#2c2c2e;
+    --border:#3a3a3c; --card-bg:rgba(44,44,46,.8); --ground:#1c1c1e;
+  }
+  .on-light,.on-dark { background:var(--ground); color:var(--fg); }
+
+  body { margin:0; padding:44px 40px 90px; background:#141416; color:#f5f5f7;
+         font-family:var(--font-ui); font-size:15px; line-height:1.5;
+         font-weight:400; }
+  h1 { font-size:21px; font-weight:600; margin:0 0 6px; letter-spacing:-.01em; }
+  p.sub { color:#98989d; margin:0; max-width:64ch; }
+  h2 { font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:#98989d;
+       margin:54px 0 6px; font-weight:600; }
+  p.note { color:#98989d; font-size:13.5px; margin:0 0 18px; max-width:66ch; }
+  .stage { padding:30px; border-radius:12px; }
+  .split { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+  /* ---------- swatches ---------- */
+  .sw { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .chip { border-radius:10px; overflow:hidden; border:1px solid #3a3a3c; }
+  .chip .cap { height:82px; display:flex; align-items:center; justify-content:center;
+               font-weight:600; font-size:15px; letter-spacing:.02em; }
+  .chip .meta { padding:11px 13px; background:#1c1c1e; }
+  .chip .tok { font-size:12.5px; font-weight:600; }
+  .chip .hex { font-size:11.5px; color:#98989d; font-family:ui-monospace,monospace; }
+  .chip .use { font-size:11.5px; color:#98989d; margin-top:6px; line-height:1.35; }
+  .pass { color:#2ed8b0; } .fail { color:#ff8f8f; }
+
+  /* ---------- lockups ----------
+     Two invisible things were breaking the spacing, and both are fixed here:
+
+     1. The mark's icon viewBox (0 0 128 128) holds a disc of r=52 at c=64, so
+        it spans 12..116 — 9.375% transparent padding on every side. Flex sizes
+        the box, not the ink, so that padding silently widens every gap next to
+        the mark. Lockups use viewBox "12 12 104 104", tight to the disc, which
+        makes the flex `gap` the one and only source of spacing.
+     2. letter-spacing appends its space AFTER the final letter too, so the
+        wordmark carries ~3.9px of dead air on its right. `margin-right:-.14em`
+        cancels exactly that — which matters most inside the nameplate pill,
+        where it would otherwise fake extra right padding.
+
+     One wordmark treatment — always caps, always .14em — in both containers.
+     Tracking is mandatory at these sizes: Rubik's caps are tight, and
+     uppercase without tracking reads as a solid block. */
+  .mark, .mark-demo { display:block; flex-shrink:0; }
+  /* .mark-demo is deliberately outside the adaptive rules below: the
+     §2 panels hard-code each treatment so they can be compared. */
+
+  /* The COUNTER adapts to the ground; the brand color never does.
+     On dark the M stays a true knockout — an actual hole, so a wallpaper shows
+     through it. On light, #2ed8b0 sits at 1.67:1 against the page, so a hole
+     has nothing to hold its shape at 16px; filling the counter with
+     --brand-ink (7.95:1) gives the mark its own internal structure.
+
+     This toggles the CSS `mask` property rather than layering an ink path on
+     top of a still-masked disc. Layering would composite the page background
+     into the M's antialiased edge at ~25% and leave a faint halo along the
+     stroke; swapping the mask off means the ink meets the mint directly. */
+  .mark circle { mask: url(#meridian-m); }
+  .mark .counter { stroke: transparent; }
+  .on-light .mark circle { mask: none; }
+  .on-light .mark .counter { stroke: var(--brand-ink); }
+  /* The nameplate mark is already ink-on-mint, so it keeps the knockout in
+     both themes — filling its counter would collapse it to a solid blob. */
+  .on-light .mark--plate circle { mask: url(#meridian-m); }
+  .on-light .mark--plate .counter { stroke: transparent; }
+
+  .wordmark { font-weight:500; text-transform:uppercase;
+              letter-spacing:.14em; margin-right:-.14em; }
+
+  /* padding-left == padding-top, so the 32px disc sits exactly concentric with
+     the pill's 26px-radius round cap rather than floating inside it. */
+  .lockup-plate { display:inline-flex; align-items:center; gap:14px;
+                  background:var(--brand); padding:10px 24px 10px 10px;
+                  border-radius:999px; }
+  .lockup-plate .wordmark { font-size:23px; color:var(--brand-ink); }
+
+  .lockup-quiet { display:flex; align-items:center; gap:14px; }
+  .lockup-quiet .wordmark { font-size:24px; }
+
+  /* ---------- type scale ---------- */
+  .scale div { margin-bottom:14px; }
+  .t-title { font-size:13px; font-weight:500; text-transform:uppercase;
+             letter-spacing:.05em; color:var(--muted); }
+  .t-card { font-size:13px; }
+  .t-count { font-size:11px; color:var(--muted); }
+  .spec { font-size:11px; color:var(--muted); font-family:ui-monospace,monospace;
+          margin-left:10px; opacity:.7; }
+
+  /* ---------- lane spine ---------- */
+  .workspace-lane { margin-bottom:8px; }
+  .lane-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .lane-title { font-size:13px; font-weight:500; line-height:1; color:var(--muted);
+                text-transform:uppercase; letter-spacing:.05em; }
+  .lane-tab-count { font-size:11px; line-height:1; color:var(--muted); opacity:.85; }
+  .lane-group-dot { width:13px; height:13px; border-radius:50%; flex-shrink:0;
+                    background:var(--ground); border:3.5px solid var(--group-color);
+                    box-sizing:border-box; }
+  .lane-body { position:relative; padding-left:26px; }
+  .lane-body::before { content:""; position:absolute; left:3px; top:-10px; bottom:10px;
+                       width:4px; border-radius:0 0 2px 2px; background:var(--group-color);
+                       opacity:.55; transition:opacity var(--transition); }
+  .workspace-lane:hover .lane-body::before { opacity:1; }
+  .tab-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+              gap:10px; padding:8px; border-radius:var(--radius); }
+  .tab-card { background:var(--card-bg); border:1px solid var(--border);
+              border-radius:var(--radius); padding:10px 12px; font-size:13px;
+              display:flex; align-items:center; gap:8px; min-height:44px; }
+  .favicon { width:16px; height:16px; border-radius:3px; background:var(--muted);
+             flex-shrink:0; opacity:.55; }
+  .tab-card span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .new-tab-card { border:1px dashed var(--border); background:transparent;
+                  color:var(--muted); justify-content:center; }
+  h3 { font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+       margin:0 0 12px; font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- shared mask: the knocked-out M, defined once -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <mask id="meridian-m" maskUnits="userSpaceOnUse" x="0" y="0" width="128" height="128">
+    <rect width="128" height="128" fill="#fff"/>
+    <path d="M44 84V44l20 24 20-24v40" fill="none" stroke="#000" stroke-width="13"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </mask>
+</defs></svg>
+
+<h1>Meridian — Rubik + #2ed8b0</h1>
+<p class="sub">Logo geometry untouched. This is type and color only.</p>
+
+<!-- ============================================================= -->
+<h2>1 · The color, measured</h2>
+<p class="note">#2ed8b0 is <strong>hsl(166 69% 51%)</strong> — a light color, used at full
+strength in both themes as specified. Two tokens, not three: the mint itself, and the one
+ink that is legible on top of it.</p>
+<div class="sw">
+  <div class="chip">
+    <div class="cap" style="background:#2ed8b0;color:#0d2f28">--brand</div>
+    <div class="meta"><div class="tok">--brand</div><div class="hex">#2ed8b0</div>
+      <div class="use"><span class="pass">9.37:1 on dark</span> ·
+        <span class="fail">1.67:1 on light</span><br>Identical in both themes.
+        A fill — never body text, never a hairline.</div></div>
+  </div>
+  <div class="chip">
+    <div class="cap" style="background:#0d2f28;color:#2ed8b0">--brand-ink</div>
+    <div class="meta"><div class="tok">--brand-ink</div><div class="hex">#0d2f28</div>
+      <div class="use"><span class="pass">7.95:1 on --brand</span><br>The only foreground
+        allowed on the mint. White scores 1.82:1 — never use it.</div></div>
+  </div>
+  <div class="chip">
+    <div class="cap" style="background:#f5f5f5;color:#2ed8b0">on light</div>
+    <div class="meta"><div class="tok">Known tradeoff</div><div class="hex">1.67:1</div>
+      <div class="use">Brand marks are exempt from WCAG contrast, so this is a legitimate
+        call — but it does mean the mark leans on <code>--brand-ink</code> for its
+        structure on light surfaces. See §2.</div></div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<h2>2 · Counter treatment — adapts to the ground</h2>
+<p class="note">The counter is the one thing that changes between themes — the brand color does not. On dark, a knockout is a genuine hole, so a wallpaper shows through the M and the disc reads at 9.37:1. On light the same hole gives 1.67:1 and the mark dissolves, so the counter fills with <code>--brand-ink</code> (7.95:1) and the mark carries its own structure. Geometry is identical in both.</p>
+<div class="split">
+  <div class="stage on-light">
+    <h3>Light · knockout — rejected</h3>
+    <div style="display:flex;align-items:center;gap:22px">
+      <svg class="mark-demo" viewBox="0 0 128 128" width="72" height="72"><circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="32" height="32"><circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="16" height="16"><circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/></svg>
+    </div>
+  </div>
+  <div class="stage on-light">
+    <h3>Light · ink counter — adopted</h3>
+    <div style="display:flex;align-items:center;gap:22px">
+      <svg class="mark-demo" viewBox="0 0 128 128" width="72" height="72"><circle cx="64" cy="64" r="52" fill="var(--brand)"/><path d="M44 84V44l20 24 20-24v40" fill="none" stroke="var(--brand-ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="32" height="32"><circle cx="64" cy="64" r="52" fill="var(--brand)"/><path d="M44 84V44l20 24 20-24v40" fill="none" stroke="var(--brand-ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="16" height="16"><circle cx="64" cy="64" r="52" fill="var(--brand)"/><path d="M44 84V44l20 24 20-24v40" fill="none" stroke="var(--brand-ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+  <div class="stage on-dark">
+    <h3>Dark · knockout — adopted</h3>
+    <div style="display:flex;align-items:center;gap:22px">
+      <svg class="mark-demo" viewBox="0 0 128 128" width="72" height="72"><circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="32" height="32"><circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="16" height="16"><circle cx="64" cy="64" r="52" fill="var(--brand)" mask="url(#meridian-m)"/></svg>
+    </div>
+  </div>
+  <div class="stage on-dark">
+    <h3>Dark · ink counter — rejected</h3>
+    <div style="display:flex;align-items:center;gap:22px">
+      <svg class="mark-demo" viewBox="0 0 128 128" width="72" height="72"><circle cx="64" cy="64" r="52" fill="var(--brand)"/><path d="M44 84V44l20 24 20-24v40" fill="none" stroke="var(--brand-ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="32" height="32"><circle cx="64" cy="64" r="52" fill="var(--brand)"/><path d="M44 84V44l20 24 20-24v40" fill="none" stroke="var(--brand-ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="mark-demo" viewBox="0 0 128 128" width="16" height="16"><circle cx="64" cy="64" r="52" fill="var(--brand)"/><path d="M44 84V44l20 24 20-24v40" fill="none" stroke="var(--brand-ink)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<h2>3 · Lockups in Rubik</h2>
+<p class="note">One color, both themes — <code>#2ed8b0</code> throughout, no light-mode
+substitute. Rubik at <strong>500</strong>, not 600: its 600 thickens against the mark's
+monolinear stroke. Always caps, always .14em tracking, in every container.</p>
+<div class="split">
+  <div class="stage on-light">
+    <h3>Nameplate</h3>
+    <div class="lockup-plate">
+      <svg class="mark mark--plate" viewBox="12 12 104 104" width="32" height="32" style="color:var(--brand-ink)"><circle cx="64" cy="64" r="52" fill="currentColor"/><path class="counter" d="M44 84V44l20 24 20-24v40" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="wordmark">Meridian</div></div>
+  </div>
+  <div class="stage on-dark">
+    <h3>Nameplate</h3>
+    <div class="lockup-plate">
+      <svg class="mark mark--plate" viewBox="12 12 104 104" width="32" height="32" style="color:var(--brand-ink)"><circle cx="64" cy="64" r="52" fill="currentColor"/><path class="counter" d="M44 84V44l20 24 20-24v40" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="wordmark">Meridian</div></div>
+  </div>
+  <div class="stage on-light">
+    <h3>Quiet lockup — the top bar</h3>
+    <div class="lockup-quiet">
+      <svg class="mark" viewBox="12 12 104 104" width="36" height="36" style="color:var(--brand)"><circle cx="64" cy="64" r="52" fill="currentColor"/><path class="counter" d="M44 84V44l20 24 20-24v40" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="wordmark">Meridian</div></div>
+  </div>
+  <div class="stage on-dark">
+    <h3>Quiet lockup — the top bar</h3>
+    <div class="lockup-quiet">
+      <svg class="mark" viewBox="12 12 104 104" width="36" height="36" style="color:var(--brand)"><circle cx="64" cy="64" r="52" fill="currentColor"/><path class="counter" d="M44 84V44l20 24 20-24v40" fill="none" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="wordmark">Meridian</div></div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<h2>4 · Rubik at the app's real sizes</h2>
+<p class="note">Rubik's x-height is slightly larger than system-ui's, so it reads a touch
+bigger at the same px. Weights drop one step across the board — your 600s become 500s —
+or the UI gains weight it didn't ask for.</p>
+<div class="split">
+  <div class="stage on-light scale">
+    <div><span class="t-title">Research</span><span class="t-count"> 4</span><span class="spec">13px / 500 / .05em</span></div>
+    <div><span class="t-card">Nielsen Norman Group</span><span class="spec">13px / 400</span></div>
+    <div><span class="wordmark" style="font-size:24px;display:inline-block">Meridian</span><span class="spec">24px / 500 / .14em caps</span></div>
+  </div>
+  <div class="stage on-dark scale">
+    <div><span class="t-title">Research</span><span class="t-count"> 4</span><span class="spec">13px / 500 / .05em</span></div>
+    <div><span class="t-card">Nielsen Norman Group</span><span class="spec">13px / 400</span></div>
+    <div><span class="wordmark" style="font-size:24px;display:inline-block">Meridian</span><span class="spec">24px / 500 / .14em caps</span></div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<h2>5 · Lane spine, with the brand as the default lane</h2>
+<p class="note">Grouped lanes keep their Chrome tab-group color — brand mint is the
+<em>ungrouped</em> default, so the identity color shows up without overriding user choices.</p>
+<div class="stage on-dark">
+  <div class="workspace-lane" style="--group-color:var(--brand)">
+    <div class="lane-header"><i class="lane-group-dot"></i>
+      <span class="lane-title">Ungrouped</span><span class="lane-tab-count">3</span></div>
+    <div class="lane-body"><div class="tab-grid">
+      <div class="tab-card"><i class="favicon"></i><span>Nielsen Norman</span></div>
+      <div class="tab-card"><i class="favicon"></i><span>WCAG 2.2 Quickref</span></div>
+      <div class="tab-card new-tab-card">+</div>
+    </div></div>
+  </div>
+  <div class="workspace-lane" style="--group-color:#8ab4f8">
+    <div class="lane-header"><i class="lane-group-dot"></i>
+      <span class="lane-title">Research</span><span class="lane-tab-count">3</span></div>
+    <div class="lane-body"><div class="tab-grid">
+      <div class="tab-card"><i class="favicon"></i><span>Baymard Institute</span></div>
+      <div class="tab-card"><i class="favicon"></i><span>MDN — CSS Grid</span></div>
+      <div class="tab-card new-tab-card">+</div>
+    </div></div>
+  </div>
+  <div class="workspace-lane" style="--group-color:#f28b82">
+    <div class="lane-header"><i class="lane-group-dot"></i>
+      <span class="lane-title">Build</span><span class="lane-tab-count">2</span></div>
+    <div class="lane-body"><div class="tab-grid">
+      <div class="tab-card"><i class="favicon"></i><span>localhost:5173</span></div>
+      <div class="tab-card new-tab-card">+</div>
+    </div></div>
+  </div>
+</div>
+
+</body>
+</html>

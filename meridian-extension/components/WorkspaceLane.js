@@ -147,27 +147,29 @@ export function createWorkspaceLane(
   collapseBtn.innerHTML = CHEVRON;
   collapseBtn.setAttribute("aria-label", "Collapse lane");
 
-  if (chromeGroup?.color) {
-    // Clickable color dot: opens a palette of the browser's group colors.
-    const dot = document.createElement("button");
-    dot.className = "lane-group-dot";
-    dot.style.setProperty(
-      "--group-color",
-      GROUP_COLORS[chromeGroup.color] ?? "#9aa0a6",
-    );
+  // Every lane gets a dot — it caps the lane spine. Only real Chrome groups
+  // get the click-to-recolor affordance; every other lane renders a static
+  // marker in the lane's --group-color, which defaults to brand mint.
+  const groupColor = chromeGroup?.color
+    ? (GROUP_COLORS[chromeGroup.color] ?? "#9aa0a6")
+    : null;
+  if (groupColor) lane.style.setProperty("--group-color", groupColor);
+
+  const recolorable = !!groupColor && hasNativeGroups;
+  const dot = document.createElement(recolorable ? "button" : "i");
+  dot.className = "lane-group-dot";
+  if (recolorable) {
     dot.setAttribute("aria-label", "Change group color");
     dot.title = "Change color";
-    if (hasNativeGroups) {
-      dot.addEventListener("click", (e) => {
-        e.stopPropagation();
-        openColorPicker(dot, chromeGroup);
-      });
-    }
-    header.appendChild(collapseBtn);
-    header.appendChild(dot);
+    dot.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openColorPicker(dot, chromeGroup);
+    });
   } else {
-    header.appendChild(collapseBtn);
+    dot.setAttribute("aria-hidden", "true");
   }
+  header.appendChild(collapseBtn);
+  header.appendChild(dot);
 
   const title = document.createElement("button");
   title.className = "lane-title";
@@ -233,8 +235,14 @@ export function createWorkspaceLane(
   const grid = document.createElement("div");
   grid.className = "tab-grid";
 
+  // The spine is drawn by .lane-body::before, so collapsing has to hide the
+  // wrapper — hiding only the grid would leave a stub of spine behind.
+  const body = document.createElement("div");
+  body.className = "lane-body";
+  body.appendChild(grid);
+
   // Apply initial collapsed state
-  grid.classList.toggle("hidden", collapsed);
+  body.classList.toggle("hidden", collapsed);
   collapseBtn.classList.toggle("lane-collapse-btn--collapsed", collapsed);
   collapseBtn.setAttribute(
     "aria-label",
@@ -243,7 +251,7 @@ export function createWorkspaceLane(
 
   collapseBtn.addEventListener("click", () => {
     collapsed = !collapsed;
-    grid.classList.toggle("hidden", collapsed);
+    body.classList.toggle("hidden", collapsed);
     collapseBtn.classList.toggle("lane-collapse-btn--collapsed", collapsed);
     collapseBtn.setAttribute(
       "aria-label",
@@ -361,7 +369,7 @@ export function createWorkspaceLane(
     grid.appendChild(el);
   }
 
-  lane.appendChild(grid);
+  lane.appendChild(body);
 
   lane.addEventListener("close-tab", (e) => onTabClosed(e.detail.tabId));
 

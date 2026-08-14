@@ -11,6 +11,7 @@ import {
   applyAccentFromBackground,
   applyBackground,
   applyPhotoAdjustments,
+  initialPhotoAdjust,
   DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
 import { getCustomBackgroundUrl } from "./utils/customBackground.js";
@@ -73,7 +74,7 @@ async function applyStoredAppearance(backgroundOverride = null) {
   const customUrl = customUrlPromise ? await customUrlPromise : null;
   if (generation !== appearanceGeneration) return;
   applyBackground(bg, customUrl);
-  applyPhotoAdjustments(bg, photoAdjust);
+  applyPhotoAdjustments(bg, initialPhotoAdjust(bg, photoAdjust));
 }
 
 function setupLightbox() {

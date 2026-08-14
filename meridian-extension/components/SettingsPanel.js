@@ -114,10 +114,10 @@ const GRADIENT_PRESETS = [
   },
 ];
 
-// Default background when the user hasn't chosen one — the bundled aurora photo.
+// Default background when the user hasn't chosen one — the bundled train photo.
 export const DEFAULT_BACKGROUND = {
   type: "photo",
-  value: "img/aurora.webp",
+  value: "img/train.webp",
 };
 
 // Photo-only appearance modifiers (transparency + blur + which color the photo
@@ -125,9 +125,34 @@ export const DEFAULT_BACKGROUND = {
 const PHOTO_BLUR_MAX = 20;
 export const DEFAULT_PHOTO_ADJUST = {
   transparency: 0, // % the photo fades toward the fade color (0 = full photo)
-  blur: 0, // px of CSS blur() on the photo
+  blur: 1, // px of CSS blur() on the photo
   fade: "bw", // "bw" (light → #fff, dark → #000) | "accent" (sampled color)
 };
+
+// Overrides that belong to the SHIPPED wallpaper specifically, not to photo
+// backgrounds in general. train.webp is busy enough that it competes with the
+// lane content, so it ships softened; a user's own upload is their photo and
+// starts from DEFAULT_PHOTO_ADJUST untouched.
+const DEFAULT_BACKGROUND_ADJUST = { blur: 2 };
+
+function isDefaultBackground(bg) {
+  return (
+    !!bg &&
+    bg.type === DEFAULT_BACKGROUND.type &&
+    bg.value === DEFAULT_BACKGROUND.value
+  );
+}
+
+// Seed the photo modifiers for a first run. Once the user has saved anything,
+// that wins outright — the shipped override is a starting point, not a floor,
+// so dragging blur to 0 on the default wallpaper sticks.
+export function initialPhotoAdjust(bg, saved) {
+  if (saved) return { ...DEFAULT_PHOTO_ADJUST, ...saved };
+  return {
+    ...DEFAULT_PHOTO_ADJUST,
+    ...(isDefaultBackground(bg) ? DEFAULT_BACKGROUND_ADJUST : {}),
+  };
+}
 
 // Only image backgrounds carry the transparency/blur modifiers.
 function isPhotoBackground(type) {
@@ -1074,7 +1099,7 @@ export function createSettingsPanel(container) {
 
   const emberstoneLogo = document.createElement("img");
   emberstoneLogo.className = "settings-emberstone-icon";
-  // Root-relative, matching how img/aurora.webp and the icon assets are
+  // Root-relative, matching how img/train.webp and the icon assets are
   // referenced elsewhere. The SVG is a fixed multi-color mark (not theme
   // adaptive), so one file serves both light and dark.
   emberstoneLogo.src = "img/emberstone.svg";
@@ -1146,7 +1171,7 @@ export function createSettingsPanel(container) {
       homepageUrl = saved.homepageUrl ?? "";
       currentTheme = saved.theme ?? "system";
       currentBg = saved.background ?? DEFAULT_BACKGROUND;
-      photoAdjust = { ...DEFAULT_PHOTO_ADJUST, ...(saved.photoAdjust ?? {}) };
+      photoAdjust = initialPhotoAdjust(currentBg, saved.photoAdjust);
       toggleCheckbox.checked = groupByDomain;
       // Resolve the stored custom image up front so its thumbnail shows in the
       // custom tile even when a different background is currently active.
@@ -1469,9 +1494,20 @@ export async function applyAccentFromBackground(bg, customDataUrl = null) {
   const { dominant, lum } = await analyzeBackground(bg, resolvedCustomDataUrl);
   if (generation !== accentGeneration) return;
 
-  lastDominant = dominant;
+  // The shipped wallpaper is part of the brand, so it keeps the brand accent
+  // instead of tinting the UI with its own dominant hue. Suppressing the
+  // dominant (rather than skipping the whole pass) makes applyDerivedAccent
+  // clear its inline vars, so the brand default in meridian.css shows through
+  // and the theme-correct lightness still applies in both light and dark.
+  // Every other background — including a user's own upload — still derives.
+  const effectiveDominant = isDefaultBackground(bg) ? null : dominant;
+
+  // lum is deliberately NOT suppressed. It drives the light-or-dark text that
+  // sits directly ON the wallpaper (lane headers), which is legibility rather
+  // than branding and has to keep tracking the actual image.
+  lastDominant = effectiveDominant;
   lastBgLum = lum;
-  applyDerivedAccent(dominant);
+  applyDerivedAccent(effectiveDominant);
   applyOnBackground(lum);
 }
 

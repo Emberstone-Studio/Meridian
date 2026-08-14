@@ -1,0 +1,76 @@
+{
+  "id": "port-rubik-2ed8b0-brand-system-into-the-extensio-45f2",
+  "title": "Port Rubik + #2ed8b0 brand system into the extension (tokens, font, mark, lane spine)",
+  "description": "Implement the design decisions locked in `img/logo-proposal/metro.html` into the live extension. That file is the approved reference — read it first; its comments carry the reasoning behind every value below. Nothing in it has been ported yet.\n\n**Mirror rule:** `meridian-extension/` is a runtime mirror of root. Every change must land in BOTH (`meridian.css` + `meridian-extension/meridian.css`, `components/*` + `meridian-extension/components/*`, fonts in both trees). The working tree has ~120 pre-existing uncommitted files — never `git checkout` / `git restore` anything.\n\n**Logo geometry is unchanged.** This is type, color, and spatial treatment only.\n\n---\n\n### 1. Bundle Rubik locally\n- Move `img/logo-proposal/fonts/Rubik-latin.woff2` and `Rubik-latin-ext.woff2` to a real runtime path (e.g. `fonts/`), in both trees.\n- Copy the two `@font-face` blocks verbatim from metro.html (lines 20–40), fixing the `url()` paths. Keep `font-weight: 300 900`, `format(\"woff2-variations\")`, both `unicode-range` declarations, and **`font-display: optional`** — `swap` would flash system-ui then jump to Rubik on every single new tab. Do not change it.\n- Add `--font-ui:\"Rubik\",system-ui,-apple-system,sans-serif` and route `meridian.css:66`'s font stack through it.\n- Rubik is SIL OFL 1.1 — ship the license file alongside the woff2s.\n\n### 2. Weight + tracking pass\nRubik runs visually heavier than the current stack. **Drop every weight one step** (600 → 500, 500 → 400) across `meridian.css` and `components/sidebar.css`, in both trees. Any all-caps text needs **.13–.15em** tracking — Rubik's caps are tight and untracked uppercase reads as a solid block.\n\n### 3. Brand tokens\n```css\n--brand:#2ed8b0;      /* FILL only — 1.67:1 on light, never text, never a hairline */\n--brand-ink:#0d2f28;  /* the only legible foreground ON --brand (7.95:1) */\n```\nFixed in both themes. **`--brand` and `--accent` must stay separate tokens** — `--accent` is wallpaper-derived; merging them makes the logo shift hue with the wallpaper. White on mint is 1.82:1 — never use it.\n\n### 4. Mark: counter treatment adapts, color does not\nDefine the `#meridian-m` mask once (metro.html lines 174–180) in the page's SVG defs. Then:\n- **Dark:** true knockout — `mask:url(#meridian-m)` on the disc, so wallpaper shows through the M (9.37:1).\n- **Light:** `mask:none` + counter path stroked in `--brand-ink`. At 1.67:1 a hole has nothing to hold its shape at 16px.\n- Toggle the **`mask` property**, do not layer an ink path over a still-masked disc — layering composites the page background into the M's antialiased edge at ~25% and leaves a visible halo along the stroke.\n- Nameplate variant (`.mark--plate`) keeps the knockout in *both* themes; it's already ink-on-mint, so filling its counter collapses it to a blob.\n- Regenerate `icon16/32/48/128.png` and `favicon.svg` from `icon-source.svg` if the ink-counter variant is needed for light-mode surfaces.\n\n### 5. Lockups — nameplate + quiet only\nPort `.lockup-plate` and `.lockup-quiet` exactly (metro.html 121–132). Two non-obvious details, both load-bearing:\n- Lockup SVGs use **`viewBox=\"12 12 104 104\"`**, not `0 0 128 128`. The disc (r=52 @ c=64) spans 12..116, so the full viewBox carries 9.375% transparent padding per side; flex sizes the box, not the ink, and that padding silently widens every gap next to the mark.\n- `.wordmark` is **always caps, weight 500, .14em tracking, `margin-right:-.14em`**. letter-spacing appends space after the *final* letter too; the negative margin cancels exactly that, which matters most inside the nameplate pill where it fakes extra right padding.\n- Nameplate padding is `10px 24px 10px 10px` — padding-left equals padding-top so the 32px disc sits concentric with the pill's round cap.\n\n### 6. Lane spine\n`components/WorkspaceLane.js` already emits `.workspace-lane`, `.lane-header`, `.lane-group-dot`, `.lane-title`, `.lane-tab-count`. The spine (`.lane-body::before`) does not exist yet — add the markup wrapper and the CSS from metro.html 143–156.\n\n- `.lane-group-dot` — 13px ring: `background:var(--ground)`, `border:3.5px solid var(--group-color)`, `box-sizing:border-box`. Reconcile with the existing rule at `meridian.css:423`.\n- `.lane-body` — `position:relative; padding-left:26px`.\n- `.lane-body::before` — `left:3px; top:-10px; bottom:10px; width:4px; border-radius:0 0 2px 2px; background:var(--group-color); opacity:.55`, rising to `1` on `.workspace-lane:hover`, transitioned over `--transition`.\n- The spine is set from each lane's Chrome tab-group color via a `--group-color` custom property on `.workspace-lane`. **Brand mint is the default only for the Ungrouped lane** — grouped lanes keep their own Chrome color.\n- `left:3px` + `width:4px` centers the spine on the dot's stroke; the `top:-10px` overhang tucks it under the header so the dot reads as the spine's cap. Verify against the existing lane spacing and adjust the offsets rather than the concept if the header rhythm differs.\n- `.lane-title` becomes 13px/500 uppercase at .05em; `.lane-tab-count` 11px muted at .85 opacity.\n\n### 7. Cleanup + verification\n- Remove any now-dead accent/brand duplication left behind.\n- Verify in light and dark, at 16px / 32px / 72px mark sizes, with a wallpaper set and with none.\n- Check the mark's edge at 16px on light specifically — that's where the halo bug would show.\n- Confirm no layout shift on new-tab paint (the whole point of `font-display: optional`).\n- Diff root vs `meridian-extension/` at the end to confirm the mirror is in sync.",
+  "status": "done",
+  "priority": "high",
+  "label": "Feature",
+  "agent_id": "designer",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-14T18:24:07.330Z",
+  "updated_at": "2026-08-14T19:52:19.040Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-14T18:24:07.330Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-14T18:24:07.330Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-fab73338b0ca360c066452df0620d7b1-8a1132d1",
+        "task_id": null
+      },
+      "task_id": "port-rubik-2ed8b0-brand-system-into-the-extensio-45f2",
+      "content": "chat chat-fab73338b0ca360c066452df0620d7b1-8a1132d1 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-14T18:25:06.326Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-08-14T18:25:33.328Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-08-14T18:25:33.582Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-14T18:41:31.816Z",
+      "type": "output",
+      "content": "# Rubik + #2ed8b0 brand system — ported\n\nAll seven sections landed in both trees. `node --test \"tests/*.test.mjs\"` → **131/131 pass** (includes `packagedParity`, which enforces the mirror). Mirror verified byte-identical across `meridian.css`, `meridian.html`, `meridian.js`, `background.js`, `manifest.json`, `components/`, `utils/`, `fonts/`.\n\n## What changed\n\n**1 · Rubik bundled.** Fonts moved to `fonts/` (both trees) with `Rubik-OFL.txt` alongside. Both `@font-face` blocks copied verbatim — `font-weight: 300 900`, `woff2-variations`, both `unicode-range`s, **`font-display: optional`** (no `swap` anywhere in live CSS). `--font-ui` added and `meridian.css`'s body stack routed through it.\n\n`sidebar.css` needed **its own copy** of the `@font-face` blocks and tokens — the side panel is a separate document that never loads `meridian.css`, so a token-only edit would have left it unstyled. Its paths are `../fonts/…`.\n\n**2 · Weights.** All 20 weight declarations dropped one step (12× 600→500, 4× 500→400, 4× 700→600). No 700s remain.\n\n**3 · Brand tokens.** `--brand` / `--brand-ink` declared once per stylesheet, so they are structurally fixed across themes — no dark-mode override exists to drift. `--accent` untouched and never aliased.\n\n**4 · Mark.** Mask defined once in `meridian.html`'s SVG defs. The treatment rides on two inherited custom properties (`--mark-mask` / `--mark-counter`) rather than theme-scoped selectors. This **toggles the `mask` property itself** as required, and it lets `.mark--plate` opt back into the knockout by re-declaring the tokens locally — no specificity fight against `html[data-theme=\"dark\"]`, which a plain `.mark--plate` rule would have lost.\n\n**5 · Lockups.** `.lockup-plate`, `.lockup-quiet`, `.wordmark` ported exactly, including `margin-right:-.14em` and the `10px 24px 10px 10px` pill padding. Lockup SVGs use `viewBox=\"12 12 104 104\"`.\n\n**6 · Lane spine.** `WorkspaceLane.js` now wraps the grid in `.lane-body` and sets `--group-color` on `.workspace-lane` (was on the dot). Dot reconciled to the 13px ring.\n\n## Judgment calls you should know about\n\n**Spine offsets re-derived** (the task authorised this). In the reference the dot is the header's first child at x=0..13; here the collapse chevron (20px) + 8px gap precede it, so the dot sits at x=28..41. Verbatim `left:3px` would have put the spine nowhere near the dot.\n- `left:32px; width:4px` → spine centre 34.0 vs dot centre 34.5. **0.5px off** — tighter than the reference's own 1.5px.\n- `top:-15px` (not −10) — the dot's lower edge lands at 17.5px and `.lane-body` starts 32px down, so 15px is what actually tucks the spine under the dot.\n- `padding-left:44px` (not 26). Preserving the reference's absolute 27px spine→card gap would have pushed cards 87px off the viewport edge, since the spine already starts 32px in versus 3px there. Gap tightened to 16px. **Offsets adjusted, concept intact.**\n\n**Dot centre is `transparent`, not `--ground`.** The reference fills it with the flat page color, but this header sits on the *wallpaper* — a plug of `--bg` would read as a mismatched grey disc over a photo. Confirmed in the dark+wallpaper shot: the wallpaper reads cleanly through the ring. Also set `color:var(--group-color)` so the pre-existing `currentColor` hover ring finally picks up the group hue.\n\n**Every lane now renders a dot** — it's the spine's cap, and ungrouped lanes had none. Click-to-recolor stays restricted to real Chrome groups; other lanes get a non-interactive `<i aria-hidden>`, matching the reference's markup.\n\n**Collapse now toggles `.lane-body`, not `.tab-grid`.** Hiding only the grid would have left an orphaned stub of spine under a collapsed lane.\n\n**Tracking — §2 vs §6 conflict.** §2 says \"any all-caps text needs .13–.15em\"; §6 explicitly specifies `.lane-title` at **.05em**, and metro.html agrees. I read the specific as overriding the general: `.lane-title` keeps .05em, `.wordmark` gets .14em, and the remaining small uppercase labels (`.settings-label`, `.search-results-label`, sidebar `.section-label`) go to .13em. Worth a glance if you meant .13em universally.\n\n## Deferred — needs your call\n\n**Icon PNGs / `favicon.svg` were not regenerated.** The shipped `img/icon-source.svg` is a **different mark entirely** — the spiral wordmark glyph, not the disc+M. Only `img/logo-proposal/icon-source.svg` carries the disc+M. Regenerating from it would swap the logo's geometry, which contradicts the task's \"Logo geometry is unchanged.\" That bullet was also conditional, and the current icon already solves light/dark contrast another way (opaque `#f5f5f7` disc behind dark ink), so the ink-counter variant isn't needed for those surfaces. **The mark redesign looks like an unshipped decision that predates this task** — say the word and I'll port the geometry and regenerate all four PNGs plus the favicon.\n\n## Verification\n\nRendered the real stylesheet in headless Chrome at 2× across light/dark × wallpaper/none, marks at 16/32/72px.\n\n- **Halo check at 16px on light (the specific risk):** sampled 392 interior pixels and measured each against the ink→mint line. **Max deviation 1.7** — a genuine halo pixel would deviate by **95.1**. The ink meets the mint directly; no page background composited into the stroke.\n- **Theme matrix:** light → `mask:none` + counter `rgb(13,47,40)`; dark → `mask:url(#meridian-m)` + counter transparent; `.mark--plate` → knockout in **both**. `--brand`/`--brand-ink` identical across themes.\n- **Dark + wallpaper:** wallpaper reads through the M at all three sizes — a true knockout, not a fill.\n- **No layout shift:** `document.fonts.ready` width delta **0**, cumulative layout shift **0**. `latin-ext` reports `unloaded` — subsetting works, it only fetches on demand.\n- **Geometry probe:** dot 13px @ x=28, spine `left:32px width:4px opacity:.55 top:-15px`, `.lane-body` padding-left 44px, `.lane-title` 13px/500/.05em/uppercase.\n\n## Two bugs I caught mid-flight\n\nBoth were silent — flagging them since they shaped the approach:\n\n1. A batch `sed` cascaded (700→600→500→400 in one pass) and flattened **every** weight to 400. Recovered by replaying the pristine `HEAD` blob's values through the mapping, without touching the working tree — no `git checkout`/`restore` was used at any point, per the constraint.\n2. The repo is **CRLF** (`sidebar.css` and `WorkspaceLane.js` are mixed CRLF/LF). My first edits normalised `meridian.css` to LF, ballooning the diff to 3,796 lines. Rebuilt byte-exactly; the diff is now 82 lines and all original line endings are preserved. The same mixed-endings trap then silently dropped sidebar's token block — **the entire side panel was rendering in Times New Roman**, caught only by screenshotting it. Fixed with an ending-agnostic match and re-verified visually.\n",
+      "attachment": "active/port-rubik-2ed8b0-brand-system-into-the-extensio-45f2/port-rubik-2ed8b0-brand-system-into-the-extension-.md",
+      "agent_run_id": "agent-port-rubik-2ed8b0-brand-system-into-the-extensio-45f2-16f45b1f2634"
+    },
+    {
+      "timestamp": "2026-08-14T19:52:19.040Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "claude-claude-opus-4-8",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-14T18:25:33.420Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-54d100fb891b28e0aaa6",
+  "agent_startup_started_at": "2026-08-14T18:25:33.572Z",
+  "role_docs": [
+    {
+      "role_slug": "designer",
+      "doc_path": "roles/designer/memory/tasks/port-rubik-2ed8b0-brand-system-into-the-extensio-45f2.md",
+      "direction": "self",
+      "at": "2026-08-14T18:41:31.816Z"
+    }
+  ]
+}

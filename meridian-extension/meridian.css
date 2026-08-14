@@ -1,3 +1,38 @@
+/* Rubik, bundled locally — no network request, which matters because this
+   surface repaints on every new tab. Variable 300–900 in two subsets: 35KB
+   latin + 19KB latin-ext, and latin-ext only downloads if a tab title
+   actually contains one of its codepoints.
+
+   font-display: optional is deliberate. `swap` would show system-ui first
+   and then visibly jump to Rubik — on every single new tab. `optional`
+   gives the font a ~100ms window and, if it isn't ready, keeps the fallback
+   for that paint and never swaps. After first load it's disk-cached and
+   effectively always ready: you get Rubik with zero layout shift.
+
+   Rubik is SIL OFL 1.1 — free to bundle and redistribute in the extension.
+   License ships alongside the woff2s at fonts/Rubik-OFL.txt. */
+@font-face {
+  font-family: "Rubik";
+  src: url("fonts/Rubik-latin.woff2") format("woff2-variations");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: optional;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Rubik";
+  src: url("fonts/Rubik-latin-ext.woff2") format("woff2-variations");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: optional;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
 *,
 *::before,
 *::after {
@@ -5,19 +40,42 @@
 }
 
 :root {
+  --font-ui: "Rubik", system-ui, -apple-system, sans-serif;
+  /* Brand is fixed in both themes. --accent DEFAULTS to the brand color but is
+     overridden by the wallpaper solver; they are NOT the same token and must
+     not be merged, or the logo would change hue with the wallpaper. */
+  --brand: #2ed8b0; /* FILL only — 1.67:1 on light, never text/hairlines */
+  --brand-ink: #0d2f28; /* the only safe foreground ON --brand (7.95:1) */
   --bg: #f5f5f5;
   --surface: #eaeaea;
   --surface-hover: #dedede;
   --border: #d2d2d2;
   --text-primary: #1a1a1a;
   --text-secondary: #6b6b6b;
-  /* Accent is auto-derived from the background's dominant color; only the hue
-     is borrowed — saturation/lightness stay tuned for a legible UI. Defaults
-     below match the default Ocean background (teal) so they agree pre-JS.
-     Light lightness runs a bit deeper so the accent stays legible on the
-     #eaeaea surface (the JS solver refines this against the live surface). */
-  --accent-hue: 197;
-  --accent: hsl(var(--accent-hue) var(--accent-sat, 100%) var(--accent-light, 40%));
+  /* The DEFAULT accent is the brand color, #2ed8b0 = hsl(166 69% 51%). It is
+     expressed as hue/sat/lightness rather than a hex because the runtime
+     solver overrides these per-channel with inline vars when a background
+     offers a usable hue (applyDerivedAccent in SettingsPanel.js) — a flat hex
+     could not be partially overridden that way.
+
+     Lightness is the one channel that cannot simply be the brand value in both
+     themes. --accent is used as TEXT in a dozen places, and #2ed8b0 is only
+     1.51:1 on the #eaeaea surface — invisible. So dark mode carries the brand
+     color exactly (51% -> #2cd8b0, 7.69:1) while light mode darkens the same
+     hue until it is legible (32% -> #198a70, 3.56:1), clearing the 3.5:1 the
+     solver itself targets. Same brand hue in both, only as light as each
+     surface allows. This is the same reason --brand is documented fill-only.
+
+     These apply wherever the solver does not override them: on the shipped
+     wallpaper, which is brand-locked and deliberately does not tint the UI
+     with its own hue; on backgrounds with no usable hue (grayscale photos,
+     "none", near-neutral solids); and in the frame before async image analysis
+     resolves. In each case applyDerivedAccent clears its inline vars and the
+     brand default below is what shows through. Any other background — a
+     gradient, a solid, a user's own upload — still derives and overrides. */
+  --accent-hue: 166;
+  --accent-sat: 69%;
+  --accent: hsl(var(--accent-hue) var(--accent-sat, 100%) var(--accent-light, 32%));
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   --card-shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.28);
   --radius: 8px;
@@ -37,7 +95,7 @@
     --border: #3a3a3c;
     --text-primary: #f5f5f7;
     --text-secondary: #98989d;
-    --accent: hsl(var(--accent-hue) var(--accent-sat, 100%) var(--accent-light, 52%));
+    --accent: hsl(var(--accent-hue) var(--accent-sat, 100%) var(--accent-light, 51%)); /* brand #2ed8b0 exactly */
     --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
     --card-bg: rgba(44, 44, 46, 0.80);
@@ -53,7 +111,7 @@ html[data-theme="dark"] {
   --border: #3a3a3c;
   --text-primary: #f5f5f7;
   --text-secondary: #98989d;
-  --accent: hsl(var(--accent-hue) var(--accent-sat, 100%) var(--accent-light, 52%));
+  --accent: hsl(var(--accent-hue) var(--accent-sat, 100%) var(--accent-light, 51%)); /* brand #2ed8b0 exactly */
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.5);
   --card-bg: rgba(44, 44, 46, 0.80);
@@ -63,10 +121,7 @@ html[data-theme="dark"] {
 
 body {
   margin: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--font-ui);
   color: var(--text-primary);
   min-height: 100vh;
 }
@@ -114,6 +169,101 @@ html {
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+/* ---- Brand: mark, wordmark, lockups ---------------------------------------
+
+   The COUNTER adapts to the ground; the brand color never does.
+   On dark the M stays a true knockout — an actual hole, so the wallpaper shows
+   through it and the disc reads at 9.37:1. On light, #2ed8b0 sits at 1.67:1
+   against the page, so a hole has nothing to hold its shape at 16px; filling
+   the counter with --brand-ink (7.95:1) gives the mark its own structure.
+
+   The treatment is carried on two inherited custom properties rather than
+   theme-scoped selectors, so the `mask` PROPERTY itself is toggled. Layering an
+   ink path over a still-masked disc would composite the page background into
+   the M's antialiased edge at ~25% and leave a faint halo along the stroke;
+   swapping the mask off means the ink meets the mint directly. Tokens also let
+   .mark--plate opt out locally without a specificity fight. */
+
+:root {
+  --mark-mask: none;
+  --mark-counter: var(--brand-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) {
+    --mark-mask: url(#meridian-m);
+    --mark-counter: transparent;
+  }
+}
+
+html[data-theme="dark"] {
+  --mark-mask: url(#meridian-m);
+  --mark-counter: transparent;
+}
+
+.mark {
+  display: block;
+  flex-shrink: 0;
+}
+
+.mark circle {
+  mask: var(--mark-mask);
+}
+
+.mark .counter {
+  stroke: var(--mark-counter);
+}
+
+/* The nameplate mark is already ink-on-mint, so it keeps the knockout in both
+   themes — filling its counter would collapse it to a solid blob. */
+.mark--plate {
+  --mark-mask: url(#meridian-m);
+  --mark-counter: transparent;
+}
+
+/* One wordmark treatment — always caps, always .14em — in every container.
+   letter-spacing appends its space AFTER the final letter too, so the wordmark
+   carries ~.14em of dead air on its right; margin-right cancels exactly that,
+   which matters most inside the nameplate pill where it would otherwise fake
+   extra right padding. */
+.wordmark {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-right: -0.14em;
+}
+
+/* Lockup marks use viewBox "12 12 104 104", tight to the disc. The icon
+   viewBox (0 0 128 128) holds a disc of r=52 at c=64, so it spans 12..116 —
+   9.375% transparent padding per side. Flex sizes the box, not the ink, so
+   that padding would silently widen every gap next to the mark. */
+
+/* padding-left == padding-top, so the 32px disc sits exactly concentric with
+   the pill's round cap rather than floating inside it. */
+.lockup-plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--brand);
+  padding: 10px 24px 10px 10px;
+  border-radius: 999px;
+}
+
+.lockup-plate .wordmark {
+  font-size: 23px;
+  color: var(--brand-ink);
+}
+
+.lockup-quiet {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lockup-quiet .wordmark {
+  font-size: 24px;
 }
 
 /* ---- Search zone ---- */
@@ -295,7 +445,12 @@ html {
   padding: 0 24px 40px;
 }
 
+/* Every lane carries its Chrome tab-group color here; the spine and the header
+   dot both read from it. Brand mint is the DEFAULT only — grouped lanes always
+   override it with their own Chrome color, so the identity color shows up
+   without overriding a user's choice. */
 .workspace-lane {
+  --group-color: var(--brand);
   margin-bottom: 32px;
 }
 
@@ -306,9 +461,49 @@ html {
   margin-bottom: 12px;
 }
 
+/* ---- Lane spine ----
+   Offsets are re-derived from THIS header's rhythm, not copied verbatim from
+   the reference. There the dot is the header's first child and sits at x=0..13;
+   here the collapse chevron (20px) and an 8px gap precede it, so the dot spans
+   x=28..41 with its centre at 34.5. left:32 + width:4 puts the spine's centre
+   at 34 — half a pixel off the dot's centre, and crisper on the pixel grid than
+   32.5 would be.
+
+   top:-15px is the same trick at this header's scale: the dot's lower edge
+   lands at 17.5px and lane-body starts 32px down (20px header + 12px margin),
+   so a 15px overhang tucks the spine's top under the dot and the dot reads as
+   the spine's cap.
+
+   padding-left:26px in the reference left ~27px of air between spine and card.
+   Preserving that absolute gap here would push cards 87px off the viewport edge
+   (the spine already starts 32px in, vs 3px there), so the gap tightens to 16px
+   — 44px padding, minus the 8px .tab-grid already contributes. Offsets adjusted,
+   concept intact. */
+.lane-body {
+  position: relative;
+  padding-left: 44px;
+}
+
+.lane-body::before {
+  content: "";
+  position: absolute;
+  left: 32px;
+  top: -15px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 0 0 2px 2px;
+  background: var(--group-color);
+  opacity: 0.55;
+  transition: opacity var(--transition);
+}
+
+.workspace-lane:hover .lane-body::before {
+  opacity: 1;
+}
+
 .lane-title {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   /* Lane headers sit on the wallpaper, not a surface — use luminance-derived
      on-background text so they stay legible against any background. */
@@ -420,19 +615,30 @@ html {
   flex: 1;
 }
 
+/* A 13px ring, not a solid disc: the ring reads as the spine's terminal cap.
+   The reference fills the centre with --ground, but this header sits on the
+   wallpaper rather than a flat surface, so a plug of --bg would show as a
+   mismatched disc over a photo — transparent is the faithful generalisation.
+   color is set so the hover ring below (currentColor) picks up the group hue. */
 .lane-group-dot {
-  background: var(--group-color, #9aa0a6);
-  width: 10px;
-  height: 10px;
+  background: transparent;
+  color: var(--group-color);
+  width: 13px;
+  height: 13px;
   border-radius: 50%;
+  box-sizing: border-box;
   flex-shrink: 0;
   display: inline-block;
   padding: 0;
-  border: none;
+  border: 3.5px solid var(--group-color);
   cursor: pointer;
   /* Optical nudge to sit the dot on the caps' center. */
   transform: translateY(1px);
   transition: box-shadow var(--transition);
+}
+
+i.lane-group-dot {
+  cursor: default;
 }
 
 .lane-group-dot:hover,
@@ -576,7 +782,7 @@ html {
   justify-content: center;
   color: var(--text-secondary);
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 500;
   opacity: 0.4;
 }
 
@@ -597,7 +803,7 @@ html {
 
 .card-title {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-primary);
   line-height: 1.4;
   white-space: nowrap;
@@ -685,8 +891,10 @@ html {
   border-bottom: 1px solid var(--border);
   color: var(--text-secondary);
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-weight: 500;
+  /* Rubik's caps are tight; small uppercase needs real tracking or it reads as
+     a solid block. .lane-title is the deliberate exception (spec'd at .05em). */
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
@@ -734,7 +942,7 @@ html {
 .result-title {
   color: var(--text-primary);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .result-meta {
@@ -835,7 +1043,7 @@ html {
 .bookmarks-tab.active {
   background: var(--surface-hover);
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .bookmarks-subnav {
@@ -861,7 +1069,7 @@ html {
   color: var(--accent);
   cursor: pointer;
   font: inherit;
-  font-weight: 600;
+  font-weight: 500;
   padding: 5px 8px;
 }
 
@@ -1006,7 +1214,7 @@ html {
   margin: 0 0 14px;
   padding-bottom: 8px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border);
 }
@@ -1018,11 +1226,11 @@ html {
 .settings-label {
   display: block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-secondary);
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.13em;
 }
 
 .settings-homepage-input {
@@ -1103,7 +1311,7 @@ html {
   border-bottom: 1px solid var(--border);
   cursor: pointer;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   list-style: none;
 }
 
@@ -1152,7 +1360,7 @@ html {
   display: inline-block;
   color: var(--accent);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: underline;
 }
 
@@ -1343,7 +1551,7 @@ html {
   border-radius: 3px;
   background: var(--accent);
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
   flex-shrink: 0;
   font-size: var(--favicon-font-size, 10px);
   line-height: 1;
@@ -1423,7 +1631,7 @@ html {
   align-items: center;
   justify-content: center;
   font-size: 56px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
@@ -1435,7 +1643,7 @@ html {
 .lightbox-title {
   margin: 0 0 6px;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -1510,7 +1718,7 @@ html {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* Behavior card grid (New Tab Behavior) + provider grid (Search Engine).
@@ -1609,7 +1817,7 @@ html {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .settings-provider-card:focus-visible {
@@ -1708,7 +1916,7 @@ html {
 .settings-bg-sublabel {
   font-size: 11px;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .settings-bg-refresh {
@@ -1854,7 +2062,7 @@ html {
 
 .settings-slider-label {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-secondary);
 }
 
