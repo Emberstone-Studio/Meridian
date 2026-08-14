@@ -6,7 +6,7 @@
 The headed-browser leg is NOT satisfied for this package and must be re-run
 before publishing.**
 
-Repackaged August 14, 2026 at commit `433f072`. The deterministic suite passes
+Repackaged August 14, 2026 at commit `a50942a`. The deterministic suite passes
 (133/133), source/package parity is green, and the regenerated ZIP extracts to
 the exact candidate tree hash.
 
@@ -17,8 +17,14 @@ allowed to inherit that pass because its only diff was the two manifest
 runtime behavior — accent derivation is now suppressed for the shipped
 wallpaper, photo-blur defaults are seeded per background, the bundled Rubik
 webfont and a new default wallpaper were added, and unreferenced image assets
-were removed. Those are exactly the kinds of changes a headed pass exists to
-catch.
+were removed. `a50942a` then changed the browser-action icon pipeline, which
+renders through the Chrome extension APIs and cannot be exercised by the
+deterministic suite at all. Those are exactly the kinds of changes a headed
+pass exists to catch.
+
+The headed re-run should specifically confirm that the action icon resolves in
+the brand hue in both colour schemes, in the toolbar **and** in the extensions
+overflow menu, since a single `chrome.action.setIcon` call drives both.
 
 **Re-run the headed Chrome validation against this package before submission.**
 
@@ -61,33 +67,43 @@ contains:
   default wallpaper; removal of unreferenced image assets and the packaged
   store screenshots; store-listing document rewritten. **This is a functional
   change set — see the Decision section on the lapsed headed-browser leg.**
+- Line-ending repair `433f072`: the tree was renormalized to LF and the
+  whitespace check scoped away from machine-written `.tasker/` state. No
+  candidate file changed content, only line endings.
+- Repackage `a50942a`: the browser action now rasterises `img/icon-source.svg`
+  and shifts only the disc's lightness per colour scheme, so the mark stays in
+  the brand hue in the toolbar and in the extensions overflow menu, which share
+  one icon. `img/Meridian.svg`, the knockout variant the old monochrome recolour
+  used, is removed as unreferenced. `components/sidebar.css` picks up the brand
+  accent hue in place of the pre-brand cyan. **Functional change set.**
 
 ## Candidate identity
 
 - Manifest version: **1.2.0** (`manifest_version` 3)
 - Validated worktree base commit:
-  `433f07296d5e2821919929ee8d2a07138ac23895`
+  `a50942ae2f5f74a55d6a75794a98fa11ed01696f`
 - Candidate content commit:
-  `433f07296d5e2821919929ee8d2a07138ac23895`
+  `a50942ae2f5f74a55d6a75794a98fa11ed01696f`
 - Tracked candidate directory: `meridian-extension`
-- Candidate file count: **48**
+- Candidate file count: **47**
 - Candidate directory tree SHA-256:
-  `48be965f13bc5d9e68ef58261bb1899a8456b6cc9e2352bed2ada087cb611020`
-- Validation archive:
-  `Meridian-1.2.0-48be965f13bc5d9e68ef58261bb1899a.zip`
-- Validation archive size: **340,967 bytes**
+  `637e80f87bb14b976550945b1e381d78252477cfc859ad69126f9d3590640b37`
+- Validation archive: `Meridian-v1.2.0.zip`
+- Validation archive size: **341,307 bytes**
 - Validation archive SHA-256:
-  `3423b3accfebb1cf8b3fa0412390dc412bd426130eb5c6080397a20e0e60b607`
+  `afc0055acdfaa868b42fe07a3b0fe55390d73395b56522a52eb868a278f7f9e6`
 - Extracted archive tree SHA-256:
-  `48be965f13bc5d9e68ef58261bb1899a8456b6cc9e2352bed2ada087cb611020`
-- Per-file archive parity: **48 files matched, 0 mismatches**.
+  `637e80f87bb14b976550945b1e381d78252477cfc859ad69126f9d3590640b37`
+- Per-file archive parity: **47 files matched, 0 mismatches**.
 
-The candidate directory dropped from 53 files to 48: `Meridian.ai`,
+The candidate directory dropped from 53 files to 48 in `e349c07`: `Meridian.ai`,
 `chrome.svg`, `edge.svg`, `emberstone.png` and four packaged store screenshots
 were removed as unreferenced, while `train.webp` and three bundled `fonts/`
 entries were added. Archive size fell from 5,569,295 to 340,967 bytes, since
 the store screenshots were being shipped inside the package despite only ever
-being uploaded to the dashboard.
+being uploaded to the dashboard. `a50942a` drops one more, `img/Meridian.svg`,
+leaving 47: the toolbar now renders the same `icon-source.svg` master as the
+manifest PNGs, so the separate knockout mark has no remaining reference.
 
 Note that `fonts/Rubik-OFL.txt` is now a candidate file. Rubik is bundled under
 SIL OFL 1.1, and that license text must ship with it — do not prune it from the
@@ -98,10 +114,11 @@ relative-path order. For each entry, the hasher receives the UTF-8 relative path
 a NUL byte, the raw file bytes, and a trailing NUL byte. This content hash is the
 authoritative package identity.
 
-The ZIP hash is specific to the `Compress-Archive` output created during this
-run; ZIP timestamps and layout may differ when repackaged. Verify any upload by
-extracting it and matching the directory tree hash, not by expecting the ZIP hash
-to remain stable.
+The ZIP hash is specific to the `zip -r -X` output created during this run; ZIP
+timestamps and layout may differ when repackaged, and this archive was built on
+Linux rather than with the `Compress-Archive` used for earlier candidates.
+Verify any upload by extracting it and matching the directory tree hash, not by
+expecting the ZIP hash to remain stable.
 
 ### Candidate file list
 
@@ -122,7 +139,6 @@ components/sidebar.js
 fonts/Rubik-OFL.txt
 fonts/Rubik-latin-ext.woff2
 fonts/Rubik-latin.woff2
-img/Meridian.svg
 img/coffee.svg
 img/emberstone.svg
 img/favicon.svg
@@ -158,6 +174,12 @@ utils/workspaceManager.js
 
 ## Validation environment
 
+The headed leg below was run on the environment recorded here. The `a50942a`
+repackage and its deterministic re-run were performed on Linux
+(Fedora 44, Node.js `v24.19.0`, Info-ZIP `zip` 3.0); no headed browser was
+available in that
+environment, which is the other reason the headed leg is unsatisfied.
+
 - Date: **August 6, 2026**
 - OS: Windows 11 Pro, version `10.0.26200`, build `26200`
 - Node.js: `v24.12.0`
@@ -191,16 +213,16 @@ git status --short
 
 Results:
 
-Results (re-run August 14, 2026 against `e349c07`):
+Results (re-run August 14, 2026 against `a50942a`):
 
 - Full Node suite: **133 passed, 0 failed, 0 skipped**.
 - Runtime JavaScript syntax: **56 files checked, 0 failures**.
 - Manifest parsing: **2 parsed**, both version `1.2.0` and
   `manifest_version` 3.
-- Runtime source/package parity: **48 file pairs matched, 0 mismatches**
+- Runtime source/package parity: **47 file pairs matched, 0 mismatches**
   (every candidate file compared byte-for-byte against its repository-root
   counterpart, not just the JavaScript).
-- Archive extraction parity: **48 files matched, 0 mismatches**; the extracted
+- Archive extraction parity: **47 files matched, 0 mismatches**; the extracted
   tree hash equals the candidate tree hash exactly.
 - `git status --short`: no candidate file is modified.
 
@@ -349,4 +371,4 @@ Repository and browser checks cannot:
 
 Before upload, confirm the public privacy page is deployed at the exact linked
 URL and re-extract the final archive to match candidate tree SHA-256
-`e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`.
+`637e80f87bb14b976550945b1e381d78252477cfc859ad69126f9d3590640b37`.
