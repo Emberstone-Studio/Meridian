@@ -73,6 +73,7 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PUSH_BEFORE_SHA: ${{ github.event.before }}
           PUSH_AFTER_SHA: ${{ github.event.after }}
+          REF_TYPE: ${{ github.ref_type }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           zero_sha=0000000000000000000000000000000000000000
@@ -83,6 +84,17 @@ jobs:
               git diff --check "$PR_BASE_SHA...$PR_HEAD_SHA" -- . ':!.tasker'
               ;;
             push)
+              # On a tag push, before/after are TAG object SHAs rather than a
+              # commit range, so diffing them is meaningless — and re-pointing an
+              # annotated tag leaves `before` naming an object that is no longer
+              # reachable, which fails as "bad object" rather than as a real
+              # whitespace fault. A tag introduces no new content anyway: the
+              # commits it names were checked when they were pushed to a branch.
+              if [[ "$REF_TYPE" == "tag" ]]; then
+                echo "Tag push introduces no new content to check."
+                exit 0
+              fi
+
               if [[ "$PUSH_AFTER_SHA" == "$zero_sha" ]]; then
                 echo "Branch deletion has no new content to check."
                 exit 0
