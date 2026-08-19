@@ -1,6 +1,8 @@
 import {
+  CUSTOM_BACKGROUND_REVISION_KEY,
   saveCustomBackground,
   getCustomBackgroundUrl,
+  refreshCustomBackgroundUrl,
   clearCustomBackground,
 } from "../utils/customBackground.js";
 import {
@@ -78,6 +80,7 @@ const THEME_ICONS = {
 };
 
 const SOLID_COLORS = [
+  { id: "s0", value: "#ffffff", label: "White" },
   { id: "s1", value: "#000000", label: "Black" },
   { id: "s2", value: "#1e2028", label: "Ink" },
   { id: "s3", value: "#0d1b2a", label: "Midnight" },
@@ -89,7 +92,7 @@ const GRADIENT_PRESETS = [
   {
     id: "g1",
     value: "linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)",
-    label: "Midnight",
+    label: "Twilight",
   },
   {
     id: "g2",
@@ -114,10 +117,11 @@ const GRADIENT_PRESETS = [
   },
 ];
 
-// Default background when the user hasn't chosen one — the bundled train photo.
+// Default background when the user hasn't chosen one. CSS resolves this to the
+// light or dark bundled topo image from the effective theme.
 export const DEFAULT_BACKGROUND = {
-  type: "photo",
-  value: "img/train.webp",
+  type: "theme",
+  value: "topo",
 };
 
 // Photo-only appearance modifiers (transparency + blur + which color the photo
@@ -125,15 +129,9 @@ export const DEFAULT_BACKGROUND = {
 const PHOTO_BLUR_MAX = 20;
 export const DEFAULT_PHOTO_ADJUST = {
   transparency: 0, // % the photo fades toward the fade color (0 = full photo)
-  blur: 1, // px of CSS blur() on the photo
+  blur: 0, // px of CSS blur() on the photo
   fade: "bw", // "bw" (light → #fff, dark → #000) | "accent" (sampled color)
 };
-
-// Overrides that belong to the SHIPPED wallpaper specifically, not to photo
-// backgrounds in general. train.webp is busy enough that it competes with the
-// lane content, so it ships softened; a user's own upload is their photo and
-// starts from DEFAULT_PHOTO_ADJUST untouched.
-const DEFAULT_BACKGROUND_ADJUST = { blur: 2 };
 
 function isDefaultBackground(bg) {
   return (
@@ -143,20 +141,18 @@ function isDefaultBackground(bg) {
   );
 }
 
-// Seed the photo modifiers for a first run. Once the user has saved anything,
-// that wins outright — the shipped override is a starting point, not a floor,
-// so dragging blur to 0 on the default wallpaper sticks.
+// Seed photo modifiers for a first run. Once the user has saved anything, that
+// wins outright for user-selected photos and uploads.
 export function initialPhotoAdjust(bg, saved) {
   if (saved) return { ...DEFAULT_PHOTO_ADJUST, ...saved };
-  return {
-    ...DEFAULT_PHOTO_ADJUST,
-    ...(isDefaultBackground(bg) ? DEFAULT_BACKGROUND_ADJUST : {}),
-  };
+  return { ...DEFAULT_PHOTO_ADJUST };
 }
 
 // Only image backgrounds carry the transparency/blur modifiers.
-function isPhotoBackground(type) {
-  return type === "photo" || type === "custom";
+function isPhotoBackground(bg) {
+  return (
+    bg?.type === "theme" || bg?.type === "photo" || bg?.type === "custom"
+  );
 }
 
 function clampNumber(value, min, max, fallback) {
@@ -173,7 +169,7 @@ function clampNumber(value, min, max, fallback) {
 // cheap enough to call on every slider tick.
 export function applyPhotoAdjustments(bg, adjust) {
   const root = document.documentElement;
-  if (!bg || !isPhotoBackground(bg.type)) {
+  if (!isPhotoBackground(bg)) {
     root.style.setProperty("--photo-opacity", "1");
     root.style.setProperty("--photo-blur", "0px");
     root.style.setProperty("--photo-fade-color", "transparent");
@@ -202,12 +198,14 @@ function generateSeeds(count = 12, exclude = new Set()) {
 export function createSettingsPanel(container) {
   let newTabBehavior = "meridian-view";
   let groupByDomain = false;
+  let showTabsFromAllWindows = true;
   let homepageUrl = "";
   let currentTheme = "system";
   let currentBg = DEFAULT_BACKGROUND;
   let customBgUrl = null;
-  // The photo grid holds 12 tiles in a 3×4 layout; the first is the custom
-  // image tile, so we only need 11 stock photo seeds.
+  let customBackgroundGeneration = 0;
+  // The photo grid holds 12 tiles in a 3×4 layout: one custom image tile and
+  // 11 stock photos. The theme background remains an implicit fallback.
   let photoSeeds = generateSeeds(11);
   let photoAdjust = { ...DEFAULT_PHOTO_ADJUST };
 
@@ -403,7 +401,7 @@ export function createSettingsPanel(container) {
 
   tabsSection.appendChild(newTabGroup);
 
-  // --- Group by domain ---
+  // --- Tab organization ---
   const domainGroup = document.createElement("div");
   domainGroup.className = "settings-group";
 
@@ -431,7 +429,28 @@ export function createSettingsPanel(container) {
 
   toggleRow.appendChild(toggleCheckbox);
   toggleRow.appendChild(toggleLabel);
-  domainGroup.appendChild(toggleRow);
+  const windowToggleRow = document.createElement("label");
+  windowToggleRow.className = "settings-toggle-row";
+
+  const windowToggleCheckbox = document.createElement("input");
+  windowToggleCheckbox.type = "checkbox";
+  windowToggleCheckbox.className = "settings-toggle";
+  windowToggleCheckbox.setAttribute(
+    "aria-label",
+    "Show tabs from all windows",
+  );
+
+  const windowToggleLabel = document.createElement("span");
+  windowToggleLabel.textContent = "Show tabs from all windows";
+
+  windowToggleCheckbox.addEventListener("change", () => {
+    showTabsFromAllWindows = windowToggleCheckbox.checked;
+    chrome.storage.sync.set({ showTabsFromAllWindows });
+    window.dispatchEvent(new CustomEvent("settings-changed"));
+  });
+
+  windowToggleRow.append(windowToggleCheckbox, windowToggleLabel);
+  domainGroup.append(toggleRow, windowToggleRow);
   tabsSection.appendChild(domainGroup);
 
   // --- Search options ---
@@ -509,11 +528,6 @@ export function createSettingsPanel(container) {
       checkbox.checked = enabled[key];
     }
   }
-
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== "sync" || !changes.localSearch) return;
-    syncLocalSearchCheckboxes(changes.localSearch.newValue);
-  });
 
   // (Appended below, after Search Engine, so the engine picker sits on top.)
 
@@ -786,29 +800,46 @@ export function createSettingsPanel(container) {
   }
 
   function makeSwatch(opts) {
-    const btn = document.createElement("button");
-    btn.className =
-      "settings-bg-swatch" +
-      (opts.isNone ? " settings-bg-swatch--none" : "") +
-      (opts.selected ? " selected" : "");
+    const swatch = document.createElement("div");
+    swatch.className =
+      "settings-bg-preset" + (opts.selected ? " selected" : "");
     if (opts.background) {
-      btn.style.setProperty("--swatch-background", opts.background);
+      swatch.style.setProperty("--swatch-background", opts.background);
     }
-    if (opts.label) btn.setAttribute("aria-label", opts.label);
-    if (opts.label) btn.title = opts.label;
-    if (opts.text) btn.textContent = opts.text;
+
+    const selectBtn = document.createElement("button");
+    selectBtn.type = "button";
+    selectBtn.className = "settings-bg-swatch settings-bg-preset-select";
+    selectBtn.setAttribute("aria-pressed", String(opts.selected));
+    if (opts.label) selectBtn.setAttribute("aria-label", opts.label);
+    if (opts.label) selectBtn.title = opts.label;
+    if (opts.text) selectBtn.textContent = opts.text;
     if (opts.imgSrc) {
       const img = document.createElement("img");
       img.src = opts.imgSrc;
       img.alt = "";
       img.loading = "lazy";
       img.onerror = () => {
-        btn.classList.add("load-failed");
+        selectBtn.classList.add("load-failed");
       };
-      btn.appendChild(img);
+      selectBtn.appendChild(img);
     }
-    btn.addEventListener("click", opts.onClick);
-    return btn;
+    selectBtn.addEventListener("click", opts.onClick);
+    swatch.appendChild(selectBtn);
+
+    if (opts.selected) {
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "settings-bg-preset-remove";
+      removeBtn.setAttribute("aria-label", `Remove ${opts.label} background`);
+      removeBtn.title = `Remove ${opts.label} background`;
+      removeBtn.addEventListener("click", () => {
+        selectBg(DEFAULT_BACKGROUND.type, DEFAULT_BACKGROUND.value);
+      });
+      swatch.appendChild(removeBtn);
+    }
+
+    return swatch;
   }
 
   function renderBgSection() {
@@ -827,19 +858,9 @@ export function createSettingsPanel(container) {
     colorGradRow.appendChild(colorGradLabel);
     bgGroup.appendChild(colorGradRow);
 
-    // ── Combined 6-column grid: [None, 5 solids] + [6 gradients] ──
+    // ── Combined grid: 6 solids + 6 gradients ──
     const combinedGrid = document.createElement("div");
     combinedGrid.className = "settings-bg-combined-grid";
-
-    // None
-    combinedGrid.appendChild(
-      makeSwatch({
-        isNone: true,
-        selected: currentBg.type === "none",
-        label: "No background",
-        onClick: () => selectBg("none", ""),
-      }),
-    );
 
     // Solid colors
     for (const c of SOLID_COLORS) {
@@ -903,9 +924,10 @@ export function createSettingsPanel(container) {
     // "add" affordance (blank --bg tile + plus) or, once an image is stored,
     // that image's thumbnail with a hover-revealed remove control.
     const customTile = document.createElement("div");
+    const customSelected = currentBg.type === "custom";
     customTile.className =
       "settings-bg-swatch settings-bg-custom" +
-      (currentBg.type === "custom" ? " selected" : "");
+      (customSelected ? " selected" : "");
 
     async function processCustomImage(file) {
       if (!file) return;
@@ -917,8 +939,8 @@ export function createSettingsPanel(container) {
       }
       customTile.classList.add("processing");
       try {
-        await saveCustomBackground(file);
-        customBgUrl = await getCustomBackgroundUrl();
+        const revision = await saveCustomBackground(file);
+        customBgUrl = await refreshCustomBackgroundUrl(revision);
         selectBg("custom", ""); // re-renders the section → tile shows the thumb
       } catch {
         customTile.classList.remove("processing");
@@ -930,8 +952,8 @@ export function createSettingsPanel(container) {
     }
 
     async function removeCustomImage() {
-      await clearCustomBackground();
-      customBgUrl = null;
+      const revision = await clearCustomBackground();
+      customBgUrl = await refreshCustomBackgroundUrl(revision);
       // "Start over": if the removed image was the active background, fall back
       // to the default; otherwise just refresh the tile back to its add state.
       if (currentBg.type === "custom") {
@@ -963,16 +985,18 @@ export function createSettingsPanel(container) {
         }
       });
 
-      const removeBtn = document.createElement("button");
-      removeBtn.type = "button";
-      removeBtn.className = "settings-bg-custom-remove"; // "+" rotated to "X" in CSS
-      removeBtn.setAttribute("aria-label", "Remove custom image");
-      removeBtn.title = "Remove custom image";
-      removeBtn.addEventListener("click", (event) => {
-        event.stopPropagation();
-        removeCustomImage();
-      });
-      customTile.appendChild(removeBtn);
+      if (customSelected) {
+        const removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "settings-bg-custom-remove"; // "+" rotated to "X" in CSS
+        removeBtn.setAttribute("aria-label", "Remove custom image");
+        removeBtn.title = "Remove custom image";
+        removeBtn.addEventListener("click", (event) => {
+          event.stopPropagation();
+          removeCustomImage();
+        });
+        customTile.appendChild(removeBtn);
+      }
     } else {
       // ── Empty state: blank --bg tile + plus; add button and drop target. ──
       customTile.classList.add("settings-bg-custom--empty");
@@ -1035,7 +1059,7 @@ export function createSettingsPanel(container) {
     // ── Photo-only modifiers (transparency + blur), at the bottom of the
     // Background section. Shown only while a photo/custom background is
     // active; colors & gradients never carry these controls.
-    if (isPhotoBackground(currentBg.type)) {
+    if (isPhotoBackground(currentBg)) {
       bgGroup.appendChild(buildPhotoAdjust());
     }
   }
@@ -1099,7 +1123,7 @@ export function createSettingsPanel(container) {
 
   const emberstoneLogo = document.createElement("img");
   emberstoneLogo.className = "settings-emberstone-icon";
-  // Root-relative, matching how img/train.webp and the icon assets are
+  // Root-relative, matching how the bundled background and icon assets are
   // referenced elsewhere. The SVG is a fixed multi-color mark (not theme
   // adaptive), so one file serves both light and dark.
   emberstoneLogo.src = "img/emberstone.svg";
@@ -1154,10 +1178,79 @@ export function createSettingsPanel(container) {
 
   container.appendChild(panel);
 
+  // Keep this panel's cached state and controls aligned with the shared sync
+  // store when another Meridian window changes a preference.
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes[CUSTOM_BACKGROUND_REVISION_KEY]) {
+      const generation = ++customBackgroundGeneration;
+      refreshCustomBackgroundUrl(
+        changes[CUSTOM_BACKGROUND_REVISION_KEY].newValue,
+      ).then((url) => {
+        if (generation !== customBackgroundGeneration) return;
+        customBgUrl = url;
+        if (currentBg.type === "custom") {
+          applyBackground(currentBg, customBgUrl);
+          applyAccentFromBackground(currentBg, customBgUrl);
+        }
+        renderBgSection();
+      });
+      return;
+    }
+    if (area !== "sync") return;
+
+    if (changes.newTabBehavior) {
+      newTabBehavior = changes.newTabBehavior.newValue ?? "meridian-view";
+      syncNewTab();
+    }
+    if (changes.homepageUrl) {
+      homepageUrl = changes.homepageUrl.newValue ?? "";
+      syncNewTab();
+    }
+    if (changes.groupByDomain) {
+      groupByDomain = !!changes.groupByDomain.newValue;
+      toggleCheckbox.checked = groupByDomain;
+    }
+    if (changes.showTabsFromAllWindows) {
+      showTabsFromAllWindows =
+        changes.showTabsFromAllWindows.newValue !== false;
+      windowToggleCheckbox.checked = showTabsFromAllWindows;
+    }
+    if (changes.theme) {
+      currentTheme = changes.theme.newValue ?? "system";
+      renderThemeButtons();
+    }
+
+    let backgroundControlsChanged = false;
+    if (changes.background) {
+      currentBg = changes.background.newValue ?? DEFAULT_BACKGROUND;
+      backgroundControlsChanged = true;
+    }
+    if (changes.photoAdjust) {
+      photoAdjust = initialPhotoAdjust(
+        currentBg,
+        changes.photoAdjust.newValue,
+      );
+      backgroundControlsChanged = true;
+    }
+    if (backgroundControlsChanged) renderBgSection();
+
+    if (changes.localSearch) {
+      syncLocalSearchCheckboxes(changes.localSearch.newValue);
+    }
+    if (changes.searchProvider) {
+      const nextProvider = changes.searchProvider.newValue;
+      searchProvider = PROVIDERS.some((p) => p.id === nextProvider)
+        ? nextProvider
+        : PROVIDERS[0].id;
+      renderProviderCards();
+    }
+  });
+
   chrome.storage.sync
     .get([
       "newTabBehavior",
       "groupByDomain",
+      "showTabsFromAllWindows",
       "homepageUrl",
       "theme",
       "background",
@@ -1168,19 +1261,23 @@ export function createSettingsPanel(container) {
     .then((saved) => {
       if (saved.newTabBehavior) newTabBehavior = saved.newTabBehavior;
       groupByDomain = !!saved.groupByDomain;
+      showTabsFromAllWindows = saved.showTabsFromAllWindows !== false;
       homepageUrl = saved.homepageUrl ?? "";
       currentTheme = saved.theme ?? "system";
       currentBg = saved.background ?? DEFAULT_BACKGROUND;
       photoAdjust = initialPhotoAdjust(currentBg, saved.photoAdjust);
       toggleCheckbox.checked = groupByDomain;
+      windowToggleCheckbox.checked = showTabsFromAllWindows;
       // Resolve the stored custom image up front so its thumbnail shows in the
       // custom tile even when a different background is currently active.
+      const customGeneration = ++customBackgroundGeneration;
       const background = currentBg;
       const customUrlPromise = getCustomBackgroundUrl();
       if (currentBg.type === "custom") {
         applyAccentFromBackground(background, customUrlPromise);
       }
       customUrlPromise.then((url) => {
+        if (customGeneration !== customBackgroundGeneration) return;
         customBgUrl = url;
         if (currentBg === background && currentBg.type === "custom") {
           applyBackground(background, customBgUrl);
@@ -1412,6 +1509,7 @@ const ACCENT_SAT = 80;
 let lastDominant = null;
 let lastBgLum = null;
 let accentGeneration = 0;
+let useThemeOnBackground = false;
 
 function docIsDark() {
   const t = document.documentElement.dataset.theme;
@@ -1486,8 +1584,24 @@ function applyOnBackground(lum) {
   }
 }
 
+function clearOnBackground() {
+  const style = document.documentElement.style;
+  style.removeProperty("--on-bg");
+  style.removeProperty("--on-bg-muted");
+  style.removeProperty("--on-bg-shadow");
+}
+
 export async function applyAccentFromBackground(bg, customDataUrl = null) {
   const generation = ++accentGeneration;
+  if (isDefaultBackground(bg)) {
+    lastDominant = null;
+    lastBgLum = null;
+    useThemeOnBackground = true;
+    applyDerivedAccent(null);
+    clearOnBackground();
+    return;
+  }
+
   const resolvedCustomDataUrl = await customDataUrl;
   if (generation !== accentGeneration) return;
 
@@ -1507,6 +1621,7 @@ export async function applyAccentFromBackground(bg, customDataUrl = null) {
   // than branding and has to keep tracking the actual image.
   lastDominant = effectiveDominant;
   lastBgLum = lum;
+  useThemeOnBackground = false;
   applyDerivedAccent(effectiveDominant);
   applyOnBackground(lum);
 }
@@ -1523,7 +1638,8 @@ export function applyTheme(theme) {
   // Both the accent solver and the on-background text depend on the theme
   // (surface + the "none" background follow it) — re-run them on switch.
   applyDerivedAccent(lastDominant);
-  applyOnBackground(lastBgLum);
+  if (useThemeOnBackground) clearOnBackground();
+  else applyOnBackground(lastBgLum);
 }
 
 export function applyBackground(bg, customDataUrl = null) {
@@ -1531,6 +1647,8 @@ export function applyBackground(bg, customDataUrl = null) {
   root.style.removeProperty("--bg");
   if (!bg || bg.type === "none") {
     root.style.removeProperty("--bg-image");
+  } else if (isDefaultBackground(bg)) {
+    root.style.setProperty("--bg-image", "var(--default-bg-image)");
   } else if (bg.type === "solid") {
     root.style.removeProperty("--bg-image");
     root.style.setProperty("--bg", bg.value);

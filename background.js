@@ -13,6 +13,7 @@ let meridianTabId = null;
 const meridianTabsByWindow = new Map();
 let meridianTabsHydrated = false;
 let meridianTabsHydration = null;
+const ensuringMeridianTabsByWindow = new Map();
 
 function getMeridianUrl() {
   return chrome.runtime.getURL("meridian.html");
@@ -97,20 +98,68 @@ async function normalizeMeridianTab(tab) {
   if (!tab.pinned) update.pinned = true;
   if (!isMeridianTab(tab)) update.url = getMeridianUrl();
   if (Object.keys(update).length > 0) {
-    tab = await chrome.tabs.update(tab.id, update);
+    try {
+      tab = await chrome.tabs.update(tab.id, update);
+    } catch (_) {
+      /* window or tab closed */
+      return null;
+    }
   }
   if (tab.index !== 0) {
     try {
       tab = await chrome.tabs.move(tab.id, { index: 0 });
     } catch (_) {
       /* window or tab closed */
+      return null;
     }
   }
   rememberMeridianTab(tab);
   return tab;
 }
 
-async function ensureMeridianTab(windowId = null, { reuseUnpinned = false } = {}) {
+async function ensureMeridianTabInWindow(windowId, options = null) {
+  const { reuseUnpinned = false, active = true } = options ?? {};
+  const mappedId = meridianTabsByWindow.get(windowId);
+  if (mappedId != null) {
+    try {
+      const mappedTab = await chrome.tabs.get(mappedId);
+      if (mappedTab.windowId === windowId) return normalizeMeridianTab(mappedTab);
+    } catch (_) {
+      meridianTabsByWindow.delete(windowId);
+    }
+  }
+
+  let tabs;
+  try {
+    tabs = await chrome.tabs.query({ windowId });
+  } catch (_) {
+    /* window closed */
+    return null;
+  }
+  const existing =
+    tabs.find((tab) => tab.pinned && isMeridianTab(tab)) ??
+    (reuseUnpinned ? tabs.find(isMeridianTab) : null);
+  if (existing) return normalizeMeridianTab(existing);
+
+  let tab;
+  try {
+    tab = await chrome.tabs.create({
+      windowId,
+      pinned: true,
+      active,
+      index: 0,
+      url: getMeridianUrl(),
+    });
+  } catch (_) {
+    /* window closed */
+    return null;
+  }
+  rememberMeridianTab(tab);
+  return tab;
+}
+
+async function ensureMeridianTab(windowId = null, options = null) {
+  const { reuseUnpinned = false, active = true } = options ?? {};
   await resolveMeridianTabs();
 
   if (windowId == null) {
@@ -122,31 +171,19 @@ async function ensureMeridianTab(windowId = null, { reuseUnpinned = false } = {}
     );
   }
 
-  const mappedId = meridianTabsByWindow.get(windowId);
-  if (mappedId != null) {
-    try {
-      const mappedTab = await chrome.tabs.get(mappedId);
-      if (mappedTab.windowId === windowId) return normalizeMeridianTab(mappedTab);
-    } catch (_) {
-      meridianTabsByWindow.delete(windowId);
+  const pending = ensuringMeridianTabsByWindow.get(windowId);
+  if (pending) return pending;
+
+  const ensure = ensureMeridianTabInWindow(windowId, {
+    reuseUnpinned,
+    active,
+  }).finally(() => {
+    if (ensuringMeridianTabsByWindow.get(windowId) === ensure) {
+      ensuringMeridianTabsByWindow.delete(windowId);
     }
-  }
-
-  const tabs = await chrome.tabs.query({ windowId });
-  const existing =
-    tabs.find((tab) => tab.pinned && isMeridianTab(tab)) ??
-    (reuseUnpinned ? tabs.find(isMeridianTab) : null);
-  if (existing) return normalizeMeridianTab(existing);
-
-  const tab = await chrome.tabs.create({
-    windowId,
-    pinned: true,
-    active: true,
-    index: 0,
-    url: getMeridianUrl(),
   });
-  rememberMeridianTab(tab);
-  return tab;
+  ensuringMeridianTabsByWindow.set(windowId, ensure);
+  return ensure;
 }
 
 async function resolveMeridianTabId() {
@@ -160,7 +197,13 @@ async function resolveMeridianTabId() {
 
 async function focusMeridianTab(windowId) {
   const tab = await ensureMeridianTab(windowId);
-  await chrome.tabs.update(tab.id, { active: true });
+  if (!tab) return null;
+  try {
+    await chrome.tabs.update(tab.id, { active: true });
+  } catch (_) {
+    /* window or tab closed */
+    return null;
+  }
   return tab;
 }
 
@@ -379,40 +422,39 @@ async function handleActivatedCapture(activeInfo) {
 
 chrome.tabs.onActivated.addListener(handleActivatedCapture);
 
+const replacingMeridianTabs = new Set();
+
 async function protectMeridianTab(tabId, changeInfo, tab) {
   const navigatedUrl = changeInfo.url;
-  if (navigatedUrl && !isMeridianTab({ url: navigatedUrl })) {
-    try {
-      await chrome.tabs.create({
-        windowId: tab.windowId,
-        index: tab.index + 1,
-        url: navigatedUrl,
-        active: tab.active,
-      });
-    } catch (error) {
-      console.warn(
-        "[Meridian] Could not open redirected navigation:",
-        error.message,
-      );
-    }
+  if (!navigatedUrl || isMeridianTab({ url: navigatedUrl })) {
+    if (changeInfo.pinned === false) await normalizeMeridianTab(tab);
+    return;
   }
 
-  if (
-    changeInfo.pinned === false ||
-    (navigatedUrl && !isMeridianTab({ url: navigatedUrl }))
-  ) {
-    try {
-      const restored = await chrome.tabs.update(tabId, {
-        pinned: true,
-        url: getMeridianUrl(),
-      });
-      if (restored.index !== 0) {
-        await chrome.tabs.move(tabId, { index: 0 });
-      }
-      rememberMeridianTab(restored);
-    } catch (_) {
-      /* the removal listener restores a closed tab */
+  if (replacingMeridianTabs.has(tabId)) return;
+  replacingMeridianTabs.add(tabId);
+
+  try {
+    const windowId = tab.windowId;
+    if (windowId == null) return;
+
+    let wasManaged = meridianTabId === tabId;
+    for (const [mappedWindowId, mappedTabId] of meridianTabsByWindow) {
+      if (mappedTabId !== tabId) continue;
+      meridianTabsByWindow.delete(mappedWindowId);
+      wasManaged = true;
     }
+    if (!wasManaged) return;
+    persistMeridianTabs();
+
+    try {
+      if (tab.pinned) await chrome.tabs.update(tabId, { pinned: false });
+    } catch (_) {
+      /* the replacement is still needed if the destination tab closed */
+    }
+    await ensureMeridianTab(windowId, { active: false });
+  } finally {
+    replacingMeridianTabs.delete(tabId);
   }
 }
 

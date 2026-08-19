@@ -8,16 +8,16 @@ export const PROVIDERS = [
     favicon: "https://www.google.com/favicon.ico",
   },
   {
-    id: "duckduckgo",
-    name: "DuckDuckGo",
-    url: "https://duckduckgo.com/?q=",
-    favicon: "https://duckduckgo.com/favicon.ico",
-  },
-  {
     id: "bing",
     name: "Bing",
     url: "https://www.bing.com/search?q=",
     favicon: "https://www.bing.com/favicon.ico",
+  },
+  {
+    id: "duckduckgo",
+    name: "DuckDuckGo",
+    url: "https://duckduckgo.com/?q=",
+    favicon: "https://duckduckgo.com/favicon.ico",
   },
   {
     id: "brave",

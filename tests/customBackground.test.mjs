@@ -19,6 +19,9 @@ function installFakeIndexedDB() {
                   put(value, key) {
                     store.set(key, value);
                   },
+                  delete(key) {
+                    store.delete(key);
+                  },
                   get(key) {
                     const getReq = {};
                     queueMicrotask(() => {
@@ -46,8 +49,15 @@ function installFakeIndexedDB() {
 }
 
 function installStubs() {
+  const revisions = [];
   globalThis.chrome = {
-    storage: { local: { get: async () => ({}), remove: async () => {} } },
+    storage: {
+      local: {
+        get: async () => ({}),
+        remove: async () => {},
+        set: async (values) => revisions.push(values),
+      },
+    },
   };
   globalThis.localStorage = {
     _m: new Map(),
@@ -62,14 +72,18 @@ function installStubs() {
     },
   };
   const created = [];
+  created.revoked = [];
   globalThis.URL = {
     createObjectURL(blob) {
       const url = `blob:fake/${created.length}`;
       created.push({ url, blob });
       return url;
     },
-    revokeObjectURL() {},
+    revokeObjectURL(url) {
+      created.revoked.push(url);
+    },
   };
+  created.revisions = revisions;
   return created;
 }
 
@@ -102,4 +116,75 @@ test("falls back to a legacy data URL when IndexedDB is empty", async () => {
   const url = await getCustomBackgroundUrl();
 
   assert.equal(url, "data:image/jpeg;base64,legacy");
+});
+
+test("shares one live blob URL across consumers until the image changes", async () => {
+  installFakeIndexedDB();
+  const created = installStubs();
+  const {
+    saveCustomBackground,
+    getCustomBackgroundUrl,
+    refreshCustomBackgroundUrl,
+  } = await import(
+    `../utils/customBackground.js?case=shared-url`
+  );
+
+  const firstFile = { type: "image/png", size: 1_000 };
+  await saveCustomBackground(firstFile);
+  const [firstUrl, secondUrl] = await Promise.all([
+    getCustomBackgroundUrl(),
+    getCustomBackgroundUrl(),
+  ]);
+
+  assert.equal(firstUrl, "blob:fake/0");
+  assert.equal(secondUrl, firstUrl);
+  assert.equal(created.length, 1);
+  assert.deepEqual(created.revoked, []);
+
+  const replacement = { type: "image/jpeg", size: 2_000 };
+  const revision = await saveCustomBackground(replacement);
+  assert.deepEqual(created.revoked, [], "the displayed URL remains live");
+  assert.equal(
+    await refreshCustomBackgroundUrl(revision),
+    "blob:fake/1",
+  );
+  assert.deepEqual(created.revoked, [], "revocation waits for consumers");
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(created.revoked, [firstUrl]);
+  assert.equal(created[1].blob, replacement);
+  assert.equal(created.revisions.length, 2);
+});
+
+test("a second document refreshes uploads and deletion from revision signals", async () => {
+  installFakeIndexedDB();
+  const created = installStubs();
+  const firstDocument = await import(
+    `../utils/customBackground.js?case=first-document`
+  );
+  const secondDocument = await import(
+    `../utils/customBackground.js?case=second-document`
+  );
+
+  const firstRevision = await firstDocument.saveCustomBackground({ id: 1 });
+  assert.equal(
+    await secondDocument.refreshCustomBackgroundUrl(firstRevision),
+    "blob:fake/0",
+  );
+
+  const secondRevision = await firstDocument.saveCustomBackground({ id: 2 });
+  const replacementUrl =
+    await secondDocument.refreshCustomBackgroundUrl(secondRevision);
+  assert.equal(replacementUrl, "blob:fake/1");
+  assert.deepEqual(created.revoked, []);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(created.revoked, ["blob:fake/0"]);
+
+  const deletionRevision = await firstDocument.clearCustomBackground();
+  assert.equal(
+    await secondDocument.refreshCustomBackgroundUrl(deletionRevision),
+    null,
+  );
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(created.revoked, ["blob:fake/0", replacementUrl]);
+  assert.equal(created.revisions.length, 3);
 });

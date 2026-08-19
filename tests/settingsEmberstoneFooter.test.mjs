@@ -90,7 +90,7 @@ test("the footer renders two side-by-side links, each with an icon", () => {
   assert.ok(site, "expected a link to the studio site");
   const siteLogo = site.children.find((n) => n.tagName === "IMG");
   assert.ok(siteLogo, "expected the studio brand mark inside the site link");
-  // Root-relative, matching img/train.webp and the icon assets.
+  // Root-relative, matching the bundled background and icon assets.
   assert.equal(siteLogo.src, "img/emberstone.svg");
   // Decorative image (the adjacent label names the studio) — hidden from AT.
   assert.equal(siteLogo.alt, "");

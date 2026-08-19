@@ -10,8 +10,14 @@ const STORE = "backgrounds";
 const THUMBNAIL_STORE = "thumbnails";
 const KEY = "custom";
 const LEGACY_KEY = "meridian_bg_custom";
+export const CUSTOM_BACKGROUND_REVISION_KEY = "customBackgroundRevision";
 
 let cachedObjectUrl = null;
+let cachedRevision = null;
+let cacheNeedsRefresh = false;
+let refreshQueue = Promise.resolve();
+let unversionedRefresh = null;
+const revisionRefreshes = new Map();
 
 function openDb() {
   return new Promise((resolve, reject) => {
@@ -82,55 +88,21 @@ function idbDelete() {
   );
 }
 
-// Persist the uploaded file's raw bytes. `blob` is the File from the picker.
-export async function saveCustomBackground(blob) {
-  await idbPut(blob);
-  // Drop any pre-IndexedDB copies so backends can't diverge.
-  try {
-    await chrome.storage.local.remove(LEGACY_KEY);
-  } catch {
-    /* ignore */
-  }
-  try {
-    localStorage.removeItem(LEGACY_KEY);
-  } catch {
-    /* ignore */
-  }
+function createRevision() {
+  const nonce =
+    globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2);
+  return `${Date.now()}-${nonce}`;
 }
 
-// Forget the stored custom image entirely — used by the "remove / start over"
-// affordance. Clears the IndexedDB record, revokes any live object URL, and
-// drops the legacy copies so no backend can resurrect the deleted image.
-export async function clearCustomBackground() {
-  await idbDelete();
-  if (cachedObjectUrl) {
-    URL.revokeObjectURL(cachedObjectUrl);
-    cachedObjectUrl = null;
-  }
-  try {
-    await chrome.storage.local.remove(LEGACY_KEY);
-  } catch {
-    /* ignore */
-  }
-  try {
-    localStorage.removeItem(LEGACY_KEY);
-  } catch {
-    /* ignore */
-  }
+async function publishRevision() {
+  const revision = createRevision();
+  await chrome.storage.local.set({
+    [CUSTOM_BACKGROUND_REVISION_KEY]: revision,
+  });
+  return revision;
 }
 
-// Returns a URL usable directly in CSS `url(...)`, or null if none is stored.
-// The returned `blob:` URL stays valid for the life of the document; the
-// previous one is revoked so we don't leak object URLs across replacements.
-export async function getCustomBackgroundUrl() {
-  const blob = await idbGet();
-  if (blob) {
-    if (cachedObjectUrl) URL.revokeObjectURL(cachedObjectUrl);
-    cachedObjectUrl = URL.createObjectURL(blob);
-    return cachedObjectUrl;
-  }
-  // Legacy fallback: small images uploaded before the IndexedDB move were
-  // stored as data URLs. Read them so existing backgrounds still render.
+async function getLegacyBackgroundUrl() {
   try {
     const local = await chrome.storage.local.get(LEGACY_KEY);
     if (local[LEGACY_KEY] != null) return local[LEGACY_KEY];
@@ -142,4 +114,117 @@ export async function getCustomBackgroundUrl() {
   } catch {
     return null;
   }
+}
+
+function revokeAfterSwap(url) {
+  // Consumers awaiting the refresh get a turn to replace their CSS/image src
+  // before the object URL backing the previous image is released.
+  const revoke = URL.revokeObjectURL.bind(URL);
+  setTimeout(() => revoke(url), 0);
+}
+
+// Persist the uploaded file's raw bytes. `blob` is the File from the picker.
+export async function saveCustomBackground(blob) {
+  await idbPut(blob);
+  cacheNeedsRefresh = true;
+  // Drop any pre-IndexedDB copies so backends can't diverge.
+  try {
+    await chrome.storage.local.remove(LEGACY_KEY);
+  } catch {
+    /* ignore */
+  }
+  try {
+    localStorage.removeItem(LEGACY_KEY);
+  } catch {
+    /* ignore */
+  }
+  return publishRevision();
+}
+
+// Forget the stored custom image entirely — used by the "remove / start over"
+// affordance. Clears the IndexedDB record and drops the legacy copies so no
+// backend can resurrect the deleted image. The refresh triggered by the
+// revision signal safely retires any live object URL.
+export async function clearCustomBackground() {
+  await idbDelete();
+  cacheNeedsRefresh = true;
+  try {
+    await chrome.storage.local.remove(LEGACY_KEY);
+  } catch {
+    /* ignore */
+  }
+  try {
+    localStorage.removeItem(LEGACY_KEY);
+  } catch {
+    /* ignore */
+  }
+  return publishRevision();
+}
+
+// Returns a URL usable directly in CSS `url(...)`, or null if none is stored.
+// The returned `blob:` URL stays valid until the image is replaced or cleared.
+export async function getCustomBackgroundUrl() {
+  if (cachedObjectUrl && !cacheNeedsRefresh) return cachedObjectUrl;
+  return refreshCustomBackgroundUrl();
+}
+
+// Refetch the shared IndexedDB value after another extension context announces
+// a revision. Refreshes are serialized so rapid replacements settle in signal
+// order, while duplicate listeners in one document share the same work.
+export function refreshCustomBackgroundUrl(revision = null) {
+  if (
+    revision != null &&
+    revision === cachedRevision &&
+    !cacheNeedsRefresh
+  ) {
+    return Promise.resolve(cachedObjectUrl);
+  }
+  if (revision != null && revisionRefreshes.has(revision)) {
+    return revisionRefreshes.get(revision);
+  }
+  if (revision == null && unversionedRefresh) return unversionedRefresh;
+
+  const refresh = refreshQueue.then(async () => {
+    if (
+      revision != null &&
+      revision === cachedRevision &&
+      !cacheNeedsRefresh
+    ) {
+      return cachedObjectUrl;
+    }
+
+    const blob = await idbGet();
+    const nextObjectUrl = blob ? URL.createObjectURL(blob) : null;
+    const nextUrl = nextObjectUrl ?? (await getLegacyBackgroundUrl());
+    const previousObjectUrl = cachedObjectUrl;
+
+    cachedObjectUrl = nextObjectUrl;
+    cachedRevision = revision;
+    cacheNeedsRefresh = false;
+
+    if (previousObjectUrl && previousObjectUrl !== nextObjectUrl) {
+      revokeAfterSwap(previousObjectUrl);
+    }
+    return nextUrl;
+  });
+
+  refreshQueue = refresh.catch(() => {});
+  if (revision != null) {
+    revisionRefreshes.set(revision, refresh);
+    refresh.then(
+      () => revisionRefreshes.delete(revision),
+      () => revisionRefreshes.delete(revision),
+    );
+  } else {
+    unversionedRefresh = refresh;
+    refresh.then(
+      () => {
+        unversionedRefresh = null;
+      },
+      () => {
+        unversionedRefresh = null;
+      },
+    );
+  }
+  return refresh;
 }

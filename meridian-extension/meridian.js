@@ -14,7 +14,11 @@ import {
   initialPhotoAdjust,
   DEFAULT_BACKGROUND,
 } from "./components/SettingsPanel.js";
-import { getCustomBackgroundUrl } from "./utils/customBackground.js";
+import {
+  CUSTOM_BACKGROUND_REVISION_KEY,
+  getCustomBackgroundUrl,
+  refreshCustomBackgroundUrl,
+} from "./utils/customBackground.js";
 import { clusterTabsByDomain } from "./utils/domainCluster.js";
 import { getAllThumbnails } from "./utils/thumbnailCache.js";
 import { getEnabledLocalSearchSources } from "./utils/localSearch.js";
@@ -50,9 +54,8 @@ async function getNewTabBehavior() {
   return newTabBehavior ?? "meridian-view";
 }
 
-async function applyStoredAppearance(backgroundOverride = null) {
+async function applyStoredAppearance() {
   const generation = ++appearanceGeneration;
-  let bg = backgroundOverride;
 
   // Photo transparency/blur modifiers live alongside the background; fetch them
   // here so a background change re-applies them against the new photo.
@@ -63,10 +66,8 @@ async function applyStoredAppearance(backgroundOverride = null) {
   ]);
   if (generation !== appearanceGeneration) return;
 
-  if (!bg) {
-    applyTheme(theme ?? "system");
-    bg = background ?? DEFAULT_BACKGROUND;
-  }
+  applyTheme(theme ?? "system");
+  const bg = background ?? DEFAULT_BACKGROUND;
 
   const customUrlPromise =
     bg.type === "custom" ? getCustomBackgroundUrl() : null;
@@ -398,7 +399,11 @@ async function render() {
   const container = document.getElementById("workspace-container");
   container.innerHTML = "";
 
-  const { groupByDomain } = await chrome.storage.sync.get("groupByDomain");
+  const { groupByDomain, showTabsFromAllWindows = true } =
+    await chrome.storage.sync.get([
+      "groupByDomain",
+      "showTabsFromAllWindows",
+    ]);
 
   const chromeGroupsPromise = hasNativeGroups
     ? chrome.tabGroups.query({})
@@ -406,7 +411,9 @@ async function render() {
 
   const [allTabs, chromeGroups, thumbnails, currentTab, wsData, localStore] =
     await Promise.all([
-      chrome.tabs.query({}),
+      chrome.tabs.query(
+        showTabsFromAllWindows ? {} : { currentWindow: true },
+      ),
       chromeGroupsPromise,
       getAllThumbnails(),
       chrome.tabs.getCurrent(),
@@ -985,8 +992,13 @@ async function init() {
   });
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "sync" && changes.background) {
-      applyStoredAppearance(changes.background.newValue ?? DEFAULT_BACKGROUND);
+    if (area === "local" && changes[CUSTOM_BACKGROUND_REVISION_KEY]) {
+      refreshCustomBackgroundUrl(
+        changes[CUSTOM_BACKGROUND_REVISION_KEY].newValue,
+      ).then(applyStoredAppearance);
+    }
+    if (area === "sync" && (changes.theme || changes.background)) {
+      applyStoredAppearance();
     }
     // A photo modifier change (e.g. from another tab) only re-interpolates the
     // CSS vars against the current background — it never re-samples the photo.
@@ -1001,6 +1013,13 @@ async function init() {
     if (area === "sync" && changes.localSearch) {
       clearBrowserSearch();
       if (searchBarApi?.getScope() !== "all") searchBarApi.setScope("all");
+      syncScopeButtons();
+    }
+    if (
+      area === "sync" &&
+      (changes.groupByDomain || changes.showTabsFromAllWindows)
+    ) {
+      scheduleRender();
     }
     if (area !== "local") return;
     const keys = Object.keys(changes);

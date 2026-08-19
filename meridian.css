@@ -47,6 +47,7 @@
   --brand: #2ed8b0; /* FILL only — 1.67:1 on light, never text/hairlines */
   --brand-ink: #0d2f28; /* the only safe foreground ON --brand (7.95:1) */
   --bg: #f5f5f5;
+  --default-bg-image: url("img/topo-light.webp");
   --surface: #eaeaea;
   --surface-hover: #dedede;
   --border: #d2d2d2;
@@ -90,6 +91,7 @@
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) {
     --bg: #1c1c1e;
+    --default-bg-image: url("img/topo-dark.webp");
     --surface: #2c2c2e;
     --surface-hover: #3a3a3c;
     --border: #3a3a3c;
@@ -106,6 +108,7 @@
 
 html[data-theme="dark"] {
   --bg: #1c1c1e;
+  --default-bg-image: url("img/topo-dark.webp");
   --surface: #2c2c2e;
   --surface-hover: #3a3a3c;
   --border: #3a3a3c;
@@ -456,7 +459,7 @@ html[data-theme="dark"] {
 
 .lane-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 8px;
   margin-bottom: 12px;
 }
@@ -547,8 +550,6 @@ html[data-theme="dark"] {
   height: 20px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
-  /* Match the dot's optical nudge so both icons align to the caps. */
-  transform: translateY(1px);
   transition:
     color var(--transition),
     background var(--transition),
@@ -694,9 +695,6 @@ i.lane-group-dot {
   color: var(--on-bg-muted, var(--text-secondary));
   text-shadow: var(--on-bg-shadow, none);
   opacity: 0.85;
-  /* Smaller than the title, so centering floats it high — drop it onto the
-     title's baseline. */
-  transform: translateY(1px);
 }
 
 .lane-delete-btn {
@@ -1303,6 +1301,10 @@ i.lane-group-dot {
 
 /* ---- Settings privacy disclosure ---- */
 
+.settings-section.settings-privacy-section {
+  margin-top: 28px;
+}
+
 .settings-privacy-summary {
   position: relative;
   margin: 0;
@@ -1845,7 +1847,7 @@ i.lane-group-dot {
 .settings-bg-combined-grid,
 .settings-bg-photo-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
   margin-top: 4px;
 }
@@ -1865,15 +1867,40 @@ i.lane-group-dot {
   padding: 0;
 }
 
+.settings-bg-preset {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition:
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.settings-bg-preset-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.settings-bg-preset-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .settings-bg-swatch.load-failed {
   background: var(--surface-hover);
 }
 
-.settings-bg-swatch:hover {
+.settings-bg-custom:hover,
+.settings-bg-preset:hover {
   transform: scale(1.05);
 }
 
-.settings-bg-swatch.selected {
+.settings-bg-custom.selected,
+.settings-bg-preset.selected {
   box-shadow: 0 0 0 2px var(--accent);
 }
 
@@ -1883,26 +1910,6 @@ i.lane-group-dot {
   object-fit: cover;
   display: block;
   pointer-events: none;
-}
-
-/* "None" swatch — diagonal stripes to indicate no background */
-.settings-bg-swatch--none {
-  background: repeating-linear-gradient(
-    45deg,
-    var(--surface-hover),
-    var(--surface-hover) 3px,
-    var(--bg) 3px,
-    var(--bg) 9px
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.settings-bg-swatch--none:hover {
-  color: var(--text-primary);
 }
 
 .settings-bg-sublabel-row {
@@ -2005,9 +2012,10 @@ i.lane-group-dot {
   pointer-events: none;
 }
 
-/* Remove control — a "+" rotated 45° into an "X". Hidden until the tile is
+/* Remove controls — a "+" rotated 45° into an "X". Hidden until the tile is
    hovered or the button itself has keyboard focus. */
-.settings-bg-custom-remove {
+.settings-bg-custom-remove,
+.settings-bg-preset-remove {
   position: absolute;
   inset: 0;
   border: none;
@@ -2021,18 +2029,22 @@ i.lane-group-dot {
   color: #fff;
   cursor: pointer;
   background: color-mix(in srgb, #000 45%, transparent);
+  border-radius: var(--radius-sm);
   opacity: 0;
   transition: opacity var(--transition);
 }
 
-.settings-bg-custom-remove::before {
+.settings-bg-custom-remove::before,
+.settings-bg-preset-remove::before {
   content: "+";
   display: block;
   transform: rotate(45deg);
 }
 
 .settings-bg-custom--filled:hover .settings-bg-custom-remove,
-.settings-bg-custom-remove:focus-visible {
+.settings-bg-custom-remove:focus-visible,
+.settings-bg-preset:hover .settings-bg-preset-remove,
+.settings-bg-preset-remove:focus-visible {
   opacity: 1;
 }
 
