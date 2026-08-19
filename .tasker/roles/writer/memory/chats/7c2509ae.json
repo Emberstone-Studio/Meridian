@@ -1,0 +1,12 @@
+{
+  "chatId": "7c2509ae",
+  "title": "Submit extension to Chrome web store",
+  "summary": "Ah, I see the confusion—let me back up.\n\nI was offering *you* two options for how to handle the trader-declaration item:\n1. You pick a choice now (Consumer vs. Trader), I'll note it\n2. Or, you want me to research the current requirements first before you decide\n\nBut looking at your follow-up, I think what you're actually asking is: **What should I choose?** Are you a trader or a consumer?\n\n**For Meridian, the answer is Consumer** — here's why:\n\n- **Trader = you're a business/company using this as a commercial product or service.** Requires public business address, phone, registered entity name.\n- **Consumer = you're an individual publishing this.** Just email required.\n\nMeridian is:\n- Free, no ads, no paid tier\n- Solo creator (you, Qolok)\n- Ko-fi link in Settings for *optional* tips, not a business transaction\n\n→ **Consumer is the right answer.** You won't need to publish your home address or register a company.\n\n**If you're staring at a form right now with those options, pick Consumer.** If the screen looks different from what I just described, paste a screenshot or describe it and I'll tell you which field/option to select.",
+  "agents": [
+    "tasker",
+    "writer"
+  ],
+  "threadPath": ".tasker/chats/7c2509ae",
+  "createdAt": "2026-08-15T18:10:43.616Z",
+  "updatedAt": "2026-08-15T18:47:55.350Z"
+}

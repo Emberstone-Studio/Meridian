@@ -1,0 +1,73 @@
+{
+  "id": "unhandled-promise-rejection-in-background-js-323-d009",
+  "title": "Unhandled promise rejection in background.js:323 (chrome.tabs.onAttached → normalizeMeridianTab)",
+  "description": "Chrome's extension error panel reports an error at `background.js:323 (anonymous function)`. That line is the closing `});` of the async callback passed to `chrome.tabs.onAttached.addListener` (background.js:304-323).\n\nRoot cause: inside that listener, `await normalizeMeridianTab(tab)` is called at line 322. Inside `normalizeMeridianTab` (background.js:97-112):\n- `tab = await chrome.tabs.update(tab.id, update);` (line 101) has NO try/catch guard.\n- Immediately below it, `tab = await chrome.tabs.move(tab.id, { index: 0 });` (line 105) IS wrapped in try/catch with a \"window or tab closed\" comment — showing the pattern already exists but wasn't applied consistently to the update() call.\n\nIf the tab is closed, detached again, or its window is mid-teardown in the moment between `onAttached` firing and this update() call resolving (a real race during rapid tab attach/detach, e.g. dragging tabs between windows quickly), `chrome.tabs.update` rejects (e.g. \"No tab with id: N\" or \"Tabs cannot be edited right now\"). Since neither this call nor the `onAttached` listener itself catches it, it becomes an unhandled promise rejection — surfacing as the Chrome extension error at line 323.\n\nFix:\n1. Wrap `chrome.tabs.update(tab.id, update)` at background.js:101 in a try/catch consistent with the `move()` call right below it (tab/window may be gone — fail gracefully, don't throw).\n2. Audit `normalizeMeridianTab` as a whole and its callers (`ensureMeridianTabInWindow`, the `onAttached` listener, `protectMeridianTab`) for other unguarded `chrome.tabs.*` calls that could reject due to the same class of race condition (tab/window disappearing mid-flight) and add equivalent guards.\n3. Mirror the fix into meridian-extension/background.js.\n4. Verify no regression to the tab-management/dedup behavior recently fixed in other background.js tasks (second-window tab duplication, Meridian tab restoration) — this file has had several recent concurrent fixes, so re-run the full test suite and check for interaction effects.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T19:47:45.971Z",
+  "updated_at": "2026-08-19T19:51:01.896Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T19:47:45.971Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T19:47:45.971Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "unhandled-promise-rejection-in-background-js-323-d009",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:47:50.350Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:47:50.457Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "unhandled-promise-rejection-in-background-js-323-d009",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T19:51:01.895Z",
+      "type": "output",
+      "content": "## Completed\n\n- Guarded `chrome.tabs.update` in `normalizeMeridianTab` so tab attach/detach races resolve without an unhandled rejection.\n- Guarded window-scoped tab queries and creation, plus focus activation, when a tab or window disappears mid-flight.\n- Mirrored all runtime changes into `meridian-extension/background.js`.\n- Added lifecycle regressions covering rejected update, query, create, and activation operations.\n- Preserved existing deduplication/restoration behavior; the concurrency, stale replacement, removal restoration, and packaged parity tests all pass.\n\nValidation: `node --test tests/*.test.mjs` — 152 tests passed; `git diff --check` passed.",
+      "attachment": "active/unhandled-promise-rejection-in-background-js-323-d009/unhandled-promise-rejection-in-background-js-323-c.md",
+      "agent_run_id": "agent-unhandled-promise-rejection-in-background-js-323-d009-c3091bad521d"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-19T19:47:50.166Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-cb1d8dc58129ae07c1ba",
+  "agent_startup_started_at": "2026-08-19T19:47:50.340Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/unhandled-promise-rejection-in-background-js-323-d009.md",
+      "direction": "self",
+      "at": "2026-08-19T19:51:01.895Z"
+    }
+  ]
+}

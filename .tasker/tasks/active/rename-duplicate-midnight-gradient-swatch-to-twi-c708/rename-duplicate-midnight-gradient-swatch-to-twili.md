@@ -1,0 +1,1 @@
+Renamed the g1 gradient swatch label from `Midnight` to `Twilight` in both `components/SettingsPanel.js` and `meridian-extension/components/SettingsPanel.js`. Preserved the solid `Midnight` label, preset ID, and gradient value. Verification passed: `git diff --check`, mirrored-file comparison, exact label/ID/value assertions, and diff review (one replacement per file).

@@ -1,0 +1,73 @@
+{
+  "id": "add-missing-top-padding-to-settings-privacy-data-7992",
+  "title": "Add missing top padding to Settings > Privacy & Data section",
+  "description": "In the Settings panel, the \"Privacy & Data\" section doesn't have top padding/spacing above it like the other sections (Appearance, Search, Tabs, etc.) do — it sits flush against whatever precedes it instead of matching the consistent section spacing used elsewhere in the panel.\n\nFind the Privacy & Data section in components/SettingsPanel.js (mirrored in meridian-extension/components/SettingsPanel.js) and its container/section styling in meridian.css, compare against the spacing rules used by the other sections, and add matching top padding/margin so it's visually consistent with the rest of the panel.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T19:42:36.690Z",
+  "updated_at": "2026-08-19T19:44:31.091Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T19:42:36.690Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T19:42:36.690Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-missing-top-padding-to-settings-privacy-data-7992",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:42:38.925Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:42:39.034Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-missing-top-padding-to-settings-privacy-data-7992",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T19:44:31.091Z",
+      "type": "output",
+      "content": "Implemented the missing Settings > Privacy & Data spacing. Added an explicit 28px top margin for `.settings-section.settings-privacy-section` in both `meridian.css` and `meridian-extension/meridian.css`, matching the standard section spacing while overriding the unintended `:first-of-type` rule.\n\nValidation:\n- `node --test tests/*.test.mjs` — 145 tests passed\n- `git diff --check` — passed\n- Confirmed source/package stylesheet parity with `cmp`",
+      "attachment": "active/add-missing-top-padding-to-settings-privacy-data-7992/add-missing-top-padding-to-settings-privacy-data-s.md",
+      "agent_run_id": "agent-add-missing-top-padding-to-settings-privacy-data-7992-e118241bdc52"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-19T19:42:38.741Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-85d7202c88198005f615",
+  "agent_startup_started_at": "2026-08-19T19:42:38.914Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/add-missing-top-padding-to-settings-privacy-data-7992.md",
+      "direction": "self",
+      "at": "2026-08-19T19:44:31.091Z"
+    }
+  ]
+}

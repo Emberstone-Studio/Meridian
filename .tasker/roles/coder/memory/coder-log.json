@@ -1,31 +1,31 @@
 {
   "status": "idle",
-  "task_id": "publish-meridian-v1-2-0-release-package-to-githu-44e0",
-  "task_title": "Publish Meridian v1.2.0 release package to GitHub",
-  "started_at": "2026-08-14T16:55:47.751Z",
-  "updated_at": "2026-08-14T17:01:47.766Z",
+  "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+  "task_title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
+  "started_at": "2026-08-19T19:00:51.315Z",
+  "updated_at": "2026-08-19T19:00:52.551Z",
   "completed_at": "2026-07-25T04:40:25.816Z",
-  "last_output": "## Meridian v1.2.0 published\n\n- Release: https://github.com/Emberstone-Studio/Meridian/releases/tag/v1.2.0\n- Annotated tag: `v1.2.0` → `7a2028c582b220de2ab5cbef0aa8f42a813de46d`\n- Asset: `Meridian-v1.2.0.zip` (5,565,865 bytes)\n- ZIP SHA-256: `f737958f6a64a8292afa5dd4af0ff8286cab0400ac028898048eb10773572478`\n- Packaged file count: 53\n- Extracted directory tree SHA-256: `e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`\n- Documented hash match: **Yes**\n- Hosted asset verification: downloaded from GitHub after publication; 53 files and the same extracted tree hash\n\n## Automated checks\n\n- Full Node suite: **131 passed, 0 failed, 0 skipped**\n- JavaScript syntax: **56 files checked, 0 failures**\n- Manifests: **2 parsed**, both version `1.2.0`, manifest version 3\n- Packaged parity: **1 passed, 0 failed**\n- `git diff --check`: clean\n- `git status --short`: clean\n\nThe Linux Tasker checkout contained mixed line endings, while the validated hash records the Windows CRLF checkout form. The release was staged with the validated checkout normalization; the staged tree, locally extracted archive, and re-downloaded GitHub asset all matched the authoritative documented hash. The Tasker-generated dispatch-baseline commit was excluded from the tag; the tag targets the task's explicitly identified release commit `7a2028c`, whose manifest and packaged extension have no content diff from validated candidate `5674a8b`.",
+  "last_output": "Implemented hover-to-remove controls for selected color, gradient, stock-photo, and topo presets. Removing a preset restores the theme-aware topo default. Replaced the diagonal No background swatch with a complementary Garnet solid, added the topo default to the balanced 12-slot photo grid, and mirrored all component/CSS changes into meridian-extension. Added focused regression coverage. Validation: syntax checks passed, git diff whitespace check passed, source/package parity passed, and all 137 Node tests passed.",
   "timeline": [
     {
-      "timestamp": "2026-08-14T16:55:41.718Z",
+      "timestamp": "2026-08-19T18:55:08.198Z",
       "type": "created",
       "content": "Task created"
     },
     {
-      "timestamp": "2026-08-14T16:55:41.718Z",
+      "timestamp": "2026-08-19T18:55:08.198Z",
       "type": "actor",
-      "content": "controller chat-90ff3f7a630f9479aa724e64a2c82f26-648fb228 called mcp__tasker__task_create"
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
     },
     {
-      "timestamp": "2026-08-14T16:55:46.800Z",
-      "type": "updated",
-      "content": "Task updated before Run Now"
+      "timestamp": "2026-08-19T18:55:20.079Z",
+      "type": "actor",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
     },
     {
-      "timestamp": "2026-08-14T16:55:47.031Z",
+      "timestamp": "2026-08-19T19:00:50.991Z",
       "type": "moved",
-      "content": "In progress"
+      "content": "Moved from ready to in_progress"
     }
   ],
   "history": [
@@ -144,6 +144,24 @@
       "started_at": "2026-08-14T16:55:47.751Z",
       "completed_at": "2026-07-25T04:40:25.816Z",
       "last_output": "## Meridian v1.2.0 published\n\n- Release: https://github.com/Emberstone-Studio/Meridian/releases/tag/v1.2.0\n- Annotated tag: `v1.2.0` → `7a2028c582b220de2ab5cbef0aa8f42a813de46d`\n- Asset: `Meridian-v1.2.0.zip` (5,565,865 bytes)\n- ZIP SHA-256: `f737958f6a64a8292afa5dd4af0ff8286cab0400ac028898048eb10773572478`\n- Packaged file count: 53\n- Extracted directory tree SHA-256: `e25a3c668b4124c3823d2cbb5694bd7afc928bd610949aa9da91ab5ff5d26c9e`\n- Documented hash match: **Yes**\n- Hosted asset verification: downloaded from GitHub after publication; 53 files and the same extracted tree hash\n\n## Automated checks\n\n- Full Node suite: **131 passed, 0 failed, 0 skipped**\n- JavaScript syntax: **56 files checked, 0 failures**\n- Manifests: **2 parsed**, both version `1.2.0`, manifest version 3\n- Packaged parity: **1 passed, 0 failed**\n- `git diff --check`: clean\n- `git status --short`: clean\n\nThe Linux Tasker checkout contained mixed line endings, while the validated hash records the Windows CRLF checkout form. The release was staged with the validated checkout normalization; the staged tree, locally extracted archive, and re-downloaded GitHub asset all matched the authoritative documented hash. The Tasker-generated dispatch-baseline commit was excluded from the tag; the tag targets the task's explicitly identified release commit `7a2028c`, whose manifest and packaged extension have no content diff from validated candidate `5674a8b`.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "task_title": "Add hover-to-remove control for selected color/photo/theme backgrounds",
+      "status": "in_review",
+      "started_at": "2026-08-19T18:17:17.826Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "Implemented hover-to-remove controls for selected color, gradient, stock-photo, and topo presets. Removing a preset restores the theme-aware topo default. Replaced the diagonal No background swatch with a complementary Garnet solid, added the topo default to the balanced 12-slot photo grid, and mirrored all component/CSS changes into meridian-extension. Added focused regression coverage. Validation: syntax checks passed, git diff whitespace check passed, source/package parity passed, and all 137 Node tests passed.",
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "task_title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
+      "status": "ready",
+      "started_at": "2026-08-19T19:00:51.315Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": null,
       "pipeline_agents": []
     }
   ],

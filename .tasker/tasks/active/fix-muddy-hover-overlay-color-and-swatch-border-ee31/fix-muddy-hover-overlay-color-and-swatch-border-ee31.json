@@ -1,0 +1,157 @@
+{
+  "id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+  "title": "Fix swatch/border animation desync on preset swatch hover",
+  "description": "On preset color/gradient and photo swatches in the Background settings panel, hovering/selecting causes the swatch's own hover transition and its border/outline to animate on different timing — they visibly don't move together. The custom/uploaded photo slot already animates swatch + border together correctly — use it as the reference implementation.\n\nCompare the custom-photo hover/selected-border transition (correct) against the preset swatch (`.settings-bg-preset`) hover/selected-border transition and align their transition duration/easing/property so both animate as one cohesive state change, matching the custom slot's behavior.\n\nRelevant files: components/SettingsPanel.js (swatch/overlay markup), meridian.css (preset/custom swatch + border transition rules, near the hover-remove overlay block ~line 2003-2037), mirrored in meridian-extension/. Verify visually that the fix doesn't regress the already-correct custom-photo hover.\n\nNote: do NOT change the hover overlay darkening color/color-mix — that's out of scope for this task.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T18:38:29.682Z",
+  "updated_at": "2026-08-19T19:36:00.165Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T18:38:29.682Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T18:38:29.682Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:38:34.278Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T18:38:34.384Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:43.709Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_stop",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_stop"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:50.173Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:52.183Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:52.287Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:45:38.115Z",
+      "type": "output",
+      "content": "Implemented the preset swatch hover/outline synchronization fix.\n\n- Moved the preset selected state to `.settings-bg-preset`, so the wrapper owns both the outline and hover transform.\n- Matched the custom-photo transition properties, duration, and easing for `box-shadow` and `transform`.\n- Kept source and packaged extension copies synchronized.\n- Added regression assertions for selected-state placement and the shared transition contract.\n- Left the hover overlay darkening color unchanged.\n\nValidation:\n- `node --test tests/*.test.mjs` — 137/137 passing.\n- Headless Chromium computed-style check — preset and custom tiles both use `box-shadow, transform`, `0.15s`, `ease`, and reach the same `scale(1.05)` hover geometry.\n- `git diff --check` and packaged parity checks pass.",
+      "attachment": "active/fix-muddy-hover-overlay-color-and-swatch-border-ee31/fix-swatch-border-animation-desync-on-preset-swatc.md",
+      "agent_run_id": "agent-fix-muddy-hover-overlay-color-and-swatch-border-ee31-37200be326d4"
+    },
+    {
+      "timestamp": "2026-08-19T18:47:51.984Z",
+      "type": "chat_user",
+      "content": "Still broken — reopening. Screenshots attached (image-10 = custom photo, correct; image-11 = preset color swatch, still wrong).\n\nCustom photo (correct): a single clean green ring hugs the image tightly and evenly on all 4 sides, no doubling.\n\nPreset color swatch (still wrong): there appear to be TWO overlapping rings that are NOT concentric — a gold/amber selection ring visible on the top and left edges, and a separate darker ring/shadow visible on the bottom and right edges, offset down-and-right from the gold ring. It looks like the swatch content is scaling (transform: scale(...)) from a different transform-origin or on a different element than whatever draws the border/box-shadow, so under hover/selected state the swatch content and its border ring drift apart instead of moving together as one rigid box — the swatch overshoots past the border on the bottom-right while the border stays anchored differently.\n\nThis is NOT fixed by matching transition duration/easing alone (which is what the last pass did) — the actual box geometry (what scales, what transform-origin, which element owns the border vs which element owns the scale) still doesn't match the custom-photo implementation. Please diff the actual DOM structure + CSS box model between `.settings-bg-custom` (correct, single element or properly nested scale+border) and `.settings-bg-preset` (broken) — not just the transition timing values — and make the preset swatch use the same box structure so the border and content are always concentric/rigid together, exactly like custom. Attach a fresh screenshot after the fix showing the preset swatch hover state next to a working custom photo hover state for comparison."
+    },
+    {
+      "timestamp": "2026-08-19T18:47:51.984Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T18:47:52.168Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-19T19:29:17.658Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:36:00.164Z",
+      "type": "output",
+      "content": "Implemented the preset swatch geometry fix.\n\n- Removed the redundant full-size child swatch from preset tiles. The preset wrapper now directly owns the background/image, clipping, hover transform, transition, and selected ring—the same single-box structure used by the custom-photo tile.\n- Preserved mouse and keyboard activation, and stopped the selected remove control from bubbling into preset selection.\n- Mirrored the implementation and CSS in `meridian-extension/`.\n- Left the hover overlay darkening color unchanged.\n- Expanded regression coverage to pin the single-box DOM structure, keyboard behavior, remove-event isolation, and shared transition contract.\n\nVerification:\n\n- `node --test tests/*.test.mjs` — 145/145 passing.\n- Source/package component and stylesheet parity checks pass.\n- `git diff --check` passes.\n- Headed Chromium computed-style check: custom and preset both reach `scale(1.05)` from the same centered transform origin, use `box-shadow, transform` at `0.15s` / `ease`, and render one 2 px selection ring on the transformed visual element.\n\nFresh hover comparison (custom photo reference left; fixed preset color right):\n\n![Custom photo and fixed preset color hover comparison](/tmp/swatch-hover-comparison.png)",
+      "attachment": "active/fix-muddy-hover-overlay-color-and-swatch-border-ee31/fix-swatch-border-animation-desync-on-preset-swatc-2.md",
+      "agent_run_id": "agent-fix-muddy-hover-overlay-color-and-swatch-border-ee31-07a7da7dd4c7"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-08-19T19:29:17.476Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-a100b23b150bd7059f80",
+  "agent_startup_started_at": "2026-08-19T19:29:17.647Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/fix-muddy-hover-overlay-color-and-swatch-border-ee31.md",
+      "direction": "self",
+      "at": "2026-08-19T18:45:38.115Z"
+    }
+  ],
+  "agent_session_confirmed_run_id": "agent-fix-muddy-hover-overlay-color-and-swatch-border-ee31-07a7da7dd4c7",
+  "agent_session_confirmed_at": "2026-08-19T19:29:18.409Z"
+}

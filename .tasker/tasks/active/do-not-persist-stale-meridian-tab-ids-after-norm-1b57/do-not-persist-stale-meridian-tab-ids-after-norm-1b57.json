@@ -1,0 +1,78 @@
+{
+  "id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+  "title": "Do not persist stale Meridian tab IDs after normalization failure",
+  "description": "background.js normalizeMeridianTab catches a rejected chrome.tabs.update call but then continues to move and remember the original tab object. When the update failed because the tab/window disappeared, this persists a known-stale managed tab ID and returns apparent success.\n\nChange normalization to return a failure sentinel (prefer null) immediately after the update rejects, skip move/remember, and make callers tolerate that result. Preserve benign tab/window teardown handling without masking unrelated programming failures where practical. Mirror the change in meridian-extension/background.js.\n\nUpdate lifecycle tests so a disappeared tab is not remembered, and rerun the per-window ensure, restoration, navigation handoff, second-window deduplication, and full packaged-parity suite.",
+  "status": "in_review",
+  "priority": "low",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T19:56:44.048Z",
+  "updated_at": "2026-08-19T20:30:08.279Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T19:56:44.048Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:44.048Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T20:17:00.967Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T20:19:49.896Z",
+      "type": "output",
+      "content": "Implemented the stale Meridian tab normalization fix.\n\n- `normalizeMeridianTab` now returns `null` immediately when `chrome.tabs.update` rejects, preventing any subsequent move or persistence of the stale tab.\n- Mirrored the worker change in `meridian-extension/background.js`.\n- Updated lifecycle regression coverage to assert the vanished tab is neither moved nor remembered and that normalization reports `null`.\n- Existing ensure, focus, and event callers already tolerate the null sentinel.\n\nVerification:\n- Targeted lifecycle scenarios (restoration, per-window ensure, navigation handoff, replacement/deduplication): 4/4 passed.\n- Packaged runtime parity: 1/1 passed.\n- Full test suite: 156/156 passed.\n- Syntax checks for both background workers passed.\n- Diff whitespace check passed.",
+      "attachment": "active/do-not-persist-stale-meridian-tab-ids-after-norm-1b57/do-not-persist-stale-meridian-tab-ids-after-normal.md",
+      "agent_run_id": "agent-do-not-persist-stale-meridian-tab-ids-after-norm-1b57-b864b309ad01"
+    },
+    {
+      "timestamp": "2026-08-19T20:30:08.279Z",
+      "type": "review",
+      "content": "Reviewer follow-up applied: normalizeMeridianTab now also returns null when chrome.tabs.move rejects, so a tab that disappears after update but before move is not remembered as managed. Mirrored in meridian-extension/background.js and added a regression asserting the move failure returns null and leaves the remembered list empty. Validation: targeted lifecycle suite 15/15; full suite 156/156; both workers pass node --check; source/package parity and code diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-19T20:30:08.279Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_comment"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-08-19T20:17:00.795Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-2f3a0a81bc729cac185d",
+  "agent_startup_started_at": "2026-08-19T20:17:00.956Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/do-not-persist-stale-meridian-tab-ids-after-norm-1b57.md",
+      "direction": "self",
+      "at": "2026-08-19T20:19:49.896Z"
+    }
+  ]
+}

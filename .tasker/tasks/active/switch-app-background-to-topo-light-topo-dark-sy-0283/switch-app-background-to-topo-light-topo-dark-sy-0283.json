@@ -1,0 +1,131 @@
+{
+  "id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+  "title": "Switch app background to topo-light/topo-dark, sync with system theme",
+  "description": "New assets img/topo-light.webp and img/topo-dark.webp have been added. Replace the current default background (train.webp) with these:\n\n- Light mode → img/topo-light.webp\n- Dark mode → img/topo-dark.webp\n- Background must switch automatically when the theme changes.\n- Theme default should be \"System\" (follow OS light/dark preference) if a default/theme setting exists and isn't already System.\n- Background image must render at 0 transparency (fully opaque) and 0 blur (no blur filter/effect) — remove any existing opacity/blur styling applied to the background.\n\nFind where train.webp is currently referenced/set as the background (CSS, theme config, component, etc.) and update all relevant places. Verify light/dark switching works and there's no leftover reference to train.webp for the default background.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T18:02:34.599Z",
+  "updated_at": "2026-08-19T18:18:24.707Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T18:02:34.599Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T18:02:34.599Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:02:36.313Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T18:02:36.413Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:07:31.520Z",
+      "type": "output",
+      "content": "## Completed\n\n- Replaced the shipped default with theme-aware topo wallpaper: `img/topo-light.webp` in light mode and `img/topo-dark.webp` in dark mode.\n- Kept the existing default theme as `System`; CSS media-query resolution switches the wallpaper automatically with OS theme changes, while explicit Light and Dark selections override it.\n- Forced the shipped wallpaper to full opacity and zero blur, including when stale photo-adjustment values exist.\n- Mirrored both WebP assets and runtime changes into `meridian-extension/`.\n- Added focused regression coverage for theme resolution, neutral photo effects, and packaged assets.\n\n## Verification\n\n- `node --test tests/*.test.mjs` — 135 tests passed.\n- `git diff --check` — clean.\n- Runtime source, packaged runtime, and tests contain no `train.webp` references.\n- Source and packaged topo assets are byte-identical valid WebP files.",
+      "attachment": "active/switch-app-background-to-topo-light-topo-dark-sy-0283/switch-app-background-to-topo-light-topo-dark-sync.md",
+      "agent_run_id": "agent-switch-app-background-to-topo-light-topo-dark-sy-0283-e28070e57f0f"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:28.479Z",
+      "type": "chat_user",
+      "content": "Regression found in review: the Transparency/Blur sliders no longer show in Settings for the default background.\n\nRoot cause: DEFAULT_BACKGROUND was changed to `{ type: \"theme\", value: \"topo\" }`, but `isPhotoBackground(bg)` in components/SettingsPanel.js (~line 149, mirrored in meridian-extension/components/SettingsPanel.js) only returns true for `type === \"photo\"` or `\"custom\"`. It was never updated for the new \"theme\" type, so `buildPhotoAdjust()` never gets appended for the shipped topo wallpaper — sliders vanish. Custom/uploaded photo backgrounds are unaffected.\n\nFix: update `isPhotoBackground` to also treat `bg?.type === \"theme\"` as slider-eligible (or otherwise account for the new default background type), and confirm `applyPhotoAdjustments` still correctly applies opacity/blur CSS vars to the topo wallpaper afterward. Apply the same fix to the mirrored copy in meridian-extension/. Re-verify default (0 opacity-loss/0 blur) still holds when sliders are at their neutral position, and that adjusting the sliders actually affects the topo background live."
+    },
+    {
+      "timestamp": "2026-08-19T18:13:28.479Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:33.943Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:36.204Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:36.307Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:15:30.663Z",
+      "type": "output",
+      "content": "## Completed\n\n- Restored Transparency and Blur controls for the shipped theme-aware topo background by treating `type: \"theme\"` as an adjustable image background.\n- Applied the fix to both `components/SettingsPanel.js` and the mirrored `meridian-extension/components/SettingsPanel.js`.\n- Updated regression coverage to verify neutral defaults remain fully opaque with zero blur, and non-neutral slider values update the live opacity/blur CSS variables.\n\n## Verification\n\n- `node --test tests/themeBackground.test.mjs` — 2 passed.\n- `node --test tests/*.test.mjs` — 135 passed.\n- `git diff --check` — clean.\n- Source and packaged component files remain byte-identical.",
+      "attachment": "active/switch-app-background-to-topo-light-topo-dark-sy-0283/switch-app-background-to-topo-light-topo-dark-sync-2.md",
+      "agent_run_id": "agent-switch-app-background-to-topo-light-topo-dark-sy-0283-4a5bba56b4e7"
+    },
+    {
+      "timestamp": "2026-08-19T18:18:24.707Z",
+      "type": "moved",
+      "content": "Moved to done"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-19T18:13:36.023Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-2f69abba119fefc9f7d6",
+  "agent_startup_started_at": "2026-08-19T18:13:36.193Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/switch-app-background-to-topo-light-topo-dark-sy-0283.md",
+      "direction": "self",
+      "at": "2026-08-19T18:07:31.520Z"
+    }
+  ]
+}

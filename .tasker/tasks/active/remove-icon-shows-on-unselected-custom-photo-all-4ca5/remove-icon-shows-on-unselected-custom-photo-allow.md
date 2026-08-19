@@ -1,0 +1,5 @@
+Implemented the active-only custom-image removal behavior in both runtime copies of `SettingsPanel.js`. An inactive custom-photo tile now remains a normal selectable tile and does not render the remove button; the remove affordance is created only when the custom background is selected.
+
+Also fixed the broken custom thumbnail shown in the attachments: `getCustomBackgroundUrl()` now shares one live blob URL among concurrent consumers instead of revoking an earlier caller’s URL. The URL is revoked when the image is replaced or cleared. Both source and packaged utility copies were updated.
+
+Added regression coverage for selected-only removal and shared blob-URL lifecycle. Verification: `node --test tests/*.test.mjs` — 141 passed, 0 failed; syntax checks, packaged parity, and `git diff --check` also pass.

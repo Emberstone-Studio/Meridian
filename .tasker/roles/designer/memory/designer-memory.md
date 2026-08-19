@@ -24,4 +24,4 @@
 **Key decisions:** 
 **Status:** done
 **Last updated:** 2026-08-14
-
+- [f96c286b] Fix GitHub checks and chrome extension UI issues (designer, 2026-08-14) → roles/designer/memory/chats/f96c286b.json

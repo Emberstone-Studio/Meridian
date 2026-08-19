@@ -1,0 +1,68 @@
+{
+  "id": "reorder-search-engine-options-google-bing-duckdu-55fd",
+  "title": "Reorder search engine options: Google, Bing, DuckDuckGo, Brave",
+  "description": "In Settings, the search engine selector/options list should be reordered to: Google, Bing, DuckDuckGo, Brave (in that order). Find where the search engine options are defined (likely an array/const in components/SettingsPanel.js or a related settings/search config file, mirrored in meridian-extension/), and reorder the list to match. This is a pure ordering change — don't alter the engines' values/URLs/icons, just their display/array order so they render in the requested sequence.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Maintenance",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T18:45:51.055Z",
+  "updated_at": "2026-08-19T19:38:22.247Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T18:45:51.055Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T18:45:51.056Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "reorder-search-engine-options-google-bing-duckdu-55fd",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:00:58.941Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-08-19T19:36:00.462Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:38:22.245Z",
+      "type": "output",
+      "content": "Updated the shared search-provider ordering in both runtime trees:\n\n- `components/SearchBar.js`\n- `meridian-extension/components/SearchBar.js`\n\nThe Settings selector now renders **Google, Bing, DuckDuckGo, Brave**. Engine IDs, names, URLs, and favicons are unchanged.\n\nValidation:\n\n- Confirmed the provider IDs appear in the requested order in both files.\n- `git diff --check` passed.\n- `node --test tests/*.test.mjs` passed: **145/145 tests**.",
+      "attachment": "active/reorder-search-engine-options-google-bing-duckdu-55fd/reorder-search-engine-options-google-bing-duckduck.md",
+      "agent_run_id": "agent-reorder-search-engine-options-google-bing-duckdu-55fd-1f32f04b5e96"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-08-19T19:36:00.282Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-2dad01ca64324844c59b",
+  "agent_startup_started_at": "2026-08-19T19:36:00.453Z",
+  "agent_session_confirmed_run_id": "agent-reorder-search-engine-options-google-bing-duckdu-55fd-1f32f04b5e96",
+  "agent_session_confirmed_at": "2026-08-19T19:36:00.963Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/reorder-search-engine-options-google-bing-duckdu-55fd.md",
+      "direction": "self",
+      "at": "2026-08-19T19:38:22.245Z"
+    }
+  ]
+}

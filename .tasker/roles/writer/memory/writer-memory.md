@@ -18,3 +18,5 @@
 **Status:** done
 **Last updated:** 2026-07-28
 
+## Chat pointers
+- [7c2509ae] Submit extension to Chrome web store (tasker, writer, 2026-08-15) → roles/writer/memory/chats/7c2509ae.json

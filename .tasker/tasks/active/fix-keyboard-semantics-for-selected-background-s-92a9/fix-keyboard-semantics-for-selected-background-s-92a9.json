@@ -1,0 +1,61 @@
+{
+  "id": "fix-keyboard-semantics-for-selected-background-s-92a9",
+  "title": "Fix keyboard semantics for selected background swatch removal",
+  "description": "Selected preset swatches currently use a div with role=button that contains a real remove button. The parent keydown listener handles bubbled Enter/Space events, calls the select action, and may prevent the nested remove button from activating. The nested interactive structure also produces poor accessibility semantics.\n\nFix components/SettingsPanel.js and the packaged mirror so selection and removal are separate, valid interactive controls. Prefer a non-interactive tile wrapper that owns the visual transform/ring, with sibling selection and remove buttons; preserve the single-box hover geometry and mouse behavior. If the current structure is retained temporarily, parent keyboard handling must at minimum ignore events originating from descendants.\n\nAdd behavioral regression coverage that dispatches real bubbling keyboard events to the focused remove control and verifies Enter and Space remove the selected preset without triggering selection. Verify mouse selection/removal and source/package parity.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T19:56:43.734Z",
+  "updated_at": "2026-08-19T20:10:00.166Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T19:56:43.734Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:43.734Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "fix-keyboard-semantics-for-selected-background-s-92a9",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T20:04:44.643Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T20:10:00.165Z",
+      "type": "output",
+      "content": "Implemented the selected preset swatch keyboard/accessibility fix.\n\n- Replaced the interactive preset wrapper with a non-interactive visual tile.\n- Added sibling native selection and remove buttons, with selection state exposed through `aria-pressed`.\n- Kept hover scaling, selected ring, overlay removal geometry, and visible keyboard focus on the tile footprint.\n- Added bubbling Enter and Space regression coverage on the focused remove button, plus mouse selection/removal assertions.\n- Mirrored component and CSS changes in `meridian-extension`.\n\nVerification:\n- `node --test tests/*.test.mjs` — 154 passed, 0 failed.\n- Source/package component and CSS comparisons — exact match.\n- `git diff --check` — clean.",
+      "attachment": "active/fix-keyboard-semantics-for-selected-background-s-92a9/fix-keyboard-semantics-for-selected-background-swa.md",
+      "agent_run_id": "agent-fix-keyboard-semantics-for-selected-background-s-92a9-9558bf0a366d"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-08-19T20:04:44.463Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-7f03dec7d909d524ea97",
+  "agent_startup_started_at": "2026-08-19T20:04:44.632Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/fix-keyboard-semantics-for-selected-background-s-92a9.md",
+      "direction": "self",
+      "at": "2026-08-19T20:10:00.165Z"
+    }
+  ]
+}

@@ -2,13 +2,13 @@
   "id": "owner-only-chrome-web-store-release-follow-ups-8398",
   "title": "Owner-only Chrome Web Store release follow-ups",
   "description": "Personal checklist for russpinkston@gmail.com — these steps require Chrome Web Store publisher dashboard access and cannot be automated by an agent. Source: prepare-chrome-web-store-privacy-disclosures-and-0fe7 (STORE_LISTING.md §5).\n\n- [ ] Publish PRIVACY.md at a stable, publicly reachable HTTPS URL and enter it in the Chrome Web Store listing's Privacy Policy field. Keep the hosted text in sync with the shipped archive.\n- [ ] In the Chrome Web Store dashboard, submit the single-purpose description, select the correct data-type categories, and check the three data-usage certifications (no sale/transfer, no unrelated use, no creditworthiness/lending use) — see STORE_LISTING.md §2 for drafted copy.\n- [ ] Confirm each permission justification in STORE_LISTING.md §4 (tabs, tabGroups, storage, unlimitedStorage, favicon, sidePanel, scripting, <all_urls>, optional bookmarks/history) matches the exact archive being uploaded, then paste each into its dashboard field.\n- [ ] Verify prominent-disclosure / affirmative-consent requirements are actually met for screenshot capture and optional bookmarks/history access in the live listing and in-product UX (a policy link alone may not be sufficient).\n- [ ] Perform a manual network audit of the packed release build (new-tab, side panel, settings, search, bookmark/history, missing-favicon, thumbnail-refresh flows) to confirm no analytics, telemetry, or remote code beyond this repository.\n- [ ] Review current picsum.photos and search-provider (Google/DuckDuckGo/Bing/Brave icon) terms, and Chrome's favicon-endpoint guidance, for ongoing policy accuracy.\n- [ ] Reconcile support-contact details, retention/deletion statements, and all Chrome Web Store form answers with actual operational practice before submitting.\n\nDo not mark any item done until it has actually been performed in the Chrome Web Store dashboard — these were explicitly left undone by the agent because they require publisher-only access.",
-  "status": "backlog",
+  "status": "done",
   "priority": "high",
   "label": "Release",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-07-28T20:32:25.300Z",
-  "updated_at": "2026-07-28T22:15:02.570Z",
+  "updated_at": "2026-08-19T18:17:10.287Z",
   "activity": [
     {
       "timestamp": "2026-07-28T20:32:25.300Z",
@@ -31,6 +31,11 @@
       "timestamp": "2026-07-28T22:15:02.570Z",
       "type": "moved",
       "content": "Moved from ready to backlog"
+    },
+    {
+      "timestamp": "2026-08-19T18:17:10.287Z",
+      "type": "moved",
+      "content": "Moved to done"
     }
   ]
 }

@@ -1,0 +1,64 @@
+{
+  "id": "synchronize-custom-background-image-lifecycle-ac-3501",
+  "title": "Synchronize custom background image lifecycle across open windows",
+  "description": "Custom background blobs are shared through IndexedDB, but each Meridian document caches its own blob URL indefinitely. Saving or clearing the image in one window does not invalidate another window cached URL. The SettingsPanel sync listener also rerenders a changed custom background without refetching customBgUrl, so another open window can show a missing thumbnail after upload or keep a deleted image selectable after removal.\n\nIntroduce a cross-context image revision/invalidation signal, such as a chrome.storage.local revision key updated after successful save/delete. Each open Meridian window must listen for it, revoke/invalidate its local cached object URL, refetch the IndexedDB value, update the applied background when needed, and rerender the custom tile. Avoid revoking URLs still in use before replacement is ready.\n\nCover upload and deletion initiated from a second window, including a settings panel that is already open. Verify the background, selected state, and custom thumbnail update without reload. Mirror runtime changes into meridian-extension and preserve source/package parity.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "deps": [
+    "fix-keyboard-semantics-for-selected-background-s-92a9"
+  ],
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T19:56:43.882Z",
+  "updated_at": "2026-08-19T20:17:00.672Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T19:56:43.882Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:43.882Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "synchronize-custom-background-image-lifecycle-ac-3501",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T20:10:00.515Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T20:17:00.671Z",
+      "type": "output",
+      "content": "## Completed\n\n- Added a `customBackgroundRevision` signal after successful IndexedDB saves and deletions.\n- Added serialized, revision-aware blob URL refreshes that create the replacement before deferring revocation of the prior URL.\n- Updated every open Meridian page to refetch and reapply appearance on image revisions.\n- Updated an already-open Settings panel to refetch the custom thumbnail, preserve current selection for replacements, clear it on deletion, and rerender without reload.\n- Mirrored all runtime changes into `meridian-extension`.\n- Added regression coverage for second-document upload/deletion and listener wiring.\n\n## Verification\n\n- `node --test` — 156 tests passed.\n- `node --check` passed for all changed source JavaScript entry points.\n- `git diff --check` passed.\n- Packaged parity test passed.",
+      "attachment": "active/synchronize-custom-background-image-lifecycle-ac-3501/synchronize-custom-background-image-lifecycle-acro.md",
+      "agent_run_id": "agent-synchronize-custom-background-image-lifecycle-ac-3501-34fa1bd66348"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct approved queue dispatch to assigned role",
+    "decided_by": "run-queue",
+    "decided_at": "2026-08-19T20:10:00.332Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-278778a8e313856c76d2",
+  "agent_startup_started_at": "2026-08-19T20:10:00.505Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/synchronize-custom-background-image-lifecycle-ac-3501.md",
+      "direction": "self",
+      "at": "2026-08-19T20:17:00.671Z"
+    }
+  ]
+}

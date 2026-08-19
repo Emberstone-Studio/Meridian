@@ -1,0 +1,121 @@
+{
+  "id": "settings-not-syncing-across-windows-new-window-d-79ae",
+  "title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
+  "description": "Settings should be global across all open windows of the app/extension, but currently a new window does not pick up settings changed/set in another already-open window (e.g. theme, background, tab organization toggles, etc. — whatever is currently window-scoped instead of global).\n\nInvestigate:\n1. How settings are currently persisted — likely `chrome.storage.sync` or `chrome.storage.local` calls in components/SettingsPanel.js (and mirrored meridian-extension/). `chrome.storage.sync`/`local` should already be shared across windows/contexts by nature — if settings still aren't reflecting live in other open windows, the likely causes are: (a) each window's UI only reads settings once at load/init and never listens for `chrome.storage.onChanged`, so an already-open second window doesn't pick up a change made in the first window until it's closed/reopened, or (b) some settings are being cached in a window-local variable/state that shadows storage after initial load, or (c) settings are incorrectly being written to a window/tab-scoped store instead of the shared sync/local storage.\n2. Confirm expected behavior: settings changed in one window should propagate live (or at minimum on next load) to all other currently-open windows — no manual reload required, ideally listen for `chrome.storage.onChanged` and update UI/state reactively.\n\nFix wherever settings are read/written to ensure a single global source of truth, and that all open windows subscribe to changes rather than caching a stale local copy. Mirror the fix into meridian-extension/. This is a high-severity correctness bug — settings desync across windows is confusing/broken UX.",
+  "status": "in_review",
+  "priority": "high",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T18:55:08.198Z",
+  "updated_at": "2026-08-19T19:06:19.256Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T18:55:08.198Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:08.198Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:20.079Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T19:00:50.991Z",
+      "type": "moved",
+      "content": "Moved from ready to in_progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:00:52.229Z",
+      "type": "moved",
+      "content": "Moved from in_progress to ready"
+    },
+    {
+      "timestamp": "2026-08-19T19:01:46.592Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:06:19.254Z",
+      "type": "output",
+      "content": "## Completed\n\n- Added a comprehensive `chrome.storage.onChanged` subscriber so all settings-panel controls update from the shared sync store across open windows.\n- Updated live Meridian pages to reapply theme/background settings, refresh local-search scope controls, and rerender tab organization when synced preferences change.\n- Mirrored all runtime changes into `meridian-extension/` and added cross-window regression coverage.\n\n## Verification\n\n- `node --check` passed for all four changed runtime files.\n- `node --test tests/*.test.mjs`: 144 passed, 0 failed.\n- `git diff --check` passed.\n- Source/package parity confirmed with `cmp` and the packaged parity test.\n\nFinal report format: Markdown in the `output` field of a Tasker `kind: \"complete\"` report.",
+      "attachment": "active/settings-not-syncing-across-windows-new-window-d-79ae/settings-not-syncing-across-windows-new-window-doe.md",
+      "agent_run_id": "agent-settings-not-syncing-across-windows-new-window-d-79ae-94b39e8fd51b"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Model explicitly set on agent (codex-gpt-5-6-sol)",
+    "alternates": [],
+    "shape": "Bug",
+    "decided_by": "explicit-role",
+    "decided_at": "2026-08-19T19:01:14.009Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "resumeReason": null,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=false,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "agent_attempt_id": "attempt-a624f5d102c5b3c76434",
+  "agent_startup_started_at": "2026-08-19T19:01:46.584Z",
+  "agent_session_confirmed_run_id": "agent-settings-not-syncing-across-windows-new-window-d-79ae-94b39e8fd51b",
+  "agent_session_confirmed_at": "2026-08-19T19:01:47.342Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/settings-not-syncing-across-windows-new-window-d-79ae.md",
+      "direction": "self",
+      "at": "2026-08-19T19:06:19.254Z"
+    }
+  ]
+}

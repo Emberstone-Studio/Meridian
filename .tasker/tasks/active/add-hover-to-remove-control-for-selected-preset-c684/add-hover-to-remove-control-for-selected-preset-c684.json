@@ -1,0 +1,98 @@
+{
+  "id": "add-hover-to-remove-control-for-selected-preset-c684",
+  "title": "Add hover-to-remove control for selected color/photo/theme backgrounds",
+  "description": "In the Background settings panel, the custom/uploaded photo slot already shows a hover \"✕\" remove control on the currently selected thumbnail (see attached screenshot — top-left dark swatch with the ✕ overlay) that clears the selection back to default.\n\nExtend this same hover-to-remove interaction to:\n1. Photos grid — the other thumbnails (stock/preset photos, and the topo theme default). Whichever one is currently selected should show the same hover \"✕\" affordance to deselect/revert to default, same as the custom photo already does.\n2. Colors & Gradients grid — same hover-to-remove behavior on the currently selected color/gradient swatch, reverting to default on click.\n\nAdditionally: remove/replace the dedicated \"no background\" (diagonal-striped) swatch in Colors & Gradients — it's redundant once hover-to-remove exists on the selected swatch itself, since that's now the way to get back to \"no background\"/default. Confirm with whoever owns the color list what \"default\" should resolve to when removed (likely the same default/theme background as elsewhere in this settings panel).\n\nSince removing the \"no background\" swatch frees up a grid slot, add one more real color/gradient option in its place (pick something that fits the existing set stylistically — e.g. another solid or gradient consistent with the current palette). Check with the user/Designer if a specific color is wanted; otherwise choose a sensible complementary addition.\n\nRelevant file: components/SettingsPanel.js (Background settings — Colors & Gradients and Photos grid rendering, near where the custom photo hover-remove is implemented) — mirror the change into meridian-extension/components/SettingsPanel.js as with prior background-related changes.\n\nNote: this touches the same settings panel area as the in-progress task switch-app-background-to-topo-light-topo-dark-sy-0283 (fixing the transparency/blur slider regression). Coordinate/rebase against that fix rather than working in parallel to avoid merge conflicts.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "deps": [
+    "switch-app-background-to-topo-light-topo-dark-sy-0283"
+  ],
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T18:15:23.686Z",
+  "updated_at": "2026-08-19T18:22:00.993Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T18:15:23.686Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T18:15:23.691Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:16:28.379Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:17:05.654Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:17:13.553Z",
+      "type": "moved",
+      "content": "Moved from backlog to ready"
+    },
+    {
+      "timestamp": "2026-08-19T18:17:16.850Z",
+      "type": "updated",
+      "content": "Task updated before Run Now"
+    },
+    {
+      "timestamp": "2026-08-19T18:17:17.124Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T18:22:00.990Z",
+      "type": "output",
+      "content": "Implemented hover-to-remove controls for selected color, gradient, stock-photo, and topo presets. Removing a preset restores the theme-aware topo default. Replaced the diagonal No background swatch with a complementary Garnet solid, added the topo default to the balanced 12-slot photo grid, and mirrored all component/CSS changes into meridian-extension. Added focused regression coverage. Validation: syntax checks passed, git diff whitespace check passed, source/package parity passed, and all 137 Node tests passed.",
+      "attachment": "active/add-hover-to-remove-control-for-selected-preset-c684/add-hover-to-remove-control-for-selected-color-pho.md",
+      "agent_run_id": "agent-add-hover-to-remove-control-for-selected-preset-c684-f022ee4fb23a"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-19T18:17:16.929Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-9da737c008ee44b7902a",
+  "agent_startup_started_at": "2026-08-19T18:17:17.114Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/add-hover-to-remove-control-for-selected-preset-c684.md",
+      "direction": "self",
+      "at": "2026-08-19T18:22:00.990Z"
+    }
+  ]
+}

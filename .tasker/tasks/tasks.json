@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 739,
+  "state_version": 962,
   "features": {
     "chat_pro": true
   },
@@ -484,6 +484,606 @@
       },
       "task_id": "port-rubik-2ed8b0-brand-system-into-the-extensio-45f2",
       "content": "chat chat-fab73338b0ca360c066452df0620d7b1-8a1132d1 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:02:34.599Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:02:36.413Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:28.479Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:33.943Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-19T18:13:36.307Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:15:23.691Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:16:28.379Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:17:05.654Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:26:11.054Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:26:13.410Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:27:10.070Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:27:21.534Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_stop",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_stop"
+    },
+    {
+      "timestamp": "2026-08-19T18:27:24.382Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:28:23.762Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:28:28.486Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_stop",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_stop"
+    },
+    {
+      "timestamp": "2026-08-19T18:28:31.512Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:34:01.386Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:34:04.087Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:36:10.613Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-vertical-misalignment-of-group-header-count-6921",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:36:13.794Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-vertical-misalignment-of-group-header-count-6921",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:38:29.682Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:38:34.384Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:43.709Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_stop",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_stop"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:50.173Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:39:52.287Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:41:30.145Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:45:49.276Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:45:51.056Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "reorder-search-engine-options-google-bing-duckdu-55fd",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:47:51.984Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T18:47:52.168Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-19T18:50:24.650Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:50:26.853Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:08.198Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:16.637Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:20.079Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:20.200Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:22.780Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T19:02:14.164Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T19:02:14.447Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-19T19:02:54.641Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T19:28:01.231Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_attach",
+      "actor": {
+        "kind": "worker",
+        "run_id": "agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5",
+        "task_id": "critical-entering-url-search-in-a-second-window-6080"
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "worker agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5 called mcp__tasker__task_attach"
+    },
+    {
+      "timestamp": "2026-08-19T19:42:36.690Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-missing-top-padding-to-settings-privacy-data-7992",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:42:39.034Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "add-missing-top-padding-to-settings-privacy-data-7992",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T19:47:45.971Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "unhandled-promise-rejection-in-background-js-323-d009",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:47:50.457Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "unhandled-promise-rejection-in-background-js-323-d009",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:43.734Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "fix-keyboard-semantics-for-selected-background-s-92a9",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:43.882Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "synchronize-custom-background-image-lifecycle-ac-3501",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:44.048Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T19:56:44.198Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "replace-source-pattern-settings-tests-with-behav-30d4",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T20:30:08.279Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-6455a45b9ada27f90be07b5cae66444e-d0f936de",
+        "task_id": null
+      },
+      "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_comment"
     }
   ],
   "execution_policy": {
@@ -495,16 +1095,24 @@
   },
   "run_queue": {
     "sequence": [
-      "investigate-blank-thumbnails-and-add-non-intrusi-3fba",
-      "prepare-chrome-web-store-privacy-disclosures-and-0fe7",
-      "add-automated-release-checks-in-ci-2918"
+      "fix-keyboard-semantics-for-selected-background-s-92a9",
+      "synchronize-custom-background-image-lifecycle-ac-3501",
+      "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "replace-source-pattern-settings-tests-with-behav-30d4"
     ],
     "conflicts": [],
-    "rationale": "Built from your Ready tasks — toggle which ones to run.",
+    "rationale": "\"Replace source-pattern settings tests with behavioral multi-window regressions\" depends on \"Do not persist stale Meridian tab IDs after normalization failure\" but was sequenced ahead of it; swapping positions 3 and 4 satisfies all declared dependencies with no other changes.",
     "decided_by": "tasker",
-    "decided_at": "2026-07-26T23:59:12.542Z",
+    "decided_at": "2026-08-19T20:04:44.345Z",
     "approved_order": true,
-    "validated_at": "2026-07-27T00:00:25.067Z"
+    "pending_approval": false,
+    "approved_sequence": [
+      "fix-keyboard-semantics-for-selected-background-s-92a9",
+      "synchronize-custom-background-image-lifecycle-ac-3501",
+      "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "replace-source-pattern-settings-tests-with-behav-30d4"
+    ],
+    "validated_at": "2026-08-19T20:04:44.345Z"
   },
   "run_queue_active": false,
   "epics": [
@@ -612,7 +1220,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -638,7 +1246,7 @@
           "input": 5,
           "output": 25
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -691,7 +1299,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -719,7 +1327,7 @@
           "cache_read": 0.3,
           "cache_write": 3.75
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -772,7 +1380,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -831,7 +1439,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -890,7 +1498,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -949,7 +1557,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1008,7 +1616,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1067,7 +1675,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1126,7 +1734,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1185,7 +1793,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1244,7 +1852,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1303,7 +1911,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1362,7 +1970,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1421,7 +2029,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1523,7 +2131,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1550,7 +2158,7 @@
           "cache_read": 1,
           "cache_write": 12.5
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -1602,7 +2210,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1630,7 +2238,7 @@
           "cache_read": 0.1,
           "cache_write": 1.25
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -1683,7 +2291,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1711,7 +2319,7 @@
           "cache_read": 0.5,
           "cache_write": 6.25
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -1765,7 +2373,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1792,7 +2400,7 @@
           "cache_read": 0.2,
           "cache_write": 2.5
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -1932,7 +2540,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1958,7 +2566,7 @@
           "output": 14,
           "cache_read": 0.175
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2012,7 +2620,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2038,7 +2646,7 @@
           "output": 4.5,
           "cache_read": 0.075
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2092,7 +2700,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2134,7 +2742,7 @@
             "cache_read": 0.5
           }
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2188,7 +2796,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2230,7 +2838,7 @@
             "cache_read": 1
           }
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2285,7 +2893,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2330,7 +2938,7 @@
             "cache_write": 0.5
           }
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2386,7 +2994,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2431,7 +3039,7 @@
             "cache_write": 12.5
           }
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2487,7 +3095,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-14",
+      "last_updated": "2026-08-19",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2532,7 +3140,7 @@
             "cache_write": 5
           }
         },
-        "synced_at": "2026-08-14"
+        "synced_at": "2026-08-19"
       },
       "connected": true
     },
@@ -2876,11 +3484,11 @@
     {
       "id": "owner-only-chrome-web-store-release-follow-ups-8398",
       "title": "Owner-only Chrome Web Store release follow-ups",
-      "status": "backlog",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "high",
-      "updated_at": "2026-07-28T22:15:02.570Z",
+      "updated_at": "2026-08-19T18:17:10.287Z",
       "file": "active/owner-only-chrome-web-store-release-follow-ups-8398/owner-only-chrome-web-store-release-follow-ups-8398.json"
     },
     {
@@ -3097,6 +3705,204 @@
       "agent_id": "designer",
       "updated_at": "2026-08-14T19:52:19.040Z",
       "file": "active/port-rubik-2ed8b0-brand-system-into-the-extensio-45f2/port-rubik-2ed8b0-brand-system-into-the-extensio-45f2.json"
+    },
+    {
+      "id": "switch-app-background-to-topo-light-topo-dark-sy-0283",
+      "title": "Switch app background to topo-light/topo-dark, sync with system theme",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:18:24.707Z",
+      "file": "active/switch-app-background-to-topo-light-topo-dark-sy-0283/switch-app-background-to-topo-light-topo-dark-sy-0283.json"
+    },
+    {
+      "id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "title": "Add hover-to-remove control for selected color/photo/theme backgrounds",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "deps": [
+        "switch-app-background-to-topo-light-topo-dark-sy-0283"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:22:00.993Z",
+      "file": "active/add-hover-to-remove-control-for-selected-preset-c684/add-hover-to-remove-control-for-selected-preset-c684.json"
+    },
+    {
+      "id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "title": "Fix hover-remove swatch alignment + drop default theme background from Photos list",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:32:23.725Z",
+      "file": "active/fix-hover-remove-swatch-alignment-drop-default-t-b263/fix-hover-remove-swatch-alignment-drop-default-t-b263.json"
+    },
+    {
+      "id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
+      "title": "Rename duplicate \"Midnight\" gradient swatch to \"Twilight\"",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:35:17.155Z",
+      "file": "active/rename-duplicate-midnight-gradient-swatch-to-twi-c708/rename-duplicate-midnight-gradient-swatch-to-twi-c708.json"
+    },
+    {
+      "id": "fix-vertical-misalignment-of-group-header-count-6921",
+      "title": "Fix vertical misalignment of group header count badge (lane-tab-count)",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:38:57.853Z",
+      "file": "active/fix-vertical-misalignment-of-group-header-count-6921/fix-vertical-misalignment-of-group-header-count-6921.json"
+    },
+    {
+      "id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "title": "Fix swatch/border animation desync on preset swatch hover",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T19:36:00.165Z",
+      "file": "active/fix-muddy-hover-overlay-color-and-swatch-border-ee31/fix-muddy-hover-overlay-color-and-swatch-border-ee31.json"
+    },
+    {
+      "id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
+      "title": "Add \"show tabs from all windows / current window only\" setting under Tab Organization",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:49:02.333Z",
+      "file": "active/add-show-tabs-from-all-windows-current-window-on-2ee6/add-show-tabs-from-all-windows-current-window-on-2ee6.json"
+    },
+    {
+      "id": "reorder-search-engine-options-google-bing-duckdu-55fd",
+      "title": "Reorder search engine options: Google, Bing, DuckDuckGo, Brave",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T19:38:22.247Z",
+      "file": "active/reorder-search-engine-options-google-bing-duckdu-55fd/reorder-search-engine-options-google-bing-duckdu-55fd.json"
+    },
+    {
+      "id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
+      "title": "Remove-icon (✕) shows on unselected custom photo, allowing accidental deletion instead of reselect",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T18:53:28.860Z",
+      "file": "active/remove-icon-shows-on-unselected-custom-photo-all-4ca5/remove-icon-shows-on-unselected-custom-photo-all-4ca5.json"
+    },
+    {
+      "id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T19:06:19.256Z",
+      "file": "active/settings-not-syncing-across-windows-new-window-d-79ae/settings-not-syncing-across-windows-new-window-d-79ae.json"
+    },
+    {
+      "id": "critical-entering-url-search-in-a-second-window-6080",
+      "title": "CRITICAL: entering URL/search in a second window opens infinite Meridian tabs",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T19:29:17.356Z",
+      "file": "active/critical-entering-url-search-in-a-second-window-6080/critical-entering-url-search-in-a-second-window-6080.json"
+    },
+    {
+      "id": "add-missing-top-padding-to-settings-privacy-data-7992",
+      "title": "Add missing top padding to Settings > Privacy & Data section",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T19:44:31.091Z",
+      "file": "active/add-missing-top-padding-to-settings-privacy-data-7992/add-missing-top-padding-to-settings-privacy-data-7992.json"
+    },
+    {
+      "id": "unhandled-promise-rejection-in-background-js-323-d009",
+      "title": "Unhandled promise rejection in background.js:323 (chrome.tabs.onAttached → normalizeMeridianTab)",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T19:51:01.896Z",
+      "file": "active/unhandled-promise-rejection-in-background-js-323-d009/unhandled-promise-rejection-in-background-js-323-d009.json"
+    },
+    {
+      "id": "fix-keyboard-semantics-for-selected-background-s-92a9",
+      "title": "Fix keyboard semantics for selected background swatch removal",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T20:10:00.166Z",
+      "file": "active/fix-keyboard-semantics-for-selected-background-s-92a9/fix-keyboard-semantics-for-selected-background-s-92a9.json"
+    },
+    {
+      "id": "synchronize-custom-background-image-lifecycle-ac-3501",
+      "title": "Synchronize custom background image lifecycle across open windows",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "deps": [
+        "fix-keyboard-semantics-for-selected-background-s-92a9"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T20:17:00.672Z",
+      "file": "active/synchronize-custom-background-image-lifecycle-ac-3501/synchronize-custom-background-image-lifecycle-ac-3501.json"
+    },
+    {
+      "id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "title": "Do not persist stale Meridian tab IDs after normalization failure",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "low",
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T20:30:08.279Z",
+      "file": "active/do-not-persist-stale-meridian-tab-ids-after-norm-1b57/do-not-persist-stale-meridian-tab-ids-after-norm-1b57.json"
+    },
+    {
+      "id": "replace-source-pattern-settings-tests-with-behav-30d4",
+      "title": "Replace source-pattern settings tests with behavioral multi-window regressions",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "deps": [
+        "fix-keyboard-semantics-for-selected-background-s-92a9",
+        "synchronize-custom-background-image-lifecycle-ac-3501",
+        "do-not-persist-stale-meridian-tab-ids-after-norm-1b57"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-08-19T20:27:02.476Z",
+      "file": "active/replace-source-pattern-settings-tests-with-behav-30d4/replace-source-pattern-settings-tests-with-behav-30d4.json"
     }
   ]
 }

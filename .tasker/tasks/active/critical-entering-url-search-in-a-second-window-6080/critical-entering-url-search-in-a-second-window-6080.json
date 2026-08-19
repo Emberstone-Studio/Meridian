@@ -1,0 +1,193 @@
+{
+  "id": "critical-entering-url-search-in-a-second-window-6080",
+  "title": "CRITICAL: entering URL/search in a second window opens infinite Meridian tabs",
+  "description": "Severe bug: when a second (non-first) window is open and the user types anything into the browser's URL/address bar (a URL or a search term) in that second window, the app opens Meridian tabs continuously/endlessly in a runaway loop — does not stop on its own. This is a critical runaway-resource bug (likely spawns tabs until the browser is unusable) and needs to be reproduced and fixed urgently.\n\nInvestigate:\n1. Likely related to new-tab-override / \"New Tab Behavior\" logic (components/SettingsPanel.js `NEW_TAB_OPTIONS`, and wherever the extension listens for new tab creation / omnibox input — check background.js and manifest.json for `chrome_url_overrides`, `chrome.tabs.onCreated`, `chrome.tabs.onUpdated`, `chrome.omnibox`, or similar listeners).\n2. Hypothesis: some listener tied to tab/window creation or URL-bar input re-triggers itself — e.g. a listener that reacts to a tab update by creating/opening a new Meridian tab, which itself triggers the same listener again, recursing indefinitely — and this loop is specific to windows other than the first/main one (suggesting window-id tracking or a \"which window is the Meridian home window\" assumption that breaks for window #2+, causing it to keep trying to redirect/open Meridian there).\n3. Reproduce with two windows open: open a second browser window, then type a URL or search query into that window's address bar, and observe tab creation behavior in background.js / relevant listeners.\n\nFix the root cause of the recursive/uncontrolled tab creation, add appropriate guards (e.g. debounce, a flag to prevent re-entrant triggering, or correct window-id scoping so the logic doesn't misfire for non-primary windows), and verify manually that typing in the address bar in a second window behaves normally (opens the typed destination, does not spawn extra tabs). Mirror the fix into meridian-extension/. Treat as top priority — this is a broken/unusable state for affected users.",
+  "status": "in_review",
+  "priority": "high",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-19T18:55:16.637Z",
+  "updated_at": "2026-08-19T19:29:17.356Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-19T18:55:16.637Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:16.637Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:20.200Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_update",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:22.674Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T18:55:22.780Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-19T18:59:28.686Z",
+      "type": "output",
+      "content": "Fixed the runaway second-window navigation loop.\n\n- Added a per-tab re-entrancy guard around managed Meridian tab restoration.\n- Re-read live tab state so stale URL update callbacks cannot reopen destinations.\n- Restore the managed Meridian tab before creating exactly one destination tab in the same window.\n- Mirrored the fix into `meridian-extension/background.js`.\n- Added regression coverage for concurrent duplicate updates and stale post-restoration updates.\n\nValidation: `node --test tests/*.test.mjs` passes all 142 tests; source/package parity, syntax, and `git diff --check` also pass.",
+      "attachment": "active/critical-entering-url-search-in-a-second-window-6080/critical-entering-url-search-in-a-second-window-op.md",
+      "agent_run_id": "agent-critical-entering-url-search-in-a-second-window-6080-0f0c0aa825d4"
+    },
+    {
+      "timestamp": "2026-08-19T19:02:14.164Z",
+      "type": "chat_user",
+      "content": "Still broken — reopening. Screenshot attached showing ~13 duplicate \"Meridian\" tabs piled up in the tab strip after testing in a second window, plus the actual search result tabs (duckduckgo \"hey\" search, hey.com) that were typed.\n\nThe claimed fix (per-tab re-entrancy guard, restoring the managed Meridian tab before creating exactly one destination tab) did not stop the duplication in practice, even though it passed 142 unit tests. That gap means the regression tests are not actually exercising the real failure path — they're likely testing the guard logic in isolation without reproducing the actual multi-window, multi-keystroke-triggered-update sequence that causes this in the browser.\n\nPlease:\n1. Actually reproduce this manually/end-to-end in a real two-window scenario (open window 1, open window 2, type a multi-character search query character-by-character or paste a URL into window 2's address bar) rather than relying solely on unit-level guard tests — the bug is clearly still reachable through some code path the current guard doesn't cover.\n2. Consider that `chrome.tabs.onUpdated` can fire MULTIPLE times per single navigation (loading → complete, and potentially once per keystroke if anything is listening to omnibox/suggestion events, or once per redirect hop) — a guard keyed only on tab id might not be sufficient if each of those events is treated as \"a new navigation needing a new Meridian restoration,\" or if the guard resets too early (e.g. cleared before all in-flight events for that tab have been processed).\n3. Check whether multiple DISTINCT tab ids are involved (e.g. each new tab created gets a new id, and the guard never learns about it because it's tracking the wrong/old tab id), which would explain why restoring \"the same tab\" logic doesn't prevent new tabs from piling up.\n4. After the real fix, retest manually with the exact repro (second window, type in address bar) and attach a fresh screenshot showing the tab strip stays clean — do not close/rely on just unit tests passing as sufficient evidence of a fix for this task."
+    },
+    {
+      "timestamp": "2026-08-19T19:02:14.164Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T19:02:14.447Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-19T19:02:54.641Z",
+      "type": "chat_user",
+      "content": "Additional context: the last fix was a partial improvement — it's no longer truly infinite/endless, but it still produces a bunch of duplicate Meridian tabs per interaction (~13 in the repro screenshot) instead of zero extra tabs. So the re-entrancy guard is helping somewhat but not fully closing the loop — there's still a path producing multiple duplicates per navigation event rather than none. Keep this in mind alongside the earlier debugging notes (distinct tab ids, onUpdated firing multiple times per navigation, guard resetting too early)."
+    },
+    {
+      "timestamp": "2026-08-19T19:02:54.641Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-19T19:12:39.515Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-19T19:28:01.231Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_attach",
+      "actor": {
+        "kind": "worker",
+        "run_id": "agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5",
+        "task_id": "critical-entering-url-search-in-a-second-window-6080"
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "worker agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5 called mcp__tasker__task_attach"
+    },
+    {
+      "timestamp": "2026-08-19T19:29:17.355Z",
+      "type": "output",
+      "content": "## Fixed the second-window Meridian tab duplication\n\nRoot cause: restoration was guarded only by the old managed tab ID, while multiple callbacks could independently enter `ensureMeridianTab(windowId)`. In a headed Chromium repro, 13 concurrent requests for one non-primary window created 13 distinct pinned Meridian tab IDs.\n\nChanges:\n- Coalesced all in-flight Meridian ensure/restore work by window, so every concurrent caller receives the same tab promise.\n- Removed the re-entrant URL rollback from `tabs.onUpdated`. A navigated managed tab now continues to the user's destination, is handed off from managed state, and one inactive pinned Meridian replacement is ensured.\n- Mirrored the runtime change byte-for-byte in `meridian-extension/background.js`.\n- Added regression coverage for 13 concurrent ensure calls, concurrent navigation updates, stale old-tab updates, and replacement-tab updates.\n\nVerification:\n- Headed Chromium 151 with multiple real windows and OS-level address-bar input:\n  - character-by-character search `hey`: one destination + one Meridian tab;\n  - typed URL `https://example.com`: one destination + one Meridian tab;\n  - 13 simultaneous restoration requests: all returned the same single tab ID.\n- Attached `meridian-second-window-fixed.png`, showing the clean tab strip after the URL test.\n- Full suite: 145 passed, 0 failed.\n- All tracked JavaScript passed `node --check`.\n- Packaged parity, source/package background parity, and `git diff --check` passed.",
+      "attachment": "active/critical-entering-url-search-in-a-second-window-6080/critical-entering-url-search-in-a-second-window-op-2.md",
+      "agent_run_id": "agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Model explicitly set on agent (codex-gpt-5-6-sol)",
+    "alternates": [],
+    "shape": "Bug",
+    "decided_by": "explicit-role",
+    "decided_at": "2026-08-19T19:12:08.450Z",
+    "auto_router_mode": null,
+    "provider": "codex",
+    "provider_source": "derived",
+    "model_source": "role",
+    "route_chain": [
+      {
+        "provider": "codex",
+        "model": "codex-gpt-5-6-sol"
+      }
+    ],
+    "floors": {
+      "minContextWindow": 0,
+      "requireVision": false,
+      "toolCallingFloor": "model_dependent",
+      "category": "everyday_coding"
+    },
+    "relaxed_floors": false,
+    "preflight": {
+      "dispatchable": true,
+      "severity": "ok",
+      "reasons": []
+    },
+    "parity": {
+      "provider": "codex",
+      "tier": "first_party_cli",
+      "systemPromptMode": "folded_into_prompt",
+      "toolSurface": "reliable",
+      "mcpSupported": true,
+      "permissionsModel": "skip_flag",
+      "resumeSupported": true,
+      "resumeReason": null,
+      "multimodal": true,
+      "notes": null
+    },
+    "route_rationale": "Route: provider=codex (derived), model=codex-gpt-5-6-sol (role); floors{ctx>=0,vision=false,tools>=model_dependent}; chain=1 link(s)"
+  },
+  "agent_attempt_id": "attempt-9e607618993131c06a6a",
+  "agent_startup_started_at": "2026-08-19T19:12:39.505Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/critical-entering-url-search-in-a-second-window-6080.md",
+      "direction": "self",
+      "at": "2026-08-19T18:59:28.686Z"
+    }
+  ],
+  "agent_session_confirmed_run_id": "agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5",
+  "agent_session_confirmed_at": "2026-08-19T19:12:40.265Z"
+}

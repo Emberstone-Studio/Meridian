@@ -12,3 +12,5 @@
 - [6e97cbcf] Investigate p.settings-permission-status empty space (tasker, 2026-07-28) → roles/tasker/memory/chats/6e97cbcf.json
 - [b33f33ec] Release app to Chrome Web Store (tasker, 2026-08-06) → roles/tasker/memory/chats/b33f33ec.json
 - [0d54c881] Debug chat session reconnection issue (tasker, 2026-08-06) → roles/tasker/memory/chats/0d54c881.json
+- [cbaeae9e] Update release package to version 1.1.1 (tasker, 2026-08-14) → roles/tasker/memory/chats/cbaeae9e.json
+- [7c2509ae] Submit extension to Chrome web store (tasker, writer, 2026-08-15) → roles/tasker/memory/chats/7c2509ae.json
