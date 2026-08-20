@@ -1,0 +1,85 @@
+{
+  "id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+  "title": "Revert lane-header scrim bar; use true inverse (mix-blend-mode) text instead",
+  "description": "The previous fix (task group-lane-label-text-isn-t-legible-across-gradi-ddd0) implemented a full-width dark translucent bar/scrim behind each .lane-header (::before pseudo-element + --on-bg vars scoped to the header, in meridian.css ~458-491 and mirrored in meridian-extension/meridian.css). See screenshot image-4.png in chat 99df29a9 — this is NOT what was wanted; it reads as a heavy dark banner across the whole lane, wrong visual direction. REVERT that specific change.\n\nWhat to revert (uncommitted working tree, so this is a clean targeted revert, not a git revert of a commit):\n1. meridian.css: remove the block added to `.lane-header` (the --on-bg / --on-bg-muted / --on-bg-shadow overrides, position:relative, isolation:isolate) and the new `.lane-header::before` scrim rule entirely. Restore `.lane-title`'s original comment (\"Lane headers sit on the wallpaper, not a surface — use luminance-derived on-background text so they stay legible against any background.\"). Restore `.lane-tab-count`'s `opacity: 0.85`.\n2. meridian-extension/meridian.css: same revert, mirrored.\n3. Leave components/SettingsPanel.js's applyOnBackground/global luminance logic as-is for now (not part of this revert) UNLESS your new approach below makes it dead code — if so, clean it up.\n4. Remove/rewrite tests/laneHeaderContrast.test.mjs if it specifically asserts the scrim/backdrop-filter approach — replace with tests for the new approach below.\n\nNew approach requested instead: make the lane header text/icons literally INVERSE against whatever is directly behind them, using CSS mix-blend-mode (e.g. `mix-blend-mode: difference` or `exclusion` with `color: #fff` or similar base) on .lane-title, .lane-tab-count, .lane-delete-btn, and .lane-collapse-btn (and its icon/chevron). This auto-inverts per-pixel against the actual background color underneath with no JS luminance sampling and no scrim/backdrop — it should stay legible on any background, including the current default img/landscape.jpg gradient, without a visible bar.\n\nThings to watch:\n- mix-blend-mode needs correct stacking/isolation context so it blends against the page background (through any transparent ancestors) rather than against sibling elements — verify visually, don't just trust the property name.\n- Check hover/focus states (.lane-title:hover, :focus) still look right — those currently switch to solid --text-primary/--surface for a \"control\" look; decide whether blend-mode should still apply on hover or whether the existing solid-surface hover state is fine to keep as is (probably keep hover/focus as-is, only change the resting/default state).\n- Verify on both light and dark theme, against img/landscape.jpg specifically (the gradient case that started this), and against at least one solid/uniform background to make sure it doesn't regress.\n- Run the full test suite and fix/replace any tests tied to the old scrim approach.\n\nReference: chat 99df29a9 in this repo has the full visual discussion, including image-3.png (original bug) and image-4.png (the scrim attempt that needs reverting).",
+  "status": "done",
+  "priority": "high",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-20T16:12:21.555Z",
+  "updated_at": "2026-08-20T16:25:26.591Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-20T16:12:21.555Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-20T16:12:21.555Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:12:23.860Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-20T16:12:23.973Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T16:19:29.727Z",
+      "type": "output",
+      "content": "Implemented the lane-header inverse-text treatment and removed the rejected scrim.\n\n- Removed the full-width `.lane-header::before` backdrop, local token overrides, and isolated stacking context from both runtime stylesheets.\n- Applied `color: #fff` plus `mix-blend-mode: difference` to resting titles, counts, delete controls, and collapse controls; the SVG chevron follows `currentColor`.\n- Preserved surface-backed title focus/editable-hover, collapse-hover, and delete-hover states with normal blending.\n- Restored the lane count to `opacity: 0.85`.\n- Removed the now-unused global on-background luminance/token pipeline while retaining dominant-color accent analysis.\n- Reworked lane-header coverage to assert direct inverse blending, absence of a scrim/isolation, chevron inheritance, and normal interactive-state blending.\n\nValidation:\n- Chromium visual checks passed on `img/landscape.jpg` in light and dark themes, plus near-black and near-white solid backgrounds; no header bar was present.\n- Source/package CSS and SettingsPanel copies are byte-identical.\n- `git diff --check` passes.\n- Full suite: **159 passed, 0 failed** via `node --test tests/*.test.mjs`.",
+      "attachment": "active/revert-lane-header-scrim-bar-use-true-inverse-mi-faa7/revert-lane-header-scrim-bar-use-true-inverse-mix-.md",
+      "agent_run_id": "agent-revert-lane-header-scrim-bar-use-true-inverse-mi-faa7-30b292387419"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:26.591Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-20T16:12:23.653Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-fc114fb148607f279c1e",
+  "agent_startup_started_at": "2026-08-20T16:12:23.849Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/revert-lane-header-scrim-bar-use-true-inverse-mi-faa7.md",
+      "direction": "self",
+      "at": "2026-08-20T16:19:29.727Z"
+    }
+  ]
+}

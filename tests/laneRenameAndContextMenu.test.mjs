@@ -62,14 +62,34 @@ const startRenameSource = extractFunction(
   laneSource,
   "function startRename(",
 );
+let selectedTitle = null;
+const selection = {
+  removeAllRanges() {},
+  addRange(range) {
+    selectedTitle = range.selectedNode;
+  },
+};
 const startRename = new Function(
   "document",
+  "window",
   `${startRenameSource}; return startRename;`,
-)({
-  execCommand(command) {
-    assert.equal(command, "selectAll");
+)(
+  {
+    createRange() {
+      return {
+        selectedNode: null,
+        selectNodeContents(node) {
+          this.selectedNode = node;
+        },
+      };
+    },
   },
-});
+  {
+    getSelection() {
+      return selection;
+    },
+  },
+);
 
 function keyEvent(key) {
   return {
@@ -84,7 +104,10 @@ function keyEvent(key) {
 test("lane rename accepts typing before Enter and commits only once", () => {
   const title = new FakeEditableTitle("Original");
   const commits = [];
+  selectedTitle = null;
   startRename(title, (name) => commits.push(name));
+
+  assert.equal(selectedTitle, title);
 
   title.textContent = "A";
   title.dispatch("keydown", keyEvent("A"));

@@ -1,0 +1,110 @@
+{
+  "id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+  "title": "Drag-and-drop tabs/groups across browser windows",
+  "description": "Currently drag-and-drop for tabs is scoped to a single window: components/WorkspaceLane.js's drop handler queries `chrome.tabs.query({ windowId: draggedTab.windowId })` (~line 72) and reorders/moves tabs only within that window's own Meridian document. There's no support for dragging a tab (or, pending the companion task, a whole group/lane) from one open browser window's Meridian tab into another open window's Meridian tab.\n\nThis is materially harder than same-window DnD because the two lanes involved live in separate DOM documents (separate top-level browser windows), so native HTML5 dragstart/dragover/drop dataTransfer alone won't carry rich state across them the way it does within one document — investigate what actually works in Chrome extension context:\n1. Confirm whether Chrome's native HTML5 drag-and-drop (dataTransfer) fires reliably across separate top-level extension windows/documents, or whether cross-window drag needs to be detected differently (e.g. relying on `dataTransfer.setData` with a serializable payload — tab id, source window id, group id — read on `drop` in the destination window, since the two windows are different JS contexts and can't share object references).\n2. On a successful cross-window drop, use `chrome.tabs.move(tabId, { windowId: destWindowId, index })` to actually relocate the tab, then update both windows' UI (source window needs to remove the tab from its lane, destination window needs to insert it) — likely via the existing settings/storage change-listener pattern already used for cross-window settings sync (see task settings-not-syncing-across-windows-new-window-d-79ae) or a dedicated runtime message (`chrome.runtime.sendMessage`/`onMessage`) between windows.\n3. Decide and implement group assignment behavior when a tab is dropped into a different window: does it need to join/create a matching group by name in the destination window, go to \"Unsorted\", or carry its group tag across? Use judgment matching how groups are modeled today (check whether group definitions are already global via chrome.storage.sync, in which case the same group in the destination window should just work) — flag if ambiguous rather than guessing silently.\n4. If the companion task (drag-and-drop to reorder groups) lands first, also support dragging an entire group from one window to another (moving all its tabs to the destination window, recreating/merging into a same-named group there per the above).\n5. Mirror the implementation into meridian-extension/.\n6. This needs real manual verification with two actual browser windows open (not just unit tests) — screenshot/describe the before/after tab strips in both windows to confirm the move worked and neither window ends up with duplicate or orphaned tabs. Note: this repo has had recent bugs around duplicate/orphaned Meridian tabs across windows (tasks critical-entering-url-search-in-a-second-window-6080, do-not-persist-stale-meridian-tab-ids-after-norm-1b57) — be careful not to reintroduce that class of bug; reuse the existing per-window ensure/coalescing guards rather than adding new ad hoc tab-creation logic.\n\nThis is a bigger/riskier feature than the same-window group-reorder task — investigate and propose the approach (comment on the task) before or alongside implementation if the cross-window mechanism is unclear.",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-20T16:27:50.181Z",
+  "updated_at": "2026-08-20T17:39:47.737Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-20T16:27:50.181Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-20T16:27:50.181Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:28:01.473Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_dependencies",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_dependencies"
+    },
+    {
+      "timestamp": "2026-08-20T17:17:10.191Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:17:10.332Z",
+      "type": "chat_user",
+      "content": "User explicitly reports tabs/groups cannot be dragged across windows. Implementing serialized lane payloads plus destination-window tab moves; native groups are recreated or merged by title/color in the destination window."
+    },
+    {
+      "timestamp": "2026-08-20T17:17:10.332Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.179Z",
+      "type": "output",
+      "content": "Implemented cross-window tab and whole-group drops. Destination drops now move tabs with chrome.tabs.move; native groups are preserved when Chrome carries them across or merged/recreated by title/color in the destination. Lane payloads are serialized through dataTransfer, and changed native group ids are remapped in persisted lane order. Verified with two real Chromium windows: a loose tab moved to the destination window; a two-tab native group moved together and remained grouped; exactly one Meridian tab remained in each window. Full suite 170/170 passes and source/package parity passes."
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.179Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.317Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:39:47.737Z",
+      "type": "moved",
+      "content": "Moved from in_review to done"
+    }
+  ],
+  "deps": [
+    "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353"
+  ]
+}

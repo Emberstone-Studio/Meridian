@@ -2,14 +2,14 @@
   "id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
   "title": "Do not persist stale Meridian tab IDs after normalization failure",
   "description": "background.js normalizeMeridianTab catches a rejected chrome.tabs.update call but then continues to move and remember the original tab object. When the update failed because the tab/window disappeared, this persists a known-stale managed tab ID and returns apparent success.\n\nChange normalization to return a failure sentinel (prefer null) immediately after the update rejects, skip move/remember, and make callers tolerate that result. Preserve benign tab/window teardown handling without masking unrelated programming failures where practical. Mirror the change in meridian-extension/background.js.\n\nUpdate lifecycle tests so a disappeared tab is not remembered, and rerun the per-window ensure, restoration, navigation handoff, second-window deduplication, and full packaged-parity suite.",
-  "status": "in_review",
+  "status": "done",
   "priority": "low",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T19:56:44.048Z",
-  "updated_at": "2026-08-19T20:30:08.279Z",
+  "updated_at": "2026-08-20T16:25:24.956Z",
   "activity": [
     {
       "timestamp": "2026-08-19T19:56:44.048Z",
@@ -56,6 +56,18 @@
       },
       "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
       "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:24.956Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

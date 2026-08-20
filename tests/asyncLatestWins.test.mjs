@@ -573,13 +573,12 @@ test("background accent ignores reversed image analysis", async () => {
   await oldAnalysis;
 
   assert.equal(properties.get("--accent-hue"), "68");
-  assert.equal(properties.get("--on-bg"), "rgba(0, 0, 0, 0.9)");
 
   applyTheme("dark");
   assert.equal(
-    properties.get("--on-bg"),
-    "rgba(0, 0, 0, 0.9)",
-    "the stale analysis must not replace the cached luminance",
+    properties.get("--accent-hue"),
+    "68",
+    "the stale analysis must not replace the cached dominant color",
   );
 
   const customUrl = deferred();

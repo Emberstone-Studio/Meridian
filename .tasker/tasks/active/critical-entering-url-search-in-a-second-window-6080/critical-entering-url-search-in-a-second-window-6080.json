@@ -2,14 +2,14 @@
   "id": "critical-entering-url-search-in-a-second-window-6080",
   "title": "CRITICAL: entering URL/search in a second window opens infinite Meridian tabs",
   "description": "Severe bug: when a second (non-first) window is open and the user types anything into the browser's URL/address bar (a URL or a search term) in that second window, the app opens Meridian tabs continuously/endlessly in a runaway loop — does not stop on its own. This is a critical runaway-resource bug (likely spawns tabs until the browser is unusable) and needs to be reproduced and fixed urgently.\n\nInvestigate:\n1. Likely related to new-tab-override / \"New Tab Behavior\" logic (components/SettingsPanel.js `NEW_TAB_OPTIONS`, and wherever the extension listens for new tab creation / omnibox input — check background.js and manifest.json for `chrome_url_overrides`, `chrome.tabs.onCreated`, `chrome.tabs.onUpdated`, `chrome.omnibox`, or similar listeners).\n2. Hypothesis: some listener tied to tab/window creation or URL-bar input re-triggers itself — e.g. a listener that reacts to a tab update by creating/opening a new Meridian tab, which itself triggers the same listener again, recursing indefinitely — and this loop is specific to windows other than the first/main one (suggesting window-id tracking or a \"which window is the Meridian home window\" assumption that breaks for window #2+, causing it to keep trying to redirect/open Meridian there).\n3. Reproduce with two windows open: open a second browser window, then type a URL or search query into that window's address bar, and observe tab creation behavior in background.js / relevant listeners.\n\nFix the root cause of the recursive/uncontrolled tab creation, add appropriate guards (e.g. debounce, a flag to prevent re-entrant triggering, or correct window-id scoping so the logic doesn't misfire for non-primary windows), and verify manually that typing in the address bar in a second window behaves normally (opens the typed destination, does not spawn extra tabs). Mirror the fix into meridian-extension/. Treat as top priority — this is a broken/unusable state for affected users.",
-  "status": "in_review",
+  "status": "done",
   "priority": "high",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:55:16.637Z",
-  "updated_at": "2026-08-19T19:29:17.356Z",
+  "updated_at": "2026-08-20T16:25:21.682Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:55:16.637Z",
@@ -133,6 +133,18 @@
       "content": "## Fixed the second-window Meridian tab duplication\n\nRoot cause: restoration was guarded only by the old managed tab ID, while multiple callbacks could independently enter `ensureMeridianTab(windowId)`. In a headed Chromium repro, 13 concurrent requests for one non-primary window created 13 distinct pinned Meridian tab IDs.\n\nChanges:\n- Coalesced all in-flight Meridian ensure/restore work by window, so every concurrent caller receives the same tab promise.\n- Removed the re-entrant URL rollback from `tabs.onUpdated`. A navigated managed tab now continues to the user's destination, is handed off from managed state, and one inactive pinned Meridian replacement is ensured.\n- Mirrored the runtime change byte-for-byte in `meridian-extension/background.js`.\n- Added regression coverage for 13 concurrent ensure calls, concurrent navigation updates, stale old-tab updates, and replacement-tab updates.\n\nVerification:\n- Headed Chromium 151 with multiple real windows and OS-level address-bar input:\n  - character-by-character search `hey`: one destination + one Meridian tab;\n  - typed URL `https://example.com`: one destination + one Meridian tab;\n  - 13 simultaneous restoration requests: all returned the same single tab ID.\n- Attached `meridian-second-window-fixed.png`, showing the clean tab strip after the URL test.\n- Full suite: 145 passed, 0 failed.\n- All tracked JavaScript passed `node --check`.\n- Packaged parity, source/package background parity, and `git diff --check` passed.",
       "attachment": "active/critical-entering-url-search-in-a-second-window-6080/critical-entering-url-search-in-a-second-window-op-2.md",
       "agent_run_id": "agent-critical-entering-url-search-in-a-second-window-6080-a7ccf05e69d5"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:21.682Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

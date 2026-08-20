@@ -2,14 +2,14 @@
   "id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
   "title": "Fix hover-remove swatch alignment + drop default theme background from Photos list",
   "description": "Follow-up nits from the just-shipped hover-to-remove feature (task add-hover-to-remove-control-for-selected-preset-c684). See attached screenshots.\n\n1. **Hover/selected swatch alignment is off.** When a swatch (color or photo) is selected/hovered with the \"✕\" remove overlay, it renders visibly larger than its grid cell and overlaps neighboring rows/columns (see screenshots — the selected swatch balloons up and covers part of the swatch above/below it). It should stay within its normal grid cell bounds like the other swatches — just show the ✕ overlay on top, no size/scale change (or if there is a slight scale-up for affordance, keep it small enough that it doesn't overlap adjacent grid cells).\n\n2. **Default theme (topo) background shouldn't be a removable list entry.** Currently the topo default appears as its own swatch in the Photos grid with the same hover-to-remove ✕ treatment, but it can't actually be removed since it's the fallback/default — there's nothing to fall back to if you \"remove\" the fallback itself. It should not be shown as a selectable/removable item in the Photos grid; it should only apply implicitly as the fallback when no other background is selected (i.e. what you get after removing whatever IS selected).\n\n3. **HIGH PRIORITY — Right-side padding is missing on the whole Background panel grid.** The last column of both the \"Colors & Gradients\" grid and the \"Photos\" grid now runs flush to (or past) the settings panel's right edge — there is no right-side gutter, while top/left/bottom padding is intact (see latest screenshot: rightmost swatches touch the panel border, no margin like the other three sides have). This is a layout regression affecting the whole panel, not just the hover state — check the grid container/column CSS (likely a width/gap calc change introduced alongside the hover-remove work) and restore symmetric padding on all sides.\n\n4. **Rename the new color swatch from \"Garnet\" to \"White\".** The new solid color/gradient swatch added to fill the slot freed up by removing the \"no background\" swatch was named/labeled \"Garnet\" — rename it to \"White\" (a plain white solid) to pair with the existing \"Black\" solid swatch. Update the swatch's actual color value to white, not just its label/name, if \"Garnet\" was a non-white color.\n\nRelevant file: components/SettingsPanel.js (Background settings — Colors & Gradients / Photos grid rendering, grid container CSS, and hover-remove overlay), mirrored in meridian-extension/components/SettingsPanel.js.",
-  "status": "in_review",
+  "status": "done",
   "priority": "high",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:26:11.049Z",
-  "updated_at": "2026-08-19T18:32:23.725Z",
+  "updated_at": "2026-08-20T16:25:16.798Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:26:11.049Z",
@@ -133,6 +133,18 @@
       "content": "Implemented the Background panel follow-up fixes in the source and packaged-extension mirrors.\n\n- Removed scale-up behavior from selected presets while preserving the hover remove overlay.\n- Constrained the four-column grids with `minmax(0, 1fr)` and zero-minimum preset wrappers so content cannot consume the right gutter.\n- Removed the Topographic fallback from the Photos grid and restored the grid to 11 stock photos plus the custom tile.\n- Replaced Garnet with a true white `#ffffff` preset labeled White.\n- Updated regression coverage for all four changes.\n\nValidation: `node --test tests/*.test.mjs` passed 137/137; mirror parity checks and `git diff --check` passed.",
       "attachment": "active/fix-hover-remove-swatch-alignment-drop-default-t-b263/fix-hover-remove-swatch-alignment-drop-default-the.md",
       "agent_run_id": "agent-fix-hover-remove-swatch-alignment-drop-default-t-b263-39649235a59c"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:16.798Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

@@ -15,6 +15,7 @@ const meridianSource = await readFile(
 
 function createTabWindow(chrome) {
   const queryArguments = [];
+  const createdLanes = [];
   const container = {
     clears: 0,
     children: [],
@@ -24,7 +25,18 @@ function createTabWindow(chrome) {
       this.children = [];
     },
     appendChild(child) {
+      this.children = this.children.filter((existing) => existing !== child);
       this.children.push(child);
+    },
+    querySelector(selector) {
+      assert.equal(selector, ".workspace-lane--empty-unsorted");
+      return this.children.find((child) =>
+        child.classes?.has("workspace-lane--empty-unsorted"),
+      );
+    },
+    querySelectorAll(selector) {
+      assert.equal(selector, ":scope > .workspace-lane");
+      return [];
     },
   };
   const timers = [];
@@ -52,6 +64,7 @@ function createTabWindow(chrome) {
   const build = new Function(
     "chrome",
     "document",
+    "createdLanes",
     "setTimeout",
     "clearTimeout",
     `
@@ -61,10 +74,22 @@ function createTabWindow(chrome) {
       let renderRunning = false;
       let renderDeferredByDrag = false;
       const isTabDragActive = () => false;
+      const isWorkspaceDragActive = () => false;
       const getAllThumbnails = async () => ({});
       const getWorkspaceData = async () => ({ workspaces: [], assignments: {} });
       const clusterTabsByDomain = () => new Map();
-      const createWorkspaceLane = () => { throw new Error("No lanes expected"); };
+      const createWorkspaceLane = (workspace, tabs) => {
+        const classes = new Set();
+        const lane = {
+          workspace,
+          tabs,
+          classes,
+          classList: { add: (...names) => names.forEach((name) => classes.add(name)) },
+          addEventListener() {},
+        };
+        createdLanes.push(lane);
+        return lane;
+      };
       const handleTabClosed = () => {};
       const clearBrowserSearch = () => {};
       const syncScopeButtons = () => {};
@@ -77,6 +102,8 @@ function createTabWindow(chrome) {
 
       ${extractFunction(meridianSource, "function scheduleRender()")}
       ${extractFunction(meridianSource, "function sortByTabOrder(")}
+      ${extractFunction(meridianSource, "function sortLaneIds(")}
+      ${extractFunction(meridianSource, "function applyLaneOrder(")}
       ${extractFunction(meridianSource, "async function render()")}
       chrome.storage.onChanged.addListener(${extractStorageListener(meridianSource)});
       return { render };
@@ -91,6 +118,7 @@ function createTabWindow(chrome) {
         return container;
       },
     },
+    createdLanes,
     setTimeout,
     clearTimeout,
   );
@@ -98,6 +126,7 @@ function createTabWindow(chrome) {
   return {
     ...api,
     container,
+    createdLanes,
     queryArguments,
     async runScheduledRender() {
       const callback = timers.shift();
@@ -117,6 +146,14 @@ test("all-windows changes alter the tab query and rerender the workspace", async
   await tabWindow.render();
   assert.deepEqual(tabWindow.queryArguments, [{}]);
   assert.equal(tabWindow.container.clears, 1);
+  assert.equal(tabWindow.createdLanes.at(-1).workspace.id, "unsorted");
+  assert.deepEqual(tabWindow.createdLanes.at(-1).tabs, []);
+  assert.equal(
+    tabWindow.createdLanes.at(-1).classes.has(
+      "workspace-lane--empty-unsorted",
+    ),
+    true,
+  );
 
   await chrome.storage.sync.set({ showTabsFromAllWindows: false });
   await tabWindow.runScheduledRender();

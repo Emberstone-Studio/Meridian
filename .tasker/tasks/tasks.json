@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "state_version": 962,
+  "state_version": 1071,
   "features": {
     "chat_pro": true
   },
@@ -1084,6 +1084,918 @@
       },
       "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
       "content": "chat chat-6455a45b9ada27f90be07b5cae66444e-d0f936de called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T15:52:16.831Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T15:52:18.900Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T16:00:13.698Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:00:15.839Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T16:12:21.555Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:12:23.973Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:15.735Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "add-hover-to-remove-control-for-selected-preset-c684",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:16.798Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:17.311Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:17.887Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-vertical-misalignment-of-group-header-count-6921",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:18.517Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:18.959Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:19.495Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "reorder-search-engine-options-google-bing-duckdu-55fd",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:20.612Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:21.140Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:21.682Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "critical-entering-url-search-in-a-second-window-6080",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:22.291Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "add-missing-top-padding-to-settings-privacy-data-7992",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:22.771Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "unhandled-promise-rejection-in-background-js-323-d009",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:23.870Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-keyboard-semantics-for-selected-background-s-92a9",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:24.404Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "synchronize-custom-background-image-lifecycle-ac-3501",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:24.956Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:25.497Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "replace-source-pattern-settings-tests-with-behav-30d4",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:26.081Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:26.591Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:26.851Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_trash",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_trash"
+    },
+    {
+      "timestamp": "2026-08-20T16:27:36.873Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:27:50.181Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:28:01.473Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_dependencies",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_dependencies"
+    },
+    {
+      "timestamp": "2026-08-20T16:28:01.944Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T17:00:17.950Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:00:18.108Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:17:10.191Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:17:10.332Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:01.891Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.032Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.179Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.317Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:38:58.629Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:38:58.772Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:41:21.985Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:41:22.134Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:44:19.103Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:44:19.245Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:46:04.110Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:46:04.258Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:48:27.165Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:48:27.324Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:49:50.120Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:49:50.277Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:50:47.866Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:50:48.010Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:53:52.750Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:53:52.900Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:54:05.870Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:54:06.012Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:57:32.988Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:57:33.142Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:02:10.680Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:02:10.832Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:13:25.515Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:13:25.662Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:14:59.358Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:14:59.517Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:21:25.316Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:21:25.470Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:24:37.535Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:24:37.686Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:25:57.139Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:25:57.293Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:54:10.145Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:54:10.298Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:58:59.847Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:59:00.015Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T19:06:18.353Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T19:08:58.192Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T19:08:58.341Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
     }
   ],
   "execution_policy": {
@@ -1220,7 +2132,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1246,7 +2158,7 @@
           "input": 5,
           "output": 25
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -1299,7 +2211,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1327,7 +2239,7 @@
           "cache_read": 0.3,
           "cache_write": 3.75
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -1380,7 +2292,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1439,7 +2351,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1498,7 +2410,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1557,7 +2469,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1616,7 +2528,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1675,7 +2587,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1734,7 +2646,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1793,7 +2705,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1852,7 +2764,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1911,7 +2823,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -1970,7 +2882,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2029,7 +2941,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "antigravity",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2131,7 +3043,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2158,7 +3070,7 @@
           "cache_read": 1,
           "cache_write": 12.5
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2210,7 +3122,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2238,7 +3150,7 @@
           "cache_read": 0.1,
           "cache_write": 1.25
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2291,7 +3203,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2319,7 +3231,7 @@
           "cache_read": 0.5,
           "cache_write": 6.25
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2373,7 +3285,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "claude",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2400,7 +3312,7 @@
           "cache_read": 0.2,
           "cache_write": 2.5
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2540,7 +3452,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2566,7 +3478,7 @@
           "output": 14,
           "cache_read": 0.175
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2620,7 +3532,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2646,7 +3558,7 @@
           "output": 4.5,
           "cache_read": 0.075
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2700,7 +3612,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2742,7 +3654,7 @@
             "cache_read": 0.5
           }
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2796,7 +3708,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2838,7 +3750,7 @@
             "cache_read": 1
           }
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2893,7 +3805,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -2938,7 +3850,7 @@
             "cache_write": 0.5
           }
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -2994,7 +3906,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -3039,7 +3951,7 @@
             "cache_write": 12.5
           }
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -3095,7 +4007,7 @@
       "synthesized": true,
       "source": "driver-model-list",
       "manifest_provider": "codex",
-      "last_updated": "2026-08-19",
+      "last_updated": "2026-08-20",
       "selectable": true,
       "cli_tool": false,
       "internal_tool": false,
@@ -3140,7 +4052,7 @@
             "cache_write": 5
           }
         },
-        "synced_at": "2026-08-19"
+        "synced_at": "2026-08-20"
       },
       "connected": true
     },
@@ -3187,13 +4099,13 @@
       "connected": true
     },
     {
-      "model_id": "ollama-qwen3-8b",
-      "display_name": "Qwen 3",
+      "model_id": "ollama-lumen-context-613573f7b5c9989c-ctx40960",
+      "display_name": "lumen-context-613573f7b5c9989c:ctx40960",
       "provider": "Ollama",
       "tier": "balanced",
       "api": {
         "endpoint": "http://localhost:11434/v1",
-        "model_string": "qwen3:8b",
+        "model_string": "lumen-context-613573f7b5c9989c:ctx40960",
         "auth": "none (self-hosted local runtime)",
         "format": "openai-chat"
       },
@@ -3229,9 +4141,105 @@
         "tools",
         "thinking"
       ],
-      "last_updated": "2026-08-11",
+      "last_updated": "2026-08-20",
       "display_tier": "balanced",
-      "ui_desc": "Efficient mid-size model for general reasoning and everyday agentic tasks",
+      "ui_desc": "General-purpose model optimized for Lumen development tasks",
+      "connected": true
+    },
+    {
+      "model_id": "ollama-lumen-context-613573f7b5c9989c-ctx8192",
+      "display_name": "lumen-context-613573f7b5c9989c:ctx8192",
+      "provider": "Ollama",
+      "tier": "balanced",
+      "api": {
+        "endpoint": "http://localhost:11434/v1",
+        "model_string": "lumen-context-613573f7b5c9989c:ctx8192",
+        "auth": "none (self-hosted local runtime)",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "General use (live-detected model)"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "low"
+      },
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "opencode-onprem",
+      "runtime": "ollama",
+      "runtime_capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ],
+      "last_updated": "2026-08-20",
+      "display_tier": "balanced",
+      "ui_desc": "Dynamically selected general model for development and reasoning tasks",
+      "connected": true
+    },
+    {
+      "model_id": "ollama-qwen3-14b",
+      "display_name": "Qwen 3",
+      "provider": "Ollama",
+      "tier": "balanced",
+      "api": {
+        "endpoint": "http://localhost:11434/v1",
+        "model_string": "qwen3:14b",
+        "auth": "none (self-hosted local runtime)",
+        "format": "openai-chat"
+      },
+      "capabilities": {
+        "best_for": [
+          "General use (live-detected model)"
+        ],
+        "avoid": [],
+        "context_window": null,
+        "supports_multimodal": false,
+        "supports_tool_use": true,
+        "relative_speed": "medium",
+        "relative_cost": "low"
+      },
+      "prompting": {
+        "responds_best_to": "Clear, explicit instructions with the output format stated.",
+        "avoid": "",
+        "system_prompt_prefix": null,
+        "ideal_task_length": "medium",
+        "needs_examples": false
+      },
+      "quirks": [],
+      "handoff": {
+        "output_format_instruction": "Specify the exact output format required.",
+        "evaluation_notes": "Review output for correctness and format adherence."
+      },
+      "synthesized": true,
+      "source": "auto-synthesized-live",
+      "manifest_provider": "opencode-onprem",
+      "runtime": "ollama",
+      "runtime_capabilities": [
+        "completion",
+        "tools",
+        "thinking"
+      ],
+      "last_updated": "2026-08-20",
+      "display_tier": "balanced",
+      "ui_desc": "Everyday workhorse for balanced reasoning, writing, and coding tasks",
       "connected": true
     }
   ],
@@ -3720,7 +4728,7 @@
     {
       "id": "add-hover-to-remove-control-for-selected-preset-c684",
       "title": "Add hover-to-remove control for selected color/photo/theme backgrounds",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
@@ -3728,145 +4736,145 @@
         "switch-app-background-to-topo-light-topo-dark-sy-0283"
       ],
       "agent_id": "coder",
-      "updated_at": "2026-08-19T18:22:00.993Z",
+      "updated_at": "2026-08-20T16:25:15.735Z",
       "file": "active/add-hover-to-remove-control-for-selected-preset-c684/add-hover-to-remove-control-for-selected-preset-c684.json"
     },
     {
       "id": "fix-hover-remove-swatch-alignment-drop-default-t-b263",
       "title": "Fix hover-remove swatch alignment + drop default theme background from Photos list",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "high",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T18:32:23.725Z",
+      "updated_at": "2026-08-20T16:25:16.798Z",
       "file": "active/fix-hover-remove-swatch-alignment-drop-default-t-b263/fix-hover-remove-swatch-alignment-drop-default-t-b263.json"
     },
     {
       "id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
       "title": "Rename duplicate \"Midnight\" gradient swatch to \"Twilight\"",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T18:35:17.155Z",
+      "updated_at": "2026-08-20T16:25:17.311Z",
       "file": "active/rename-duplicate-midnight-gradient-swatch-to-twi-c708/rename-duplicate-midnight-gradient-swatch-to-twi-c708.json"
     },
     {
       "id": "fix-vertical-misalignment-of-group-header-count-6921",
       "title": "Fix vertical misalignment of group header count badge (lane-tab-count)",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T18:38:57.853Z",
+      "updated_at": "2026-08-20T16:25:17.887Z",
       "file": "active/fix-vertical-misalignment-of-group-header-count-6921/fix-vertical-misalignment-of-group-header-count-6921.json"
     },
     {
       "id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
       "title": "Fix swatch/border animation desync on preset swatch hover",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T19:36:00.165Z",
+      "updated_at": "2026-08-20T16:25:18.517Z",
       "file": "active/fix-muddy-hover-overlay-color-and-swatch-border-ee31/fix-muddy-hover-overlay-color-and-swatch-border-ee31.json"
     },
     {
       "id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
       "title": "Add \"show tabs from all windows / current window only\" setting under Tab Organization",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T18:49:02.333Z",
+      "updated_at": "2026-08-20T16:25:18.959Z",
       "file": "active/add-show-tabs-from-all-windows-current-window-on-2ee6/add-show-tabs-from-all-windows-current-window-on-2ee6.json"
     },
     {
       "id": "reorder-search-engine-options-google-bing-duckdu-55fd",
       "title": "Reorder search engine options: Google, Bing, DuckDuckGo, Brave",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T19:38:22.247Z",
+      "updated_at": "2026-08-20T16:25:19.495Z",
       "file": "active/reorder-search-engine-options-google-bing-duckdu-55fd/reorder-search-engine-options-google-bing-duckdu-55fd.json"
     },
     {
       "id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
       "title": "Remove-icon (✕) shows on unselected custom photo, allowing accidental deletion instead of reselect",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "high",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T18:53:28.860Z",
+      "updated_at": "2026-08-20T16:25:20.612Z",
       "file": "active/remove-icon-shows-on-unselected-custom-photo-all-4ca5/remove-icon-shows-on-unselected-custom-photo-all-4ca5.json"
     },
     {
       "id": "settings-not-syncing-across-windows-new-window-d-79ae",
       "title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "high",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T19:06:19.256Z",
+      "updated_at": "2026-08-20T16:25:21.140Z",
       "file": "active/settings-not-syncing-across-windows-new-window-d-79ae/settings-not-syncing-across-windows-new-window-d-79ae.json"
     },
     {
       "id": "critical-entering-url-search-in-a-second-window-6080",
       "title": "CRITICAL: entering URL/search in a second window opens infinite Meridian tabs",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "high",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T19:29:17.356Z",
+      "updated_at": "2026-08-20T16:25:21.682Z",
       "file": "active/critical-entering-url-search-in-a-second-window-6080/critical-entering-url-search-in-a-second-window-6080.json"
     },
     {
       "id": "add-missing-top-padding-to-settings-privacy-data-7992",
       "title": "Add missing top padding to Settings > Privacy & Data section",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T19:44:31.091Z",
+      "updated_at": "2026-08-20T16:25:22.291Z",
       "file": "active/add-missing-top-padding-to-settings-privacy-data-7992/add-missing-top-padding-to-settings-privacy-data-7992.json"
     },
     {
       "id": "unhandled-promise-rejection-in-background-js-323-d009",
       "title": "Unhandled promise rejection in background.js:323 (chrome.tabs.onAttached → normalizeMeridianTab)",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T19:51:01.896Z",
+      "updated_at": "2026-08-20T16:25:22.771Z",
       "file": "active/unhandled-promise-rejection-in-background-js-323-d009/unhandled-promise-rejection-in-background-js-323-d009.json"
     },
     {
       "id": "fix-keyboard-semantics-for-selected-background-s-92a9",
       "title": "Fix keyboard semantics for selected background swatch removal",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T20:10:00.166Z",
+      "updated_at": "2026-08-20T16:25:23.870Z",
       "file": "active/fix-keyboard-semantics-for-selected-background-s-92a9/fix-keyboard-semantics-for-selected-background-s-92a9.json"
     },
     {
       "id": "synchronize-custom-background-image-lifecycle-ac-3501",
       "title": "Synchronize custom background image lifecycle across open windows",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
@@ -3874,24 +4882,24 @@
         "fix-keyboard-semantics-for-selected-background-s-92a9"
       ],
       "agent_id": "coder",
-      "updated_at": "2026-08-19T20:17:00.672Z",
+      "updated_at": "2026-08-20T16:25:24.404Z",
       "file": "active/synchronize-custom-background-image-lifecycle-ac-3501/synchronize-custom-background-image-lifecycle-ac-3501.json"
     },
     {
       "id": "do-not-persist-stale-meridian-tab-ids-after-norm-1b57",
       "title": "Do not persist stale Meridian tab IDs after normalization failure",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "low",
       "agent_id": "coder",
-      "updated_at": "2026-08-19T20:30:08.279Z",
+      "updated_at": "2026-08-20T16:25:24.956Z",
       "file": "active/do-not-persist-stale-meridian-tab-ids-after-norm-1b57/do-not-persist-stale-meridian-tab-ids-after-norm-1b57.json"
     },
     {
       "id": "replace-source-pattern-settings-tests-with-behav-30d4",
       "title": "Replace source-pattern settings tests with behavioral multi-window regressions",
-      "status": "in_review",
+      "status": "done",
       "trashed": false,
       "trashed_at": null,
       "priority": "medium",
@@ -3901,8 +4909,55 @@
         "do-not-persist-stale-meridian-tab-ids-after-norm-1b57"
       ],
       "agent_id": "coder",
-      "updated_at": "2026-08-19T20:27:02.476Z",
+      "updated_at": "2026-08-20T16:25:25.497Z",
       "file": "active/replace-source-pattern-settings-tests-with-behav-30d4/replace-source-pattern-settings-tests-with-behav-30d4.json"
+    },
+    {
+      "id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "title": "Switch default background to landscape.jpg (both themes) with brand accent #2ed8b0",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-20T16:25:26.081Z",
+      "file": "active/switch-default-background-to-landscape-jpg-both-dddc/switch-default-background-to-landscape-jpg-both-dddc.json"
+    },
+    {
+      "id": "revert-lane-header-scrim-bar-use-true-inverse-mi-faa7",
+      "title": "Revert lane-header scrim bar; use true inverse (mix-blend-mode) text instead",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "high",
+      "agent_id": "coder",
+      "updated_at": "2026-08-20T16:25:26.591Z",
+      "file": "active/revert-lane-header-scrim-bar-use-true-inverse-mi-faa7/revert-lane-header-scrim-bar-use-true-inverse-mi-faa7.json"
+    },
+    {
+      "id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "title": "Drag-and-drop to reorder groups (lanes) in the workspace",
+      "status": "in_review",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-20T19:08:58.341Z",
+      "file": "active/drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353/drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353.json"
+    },
+    {
+      "id": "drag-and-drop-tabs-groups-across-browser-windows-c19e",
+      "title": "Drag-and-drop tabs/groups across browser windows",
+      "status": "done",
+      "trashed": false,
+      "trashed_at": null,
+      "priority": "medium",
+      "deps": [
+        "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353"
+      ],
+      "agent_id": "coder",
+      "updated_at": "2026-08-20T17:39:47.737Z",
+      "file": "active/drag-and-drop-tabs-groups-across-browser-windows-c19e/drag-and-drop-tabs-groups-across-browser-windows-c19e.json"
     }
   ]
 }

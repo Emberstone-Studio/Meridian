@@ -2,14 +2,14 @@
   "id": "settings-not-syncing-across-windows-new-window-d-79ae",
   "title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
   "description": "Settings should be global across all open windows of the app/extension, but currently a new window does not pick up settings changed/set in another already-open window (e.g. theme, background, tab organization toggles, etc. — whatever is currently window-scoped instead of global).\n\nInvestigate:\n1. How settings are currently persisted — likely `chrome.storage.sync` or `chrome.storage.local` calls in components/SettingsPanel.js (and mirrored meridian-extension/). `chrome.storage.sync`/`local` should already be shared across windows/contexts by nature — if settings still aren't reflecting live in other open windows, the likely causes are: (a) each window's UI only reads settings once at load/init and never listens for `chrome.storage.onChanged`, so an already-open second window doesn't pick up a change made in the first window until it's closed/reopened, or (b) some settings are being cached in a window-local variable/state that shadows storage after initial load, or (c) settings are incorrectly being written to a window/tab-scoped store instead of the shared sync/local storage.\n2. Confirm expected behavior: settings changed in one window should propagate live (or at minimum on next load) to all other currently-open windows — no manual reload required, ideally listen for `chrome.storage.onChanged` and update UI/state reactively.\n\nFix wherever settings are read/written to ensure a single global source of truth, and that all open windows subscribe to changes rather than caching a stale local copy. Mirror the fix into meridian-extension/. This is a high-severity correctness bug — settings desync across windows is confusing/broken UX.",
-  "status": "in_review",
+  "status": "done",
   "priority": "high",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:55:08.198Z",
-  "updated_at": "2026-08-19T19:06:19.256Z",
+  "updated_at": "2026-08-20T16:25:21.140Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:55:08.198Z",
@@ -61,6 +61,18 @@
       "content": "## Completed\n\n- Added a comprehensive `chrome.storage.onChanged` subscriber so all settings-panel controls update from the shared sync store across open windows.\n- Updated live Meridian pages to reapply theme/background settings, refresh local-search scope controls, and rerender tab organization when synced preferences change.\n- Mirrored all runtime changes into `meridian-extension/` and added cross-window regression coverage.\n\n## Verification\n\n- `node --check` passed for all four changed runtime files.\n- `node --test tests/*.test.mjs`: 144 passed, 0 failed.\n- `git diff --check` passed.\n- Source/package parity confirmed with `cmp` and the packaged parity test.\n\nFinal report format: Markdown in the `output` field of a Tasker `kind: \"complete\"` report.",
       "attachment": "active/settings-not-syncing-across-windows-new-window-d-79ae/settings-not-syncing-across-windows-new-window-doe.md",
       "agent_run_id": "agent-settings-not-syncing-across-windows-new-window-d-79ae-94b39e8fd51b"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:21.140Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

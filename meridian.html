@@ -100,13 +100,26 @@
           </button>
         </div>
       </div>
-      <div id="workspace-container"></div>
+      <div id="workspace-drop-region">
+        <div
+          id="ungroup-drop-zone"
+          class="tab-drop-zone hidden"
+          aria-label="Drop a tab here to remove from all groups"
+        >
+          <span class="tab-drop-zone-label">
+            Drop a tab here to remove from all groups
+          </span>
+        </div>
+        <div id="workspace-container"></div>
+      </div>
       <div
         id="new-group-drop-zone"
-        class="hidden"
+        class="tab-drop-zone hidden"
         aria-label="Drop tab here to create a new group"
       >
-        Drop a tab here to create a new group
+        <span class="tab-drop-zone-label">
+          Drop a tab here to create a new group
+        </span>
       </div>
       <div id="tab-lightbox" class="hidden" aria-label="Tab preview">
         <div class="lightbox-media">

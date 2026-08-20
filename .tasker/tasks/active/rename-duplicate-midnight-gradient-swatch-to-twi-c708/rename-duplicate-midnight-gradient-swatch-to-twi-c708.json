@@ -2,14 +2,14 @@
   "id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
   "title": "Rename duplicate \"Midnight\" gradient swatch to \"Twilight\"",
   "description": "In the Background settings panel, Colors & Gradients grid, there are two swatches both named/labeled \"Midnight\" (one solid, one gradient). Rename the gradient one to \"Twilight\" to disambiguate. Only change the label/name — keep its existing color/gradient value as-is unless changing the name reveals it should also be renamed elsewhere (e.g. a matching id/key used in code/tests) — update those references too for consistency.\n\nRelevant file: components/SettingsPanel.js (Background settings — Colors & Gradients swatch list), mirrored in meridian-extension/components/SettingsPanel.js.",
-  "status": "in_review",
+  "status": "done",
   "priority": "medium",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:34:01.385Z",
-  "updated_at": "2026-08-19T18:35:17.155Z",
+  "updated_at": "2026-08-20T16:25:17.311Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:34:01.385Z",
@@ -51,6 +51,18 @@
       "content": "Renamed the g1 gradient swatch label from `Midnight` to `Twilight` in both `components/SettingsPanel.js` and `meridian-extension/components/SettingsPanel.js`. Preserved the solid `Midnight` label, preset ID, and gradient value. Verification passed: `git diff --check`, mirrored-file comparison, exact label/ID/value assertions, and diff review (one replacement per file).",
       "attachment": "active/rename-duplicate-midnight-gradient-swatch-to-twi-c708/rename-duplicate-midnight-gradient-swatch-to-twili.md",
       "agent_run_id": "agent-rename-duplicate-midnight-gradient-swatch-to-twi-c708-ddeb2d350575"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:17.311Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "rename-duplicate-midnight-gradient-swatch-to-twi-c708",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

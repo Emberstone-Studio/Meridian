@@ -40,4 +40,4 @@
 **Key decisions:** 
 **Status:** done
 **Last updated:** 2026-08-06
-
+- [692f3939] Topo backgrounds light and dark mode (tasker, reviewer, 2026-08-19) → roles/reviewer/memory/chats/692f3939.json

@@ -1,0 +1,12 @@
+{
+  "chatId": "692f3939",
+  "title": "Topo backgrounds light and dark mode",
+  "summary": "**Hover-to-remove bug fixed and dispatched:** ✕ now only shows when swatch is the *currently selected* background; unselected tiles show normal click-to-select hover (fixes data-loss risk). Animation-sync retry queued (diagnosed root cause: swatch content and border scale independently, creating two non-concentric rings instead of one).\n\n**Two critical bugs now running, top priority:**\n\n1. **Infinite-tab-spawn (dispatched now):** Typing URL/search in a second window causes Meridian to endlessly create tabs — likely a tab/window listener in `background.js` re-triggering itself due to broken window-id tracking for window #2+.\n\n2. **Settings not syncing across windows (queued next):** New window doesn't reflect settings changed in another window — suspect each window reads settings once at load without listening to `chrome.storage.onChanged`.\n\nAlso queued: search-engine reorder (Google > Bing > DuckDuckGo > Brave), and animation-sync retry for swatch scaling. All pending same-file collisions clearing.",
+  "agents": [
+    "tasker",
+    "reviewer"
+  ],
+  "threadPath": ".tasker/chats/692f3939",
+  "createdAt": "2026-08-19T18:02:12.410Z",
+  "updatedAt": "2026-08-19T20:36:05.395Z"
+}

@@ -2,14 +2,14 @@
   "id": "reorder-search-engine-options-google-bing-duckdu-55fd",
   "title": "Reorder search engine options: Google, Bing, DuckDuckGo, Brave",
   "description": "In Settings, the search engine selector/options list should be reordered to: Google, Bing, DuckDuckGo, Brave (in that order). Find where the search engine options are defined (likely an array/const in components/SettingsPanel.js or a related settings/search config file, mirrored in meridian-extension/), and reorder the list to match. This is a pure ordering change — don't alter the engines' values/URLs/icons, just their display/array order so they render in the requested sequence.",
-  "status": "in_review",
+  "status": "done",
   "priority": "medium",
   "label": "Maintenance",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:45:51.055Z",
-  "updated_at": "2026-08-19T19:38:22.247Z",
+  "updated_at": "2026-08-20T16:25:19.495Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:45:51.055Z",
@@ -44,6 +44,18 @@
       "content": "Updated the shared search-provider ordering in both runtime trees:\n\n- `components/SearchBar.js`\n- `meridian-extension/components/SearchBar.js`\n\nThe Settings selector now renders **Google, Bing, DuckDuckGo, Brave**. Engine IDs, names, URLs, and favicons are unchanged.\n\nValidation:\n\n- Confirmed the provider IDs appear in the requested order in both files.\n- `git diff --check` passed.\n- `node --test tests/*.test.mjs` passed: **145/145 tests**.",
       "attachment": "active/reorder-search-engine-options-google-bing-duckdu-55fd/reorder-search-engine-options-google-bing-duckduck.md",
       "agent_run_id": "agent-reorder-search-engine-options-google-bing-duckdu-55fd-1f32f04b5e96"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:19.495Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "reorder-search-engine-options-google-bing-duckdu-55fd",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

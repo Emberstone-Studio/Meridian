@@ -1,0 +1,85 @@
+{
+  "id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+  "title": "Group/lane label text isn't legible across gradient backgrounds (single global luminance sample)",
+  "description": "Bug: lane/group header text (e.g. \"UNSORTED\", \"EMBERSTONE\" — .lane-title, .lane-tab-count, .lane-delete-btn, .lane-collapse-btn) goes low-contrast against parts of the new default background (img/landscape.jpg), which has a strong luminance gradient from dark teal top-left to light peach bottom-right. See screenshot in chat 99df29a9 (image-3.png): \"UNSORTED\" is barely readable against the teal corner while \"EMBERSTONE\" lower on the page reads fine.\n\nRoot cause: components/SettingsPanel.js `applyOnBackground(lum)` sets one global --on-bg / --on-bg-muted / --on-bg-shadow pair from a single averaged luminance value for the whole wallpaper (see lumSum averaging around line ~1385, and lastBgLum/applyOnBackground around line 1565-1642). That's a fine model for a background with roughly uniform luminance, but breaks down for a gradient/photo where luminance varies a lot across the viewport — one global light-or-dark text choice can't be correct everywhere.\n\nFix needed: make on-background text contrast-aware per label position rather than globally. Some directions to evaluate (pick what's cleanest, don't need to do all):\n1. Sample local luminance under/near each .lane-title's actual rendered rect (e.g. via a small offscreen canvas draw of the background image cropped to that element's approximate position) instead of one whole-image average, and set the on-bg vars per-lane (or per-label) rather than on :root.\n2. If per-element sampling is too heavy, at minimum strengthen the always-on text-shadow/scrim (--on-bg-shadow) so it guarantees contrast regardless of local luminance — e.g. a bigger blur/spread outline rather than a soft 1px shadow, so light-on-dark or dark-on-light both stay legible even when the global pick is \"wrong\" for that spot.\n3. Consider whether a translucent scrim/backdrop strip behind lane headers (similar to --card-bg) is simpler and more robust than trying to solve pure luminance-derived text color for photos with high local variance.\n\nWhatever approach you land on, verify specifically against img/landscape.jpg in both light and dark theme, and check it doesn't regress the existing behavior on more uniform backgrounds (solids, gradients with low variance, other photos, \"none\").\n\nMind the existing comment/intent at meridian.css ~505-515 (\"Lane headers sit on the wallpaper, not a surface — use luminance-derived on-background text so they stay legible against any background.\") — the intent is right, the single global sample is the bug.",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Bug",
+  "agent_id": "coder",
+  "trashed": true,
+  "trashed_at": "2026-08-20T16:25:26.851Z",
+  "created_at": "2026-08-20T16:00:13.698Z",
+  "updated_at": "2026-08-20T16:25:26.851Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-20T16:00:13.698Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-20T16:00:13.698Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T16:00:15.726Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-20T16:00:15.839Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T16:06:25.909Z",
+      "type": "output",
+      "content": "Implemented a local contrast surface for every lane header.\n\n- Scoped the on-background text variables to each .lane-header and placed them over a 94%-opaque, blurred theme surface, eliminating dependence on one wallpaper-wide luminance sample.\n- Strengthened the muted token with a primary/secondary mix and removed the tab-count opacity that reduced effective contrast.\n- Mirrored runtime changes into meridian-extension and updated the luminance-solver comments to document the local override.\n- Added regression coverage proving the scoped scrim exists and that muted labels retain at least 4.5:1 contrast over worst-case black and white wallpaper pixels in light and dark themes.\n\nVerification: node --test tests/*.test.mjs passed all 158 tests; git diff --check passed; packaged CSS and SettingsPanel sources match. Headed Chromium screenshots using img/landscape.jpg confirmed legible upper and lower lane headers in explicit light and dark themes.",
+      "attachment": "active/group-lane-label-text-isn-t-legible-across-gradi-ddd0/group-lane-label-text-isn-t-legible-across-gradien.md",
+      "agent_run_id": "agent-group-lane-label-text-isn-t-legible-across-gradi-ddd0-258d595e0f14"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:26.851Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_trash",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_trash"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-20T16:00:15.517Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-c979d91eebcbf4063a7d",
+  "agent_startup_started_at": "2026-08-20T16:00:15.715Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/group-lane-label-text-isn-t-legible-across-gradi-ddd0.md",
+      "direction": "self",
+      "at": "2026-08-20T16:06:25.909Z"
+    }
+  ]
+}

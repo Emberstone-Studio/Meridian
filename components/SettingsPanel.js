@@ -117,8 +117,8 @@ const GRADIENT_PRESETS = [
   },
 ];
 
-// Default background when the user hasn't chosen one. CSS resolves this to the
-// light or dark bundled topo image from the effective theme.
+// Default background when the user hasn't chosen one. CSS resolves this token
+// to the bundled wallpaper for the effective theme.
 export const DEFAULT_BACKGROUND = {
   type: "theme",
   value: "topo",
@@ -1358,8 +1358,6 @@ function dominantHex(str) {
 
 // Find an image's dominant *vivid* hue via a saturation-weighted histogram.
 // A plain pixel average collapses to gray and throws the real color away.
-// Also returns the image's overall luminance (all opaque pixels) so callers
-// can decide whether content sitting on it needs light or dark text.
 function analyzeImage(url) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -1378,12 +1376,8 @@ function analyzeImage(url) {
         const sSum = new Array(BINS).fill(0);
         const lSum = new Array(BINS).fill(0);
         const count = new Array(BINS).fill(0);
-        let lumSum = 0;
-        let lumN = 0;
         for (let i = 0; i < data.length; i += 4) {
           if (data[i + 3] < 125) continue;
-          lumSum += relLum(data[i], data[i + 1], data[i + 2]);
-          lumN += 1;
           const hsl = rgbToHsl(data[i], data[i + 1], data[i + 2]);
           // Skip grays and near black/white — they carry no hue identity.
           if (hsl.s < 18 || hsl.l < 10 || hsl.l > 92) continue;
@@ -1393,7 +1387,6 @@ function analyzeImage(url) {
           lSum[bin] += hsl.l;
           count[bin] += 1;
         }
-        const lum = lumN ? lumSum / lumN : null;
         let top = -1;
         let topW = 0;
         for (let b = 0; b < BINS; b += 1) {
@@ -1402,60 +1395,35 @@ function analyzeImage(url) {
             top = b;
           }
         }
-        if (top < 0) return resolve({ dominant: null, lum }); // no vivid pixels
+        if (top < 0) return resolve({ dominant: null }); // no vivid pixels
         resolve({
           dominant: {
             h: Math.round(((top + 0.5) / BINS) * 360),
             s: Math.round(sSum[top] / count[top]),
             l: Math.round(lSum[top] / count[top]),
           },
-          lum,
         });
       } catch {
-        resolve({ dominant: null, lum: null }); // cross-origin taint, etc.
+        resolve({ dominant: null }); // cross-origin taint, etc.
       }
     };
-    img.onerror = () => resolve({ dominant: null, lum: null });
+    img.onerror = () => resolve({ dominant: null });
     img.src = url;
   });
 }
 
-// Average relative luminance across every hex stop in a string.
-function averageLumOfHexes(str) {
-  const hexes = String(str).match(/#[0-9a-f]{6}|#[0-9a-f]{3}/gi);
-  if (!hexes || !hexes.length) return null;
-  let sum = 0;
-  let n = 0;
-  for (const hx of hexes) {
-    const rgb = hexToRgb(hx);
-    if (!rgb) continue;
-    sum += relLum(...rgb);
-    n += 1;
-  }
-  return n ? sum / n : null;
-}
-
-// Returns { dominant, lum } for the active background. `lum` is null for the
-// "none" background, which follows the theme's --bg (read live at apply time).
 async function analyzeBackground(bg, customDataUrl) {
-  if (!bg || bg.type === "none") return { dominant: null, lum: null };
+  if (!bg || bg.type === "none") return { dominant: null };
   if (bg.type === "solid") {
     const rgb = hexToRgb(bg.value);
-    return {
-      dominant: rgb ? rgbToHsl(...rgb) : null,
-      lum: rgb ? relLum(...rgb) : null,
-    };
+    return { dominant: rgb ? rgbToHsl(...rgb) : null };
   }
-  if (bg.type === "gradient") {
-    return { dominant: dominantHex(bg.value), lum: averageLumOfHexes(bg.value) };
-  }
+  if (bg.type === "gradient") return { dominant: dominantHex(bg.value) };
   if (bg.type === "photo") return analyzeImage(bg.value);
   if (bg.type === "custom") {
-    return customDataUrl
-      ? analyzeImage(customDataUrl)
-      : { dominant: null, lum: null };
+    return customDataUrl ? analyzeImage(customDataUrl) : { dominant: null };
   }
-  return { dominant: null, lum: null };
+  return { dominant: null };
 }
 
 // ── Color math for the surface-contrast solver ──
@@ -1504,12 +1472,10 @@ function surfaceLum() {
 // Derived accents run a touch under full saturation — neon reads cheap.
 const ACCENT_SAT = 80;
 
-// Last resolved dominant + background luminance, cached so a theme switch can
-// re-run the solver and re-pick on-background text without re-sampling.
+// Last resolved dominant color, cached so a theme switch can re-run the solver
+// without re-sampling.
 let lastDominant = null;
-let lastBgLum = null;
 let accentGeneration = 0;
-let useThemeOnBackground = false;
 
 function docIsDark() {
   const t = document.documentElement.dataset.theme;
@@ -1558,54 +1524,18 @@ function applyDerivedAccent(dominant) {
   root.style.setProperty("--accent-light", `${l}%`);
 }
 
-// Content that sits directly on the background (lane headers) can't rely on the
-// theme's text color — the wallpaper may be light or dark regardless of theme.
-// Pick light or dark on-background text from the background's own luminance,
-// plus a contrasting text-shadow scrim so it survives busy photos.
-function applyOnBackground(lum) {
-  const root = document.documentElement;
-  let L = lum;
-  if (L == null) {
-    // "none" background follows the theme's --bg — read it live.
-    const v = getComputedStyle(root).getPropertyValue("--bg").trim();
-    const rgb = hexToRgb(v);
-    L = rgb ? relLum(...rgb) : docIsDark() ? 0.02 : 0.9;
-  }
-  if (L < 0.4) {
-    // Dark background → light text.
-    root.style.setProperty("--on-bg", "rgba(255, 255, 255, 0.95)");
-    root.style.setProperty("--on-bg-muted", "rgba(255, 255, 255, 0.72)");
-    root.style.setProperty("--on-bg-shadow", "0 1px 3px rgba(0, 0, 0, 0.55)");
-  } else {
-    // Light background → dark text.
-    root.style.setProperty("--on-bg", "rgba(0, 0, 0, 0.9)");
-    root.style.setProperty("--on-bg-muted", "rgba(0, 0, 0, 0.6)");
-    root.style.setProperty("--on-bg-shadow", "0 1px 2px rgba(255, 255, 255, 0.4)");
-  }
-}
-
-function clearOnBackground() {
-  const style = document.documentElement.style;
-  style.removeProperty("--on-bg");
-  style.removeProperty("--on-bg-muted");
-  style.removeProperty("--on-bg-shadow");
-}
-
 export async function applyAccentFromBackground(bg, customDataUrl = null) {
   const generation = ++accentGeneration;
   if (isDefaultBackground(bg)) {
     lastDominant = null;
-    lastBgLum = null;
-    useThemeOnBackground = true;
     applyDerivedAccent(null);
-    clearOnBackground();
     return;
   }
 
   const resolvedCustomDataUrl = await customDataUrl;
   if (generation !== accentGeneration) return;
 
-  const { dominant, lum } = await analyzeBackground(bg, resolvedCustomDataUrl);
+  const { dominant } = await analyzeBackground(bg, resolvedCustomDataUrl);
   if (generation !== accentGeneration) return;
 
   // The shipped wallpaper is part of the brand, so it keeps the brand accent
@@ -1616,14 +1546,8 @@ export async function applyAccentFromBackground(bg, customDataUrl = null) {
   // Every other background — including a user's own upload — still derives.
   const effectiveDominant = isDefaultBackground(bg) ? null : dominant;
 
-  // lum is deliberately NOT suppressed. It drives the light-or-dark text that
-  // sits directly ON the wallpaper (lane headers), which is legibility rather
-  // than branding and has to keep tracking the actual image.
   lastDominant = effectiveDominant;
-  lastBgLum = lum;
-  useThemeOnBackground = false;
   applyDerivedAccent(effectiveDominant);
-  applyOnBackground(lum);
 }
 
 export function applyTheme(theme) {
@@ -1635,11 +1559,8 @@ export function applyTheme(theme) {
   } else {
     delete html.dataset.theme;
   }
-  // Both the accent solver and the on-background text depend on the theme
-  // (surface + the "none" background follow it) — re-run them on switch.
+  // The accent solver depends on the theme surface, so re-run it on switch.
   applyDerivedAccent(lastDominant);
-  if (useThemeOnBackground) clearOnBackground();
-  else applyOnBackground(lastBgLum);
 }
 
 export function applyBackground(bg, customDataUrl = null) {

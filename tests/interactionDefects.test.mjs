@@ -640,3 +640,54 @@ test("the Web section launches the selected provider and clears the query", asyn
   ]);
   assert.equal(clears, 2);
 });
+
+test("opening local search results clears the retained query", async () => {
+  const source = await readFile(
+    new URL("../meridian.js", import.meta.url),
+    "utf8",
+  );
+  const activated = [];
+  const opened = [];
+  let clears = 0;
+  const searchBarApi = {
+    clearSearch: () => {
+      clears += 1;
+    },
+  };
+  const buildResultRow = new Function(
+    "document",
+    "activateTab",
+    "openUrlFromMeridian",
+    "searchBarApi",
+    `${extractFunction(source, "function buildResultRow(")}
+     return buildResultRow;`,
+  )(
+    { createElement: (tagName) => new FakeElement(tagName) },
+    (tabId) => activated.push(tabId),
+    (url) => opened.push(url),
+    searchBarApi,
+  );
+
+  buildResultRow({ tabId: 41, title: "Open tab", url: "https://tab.test" })
+    .dispatch("click");
+  buildResultRow({ title: "History", url: "https://history.test" })
+    .dispatch("click");
+
+  assert.deepEqual(activated, [41]);
+  assert.deepEqual(opened, ["https://history.test"]);
+  assert.equal(clears, 2);
+
+  const openBookmark = new Function(
+    "searchBarApi",
+    "openUrlFromMeridian",
+    `${extractFunction(source, "async function openBookmark(")}
+     return openBookmark;`,
+  )(searchBarApi, async (url) => opened.push(url));
+  await openBookmark("https://bookmark.test");
+
+  assert.deepEqual(opened, [
+    "https://history.test",
+    "https://bookmark.test",
+  ]);
+  assert.equal(clears, 3);
+});

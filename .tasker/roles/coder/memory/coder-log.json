@@ -1,31 +1,81 @@
 {
   "status": "idle",
-  "task_id": "settings-not-syncing-across-windows-new-window-d-79ae",
-  "task_title": "Settings not syncing across windows — new window doesn't reflect other window's settings",
-  "started_at": "2026-08-19T19:00:51.315Z",
-  "updated_at": "2026-08-19T19:00:52.551Z",
+  "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+  "task_title": "Drag-and-drop to reorder groups (lanes) in the workspace",
+  "started_at": "2026-08-20T17:39:48.062Z",
+  "updated_at": "2026-08-20T17:41:22.245Z",
   "completed_at": "2026-07-25T04:40:25.816Z",
-  "last_output": "Implemented hover-to-remove controls for selected color, gradient, stock-photo, and topo presets. Removing a preset restores the theme-aware topo default. Replaced the diagonal No background swatch with a complementary Garnet solid, added the topo default to the balanced 12-slot photo grid, and mirrored all component/CSS changes into meridian-extension. Added focused regression coverage. Validation: syntax checks passed, git diff whitespace check passed, source/package parity passed, and all 137 Node tests passed.",
+  "last_output": "Applied the two requested follow-ups. Unsorted now renders even when empty, so it is always available as a drop target; dropping a grouped tab there calls the existing ungroup/unassign path. Rename selection now uses a Range scoped to the title instead of document.execCommand(selectAll), preventing page-wide selection. Real Chromium verification: empty Unsorted rendered with zero cards, dropping a grouped tab moved it there with groupId -1, and clicking the group name selected only that title. Full suite remains 170/170 green; focused tests 18/18 and source/package parity pass.",
   "timeline": [
     {
-      "timestamp": "2026-08-19T18:55:08.198Z",
+      "timestamp": "2026-08-20T16:27:36.873Z",
       "type": "created",
       "content": "Task created"
     },
     {
-      "timestamp": "2026-08-19T18:55:08.198Z",
+      "timestamp": "2026-08-20T16:27:36.873Z",
       "type": "actor",
-      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_create"
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
     },
     {
-      "timestamp": "2026-08-19T18:55:20.079Z",
-      "type": "actor",
-      "content": "controller chat-5868724dbcef74ffc1cf944cae6f6283-2bd65fe7 called mcp__tasker__task_update"
-    },
-    {
-      "timestamp": "2026-08-19T19:00:50.991Z",
+      "timestamp": "2026-08-20T16:28:01.827Z",
       "type": "moved",
-      "content": "Moved from ready to in_progress"
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-20T16:28:01.944Z",
+      "type": "actor",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T16:39:21.700Z",
+      "type": "output",
+      "content": "Implemented lane-level reordering across the workspace.\n\n- Added a dedicated draggable lane-header handle with a lane-sized dashed placeholder, drag-state cleanup, and Up/Down keyboard reordering.\n- Kept lane and tab drag state separate so tab reordering, cross-lane tab moves, and the new-group drop zone retain their existing behavior.\n- Persisted `laneOrder` in shared `chrome.storage.local`, restored it during render, preserved temporarily hidden lanes, and rerendered every open window on storage changes.\n- Mirrored all runtime changes into `meridian-extension/`.\n- Added focused coverage for mouse/drop behavior, keyboard behavior, persistence ordering, hidden lanes, cross-window rerenders, and tab-drag isolation.\n\nVerification:\n- `node --test tests/*.test.mjs`: 165 passed, 0 failed.\n- `git diff --check`: passed.\n- Source/package parity checks: passed.\n- Headless Chrome DOM smoke: draggable handles rendered with accessible labels; ArrowDown reordered and retained focus; mouse drag activated the placeholder, committed lane order, and cleaned up drag state."
+    },
+    {
+      "timestamp": "2026-08-20T17:00:17.950Z",
+      "type": "actor",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:00:18.108Z",
+      "type": "chat_user",
+      "content": "User rejection: dragging tabs or groups does not work in actual use, and the dedicated grab handles are unwanted. Rework so the group name itself is the drag target; verify real browser behavior rather than only fake-DOM tests."
+    },
+    {
+      "timestamp": "2026-08-20T17:00:18.108Z",
+      "type": "actor",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:01.891Z",
+      "type": "output",
+      "content": "Reworked after user rejection. Root cause was a real null-placeholder crash when dragging the last tab/lane (null compared equal to an uncreated placeholder, followed by null.nextElementSibling); fixed for both tab and lane paths. Removed grab handles entirely: the group name is now the draggable target. Full-card directional tab drops and full-target directional lane drops avoid the prior half-card/half-header dead zones. Verified lane-name dragging and persisted order in a real unpacked Chromium extension; full suite 170/170 passes."
+    },
+    {
+      "timestamp": "2026-08-20T17:20:01.891Z",
+      "type": "actor",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:20:02.032Z",
+      "type": "actor",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:38:58.629Z",
+      "type": "actor",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:38:58.772Z",
+      "type": "chat_user",
+      "content": "Follow-up tweaks: keep an empty Unsorted lane available as a tab drop target, and fix single-click group-name rename so it selects only the title rather than all page text."
+    },
+    {
+      "timestamp": "2026-08-20T17:38:58.772Z",
+      "type": "actor",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
     }
   ],
   "history": [
@@ -162,6 +212,15 @@
       "started_at": "2026-08-19T19:00:51.315Z",
       "completed_at": "2026-07-25T04:40:25.816Z",
       "last_output": null,
+      "pipeline_agents": []
+    },
+    {
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "task_title": "Drag-and-drop to reorder groups (lanes) in the workspace",
+      "status": "in_review",
+      "started_at": "2026-08-20T17:39:48.062Z",
+      "completed_at": "2026-07-25T04:40:25.816Z",
+      "last_output": "Applied the two requested follow-ups. Unsorted now renders even when empty, so it is always available as a drop target; dropping a grouped tab there calls the existing ungroup/unassign path. Rename selection now uses a Range scoped to the title instead of document.execCommand(selectAll), preventing page-wide selection. Real Chromium verification: empty Unsorted rendered with zero cards, dropping a grouped tab moved it there with groupId -1, and clicking the group name selected only that title. Full suite remains 170/170 green; focused tests 18/18 and source/package parity pass.",
       "pipeline_agents": []
     }
   ],

@@ -22,6 +22,17 @@
       "agent_id": "writer",
       "updated_at": "2026-08-06T12:43:24.839Z",
       "file": "trash/prep-privacy-md-for-publishing-at-emberstone-stu-dd8b/prep-privacy-md-for-publishing-at-emberstone-stu-dd8b.json"
+    },
+    {
+      "id": "group-lane-label-text-isn-t-legible-across-gradi-ddd0",
+      "title": "Group/lane label text isn't legible across gradient backgrounds (single global luminance sample)",
+      "status": "in_review",
+      "trashed": true,
+      "trashed_at": "2026-08-20T16:25:26.851Z",
+      "priority": "medium",
+      "agent_id": "coder",
+      "updated_at": "2026-08-20T16:25:26.851Z",
+      "file": "trash/group-lane-label-text-isn-t-legible-across-gradi-ddd0/group-lane-label-text-isn-t-legible-across-gradi-ddd0.json"
     }
   ]
 }

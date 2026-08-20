@@ -1,0 +1,414 @@
+{
+  "id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+  "title": "Drag-and-drop to reorder groups (lanes) in the workspace",
+  "description": "Add drag-and-drop reordering for entire tab groups/lanes (e.g. \"UNSORTED\", \"EMBERSTONE\"), not just tabs within a lane. Currently components/WorkspaceLane.js already implements drag-and-drop reordering of individual tab cards within a lane (see dragstart/dragover/drop handlers, drag-placeholder logic ~line 270-400), but there is no equivalent for reordering the lanes themselves.\n\nScope:\n1. Make the `.lane-header` (or an appropriate handle within it) draggable, and implement dragstart/dragover/drop on the lane container level (sibling to the existing per-tab drag logic, don't conflict with it — tab-card drags must keep working for reordering tabs and moving tabs between groups).\n2. Persist the new lane order (check how lane/group order is currently stored — likely alongside group definitions in chrome.storage.sync or wherever groups/tags are defined) so the order survives reload/reopen.\n3. Reuse the existing drag-placeholder visual pattern (drag-placeholder div insertion) for consistency with the tab-card drag UX already in the codebase, if practical for a lane-sized element.\n4. Update in all open windows if groups are global/shared across windows (check whether group definitions are already synced across windows per the recent settings-sync fix — task settings-not-syncing-across-windows-new-window-d-79ae — group order should behave the same way).\n5. Mirror the change into meridian-extension/.\n6. Add test coverage and verify manually (keyboard/mouse) that reordering doesn't break existing tab drag-and-drop within/between lanes.\n\nReference existing per-tab implementation in components/WorkspaceLane.js as the pattern to follow for interaction feel (placeholder insertion, dragover targeting logic).",
+  "status": "in_review",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-20T16:27:36.873Z",
+  "updated_at": "2026-08-20T19:08:58.341Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-20T17:50:48.010Z",
+      "type": "chat_user",
+      "content": "UX correction: the transient Unsorted target must appear at the top (where Unsorted will land), while New Group remains at the bottom. Implement as an overlay so showing the top target does not shift/break the active drag."
+    },
+    {
+      "timestamp": "2026-08-20T17:50:48.010Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:53:52.750Z",
+      "type": "chat_user",
+      "content": "Corrected the drop-target placement: empty Unsorted now appears as an absolute overlay at the top of the workspace only during tab drag, so it matches Unsorted’s eventual position without moving the source card or any lane. New Group remains in normal flow below the workspace. Real unpacked-Chromium verification confirmed the dragged card’s rect is unchanged across dragstart, Unsorted is at the workspace top, New Group is below the workspace, and dropping a grouped tab onto Unsorted actually ungroups it (groupId -1). Full suite 171/171 passes; focused tests 11/11; source/package parity and scoped diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T17:53:52.750Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:53:52.900Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:54:05.870Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T17:54:06.012Z",
+      "type": "chat_user",
+      "content": "User reports same-group tab reorder animation is glitchy: all cards blink/flash together while shifting. Reopening to remove the unstable visual behavior and verify in the real extension."
+    },
+    {
+      "timestamp": "2026-08-20T17:54:06.012Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:57:32.988Z",
+      "type": "chat_user",
+      "content": "Removed the glitchy same-group gap/shift preview. Hovering during a tab reorder no longer inserts a grid item or reflows every card; it now shows a fixed accent insertion edge on the destination card, and hover transforms/transitions are disabled for the duration of the drag. Real unpacked-Chromium verification across repeated dragovers recorded zero grid child mutations, identical card rects before/during drag, one stable marker, 0s card transition duration, and the final Chrome tab order changed correctly on drop. Full suite 171/171 passes; source/package parity and scoped diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T17:57:32.988Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T17:57:33.142Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:02:10.680Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:02:10.832Z",
+      "type": "chat_user",
+      "content": "User rejected the replacement insertion-edge mechanic and the lane-shaped Unsorted target. Restore the original moving gap/drop preview with a smoother non-stacking animation, and make the top ungroup target visually identical to the existing full-width New Group drop zone with the requested copy."
+    },
+    {
+      "timestamp": "2026-08-20T18:02:10.832Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:13:25.515Z",
+      "type": "chat_user",
+      "content": "Corrected both rejected redesigns. The top ungroup target is now a separate full-width drop zone using the exact same `.tab-drop-zone` structure/styles/dimensions as New Group, with copy “Drop a tab here to remove from all groups”; it overlays at the workspace top without shifting the native drag source, and its drop path moves cross-window tabs when needed, ungroups, and clears Meridian assignment. Restored the original full-card dashed gap preview and shifting cards for same-group reorders. Replaced the glitch-prone stacked CSS-transition FLIP with cancel-and-retarget Web Animations: each affected card has at most one animation and reversals continue from the current visual position. Real Chromium verified identical 1625×62 top/bottom drop-zone geometry and styling, successful ungroup (groupId -1), a real reordered Chrome tab strip, one gap only, and max one animation per card through 30 rapid direction changes. Full suite 171/171 passes; all runtime trees mirrored and scoped diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T18:13:25.515Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:13:25.662Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:14:59.358Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:14:59.517Z",
+      "type": "chat_user",
+      "content": "The top drop zone is visibly wrong: it is absolutely overlaid across the Unsorted/group header and cards instead of occupying its own row above the stack. Correcting it to the same in-flow full-width row as New Group; defer its reveal until after native dragstart so inserting the row does not cancel the drag."
+    },
+    {
+      "timestamp": "2026-08-20T18:14:59.517Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-edbee11803ba6bf24830c3ad80e079dd-3226967f",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-edbee11803ba6bf24830c3ad80e079dd-3226967f called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:15:15.394Z",
+      "type": "moved",
+      "content": "Stopped by user — agent process tree killed; task returned to Ready"
+    },
+    {
+      "timestamp": "2026-08-20T18:21:25.316Z",
+      "type": "chat_user",
+      "content": "Fixed directly in chat, without dispatch/delegation. The ungroup target is now an actual in-flow row above the workspace (not an overlay); its reveal is deferred one frame after native dragstart, and real CDP mouse input confirmed the drag remains active while the target occupies a separate 62px row above the workspace. It only appears when Unsorted is empty/absent; with a visible Unsorted lane, the extra target stays hidden and the workspace remains at the top. Reworked same-group preview so the dragged source leaves grid flow after dragstart, one placeholder continuously occupies exactly one card slot, and it advances at most one slot every 140ms toward the pointer. Real browser timing check recorded indices 0→1→2 rather than jumping, with one placeholder and no stacked animations. Chromium also confirmed ungrouping to groupId -1. Full suite 171/171 passes; runtime trees mirrored and scoped diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T18:21:25.316Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:21:25.470Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:24:37.535Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:24:37.686Z",
+      "type": "chat_user",
+      "content": "Image-6 shows the remaining reorder bug: the dashed gap is being appended after the +/new-tab card, outside the sequence of actual tabs. Fixing it directly so the terminal tab slot is before the + card. Also applying the same per-pixel inverse text treatment as lane titles to both drop-zone labels, without blending/inverting their borders or backgrounds."
+    },
+    {
+      "timestamp": "2026-08-20T18:24:37.686Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:25:57.139Z",
+      "type": "chat_user",
+      "content": "Fixed image-6 issues directly. Both full-width drop-zone texts now use dedicated label spans with the same `color:#fff; mix-blend-mode:difference` treatment as lane titles, so only the text inverses against the wallpaper while borders/backgrounds retain their intended styling. The tab reorder terminal slot now resolves to the first non-tab/new-tab card and inserts before it, never after the + control. Real Chromium verification: placeholder left 666.625, + card left 863.5, placeholder.nextElementSibling is `.new-tab-card`; visible Unsorted correctly kept the extra top target hidden; computed drop-label style is white/difference. Visual screenshot confirmed the gap sits immediately after the last real tab and before +. Full suite 171/171 passes; parity and scoped diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T18:25:57.139Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:25:57.293Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:54:10.145Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T18:54:10.298Z",
+      "type": "chat_user",
+      "content": "Root cause of reported flakiness: placeholder motion is driven by narrow card-level dragover targets plus a 140ms chase timer. When the moving placeholder or a gap/+ control comes under the pointer, target updates stop and the timer continues toward stale coordinates. Replacing it directly with a grid-wide hit area and coordinate-derived insertion slot, with immediate retargeting and no chase timer."
+    },
+    {
+      "timestamp": "2026-08-20T18:54:10.298Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:58:59.847Z",
+      "type": "chat_user",
+      "content": "Fixed the reorder flakiness directly. Removed the 140ms placeholder chase timer and all per-card dragover handlers. The entire `.tab-grid` is now the hit area, including card gaps, the placeholder, empty row space, and the + control. Every dragover derives the insertion slot immediately from pointer X/Y, choosing the nearest row and the midpoint-defined slot. Hit testing uses stable layout offsets (`offsetLeft/offsetTop` normalized to the grid), not animated `getBoundingClientRect()` values, so FLIP transforms cannot move the target under a stationary mouse. Chromium coordinate verification across every card: left/right quarters mapped deterministically to indices 0,1,1,2,2,3,3,4; 25 repeated events at the stationary placeholder center remained at index 4. Rapid jumps 0→4→2→4 retargeted immediately with no timer. Full suite 171/171 passes; source/package parity and scoped diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T18:58:59.847Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T18:59:00.015Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T19:06:18.353Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    },
+    {
+      "timestamp": "2026-08-20T19:08:58.192Z",
+      "type": "chat_user",
+      "content": "Applied both follow-up fixes directly. Cross-window tab transfers now listen for chrome.tabs.onDetached and onAttached (Chrome does not emit onMoved for window changes), so both the original and destination Meridian pages schedule a rerender after a move. Opening any local search result now clears the retained query: Open Tabs/Bookmarks/History rows in Anything search clear on activation, and scoped Bookmarks/History results clear through openBookmark. Mirrored in meridian-extension. Added regressions for both listener registration and query clearing; full suite passes 173/173, packaged parity and diff checks pass."
+    },
+    {
+      "timestamp": "2026-08-20T19:08:58.192Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_comment",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_comment"
+    },
+    {
+      "timestamp": "2026-08-20T19:08:58.341Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "chat",
+        "run_id": "chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2",
+        "task_id": null
+      },
+      "task_id": "drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353",
+      "content": "chat chat-334f7c5e3a8b10cdb06f379b87f7cde0-b048a3e2 called mcp__tasker__task_move"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-20T16:28:01.616Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-b799f219b88e4bb7e075",
+  "agent_startup_started_at": "2026-08-20T16:28:01.816Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353.md",
+      "direction": "self",
+      "at": "2026-08-20T16:39:21.700Z"
+    }
+  ]
+}

@@ -2,14 +2,14 @@
   "id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
   "title": "Fix swatch/border animation desync on preset swatch hover",
   "description": "On preset color/gradient and photo swatches in the Background settings panel, hovering/selecting causes the swatch's own hover transition and its border/outline to animate on different timing — they visibly don't move together. The custom/uploaded photo slot already animates swatch + border together correctly — use it as the reference implementation.\n\nCompare the custom-photo hover/selected-border transition (correct) against the preset swatch (`.settings-bg-preset`) hover/selected-border transition and align their transition duration/easing/property so both animate as one cohesive state change, matching the custom slot's behavior.\n\nRelevant files: components/SettingsPanel.js (swatch/overlay markup), meridian.css (preset/custom swatch + border transition rules, near the hover-remove overlay block ~line 2003-2037), mirrored in meridian-extension/. Verify visually that the fix doesn't regress the already-correct custom-photo hover.\n\nNote: do NOT change the hover overlay darkening color/color-mix — that's out of scope for this task.",
-  "status": "in_review",
+  "status": "done",
   "priority": "medium",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:38:29.682Z",
-  "updated_at": "2026-08-19T19:36:00.165Z",
+  "updated_at": "2026-08-20T16:25:18.517Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:38:29.682Z",
@@ -133,6 +133,18 @@
       "content": "Implemented the preset swatch geometry fix.\n\n- Removed the redundant full-size child swatch from preset tiles. The preset wrapper now directly owns the background/image, clipping, hover transform, transition, and selected ring—the same single-box structure used by the custom-photo tile.\n- Preserved mouse and keyboard activation, and stopped the selected remove control from bubbling into preset selection.\n- Mirrored the implementation and CSS in `meridian-extension/`.\n- Left the hover overlay darkening color unchanged.\n- Expanded regression coverage to pin the single-box DOM structure, keyboard behavior, remove-event isolation, and shared transition contract.\n\nVerification:\n\n- `node --test tests/*.test.mjs` — 145/145 passing.\n- Source/package component and stylesheet parity checks pass.\n- `git diff --check` passes.\n- Headed Chromium computed-style check: custom and preset both reach `scale(1.05)` from the same centered transform origin, use `box-shadow, transform` at `0.15s` / `ease`, and render one 2 px selection ring on the transformed visual element.\n\nFresh hover comparison (custom photo reference left; fixed preset color right):\n\n![Custom photo and fixed preset color hover comparison](/tmp/swatch-hover-comparison.png)",
       "attachment": "active/fix-muddy-hover-overlay-color-and-swatch-border-ee31/fix-swatch-border-animation-desync-on-preset-swatc-2.md",
       "agent_run_id": "agent-fix-muddy-hover-overlay-color-and-swatch-border-ee31-07a7da7dd4c7"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:18.517Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-muddy-hover-overlay-color-and-swatch-border-ee31",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

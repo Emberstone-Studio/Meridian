@@ -2,7 +2,7 @@
   "id": "replace-source-pattern-settings-tests-with-behav-30d4",
   "title": "Replace source-pattern settings tests with behavioral multi-window regressions",
   "description": "tests/settingsWindowSync.test.mjs and tests/tabWindowScope.test.mjs primarily assert source-code text patterns. They can pass while runtime event ordering, cached state, or DOM updates remain broken, as seen in recent browser-only regressions.\n\nAdd behavior-level tests using a fake chrome.storage.onChanged emitter and realistic DOM/control stubs, or a focused browser harness where needed. Verify: settings changed in one context update controls and appearance in another; all-windows/current-window changes alter the actual chrome.tabs.query arguments and rerender; custom-image upload/delete invalidation updates open windows; and background/theme updates handle asynchronous ordering without stale UI. Keep only minimal source-shape assertions where they protect package parity.\n\nThe task is complete when the tests fail against the pre-fix behavior, pass against the corrected implementation, and the complete suite remains green.",
-  "status": "in_review",
+  "status": "done",
   "priority": "medium",
   "label": "Maintenance",
   "agent_id": "coder",
@@ -14,7 +14,7 @@
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T19:56:44.198Z",
-  "updated_at": "2026-08-19T20:27:02.476Z",
+  "updated_at": "2026-08-20T16:25:25.497Z",
   "activity": [
     {
       "timestamp": "2026-08-19T19:56:44.198Z",
@@ -44,6 +44,18 @@
       "content": "Replaced the source-pattern settings suites with behavior-level regressions driven by a shared fake chrome.storage.onChanged emitter. The tests now execute the production storage callbacks, appearance loader, render scheduler, and workspace render function against control/container stubs. Coverage verifies cross-window control and appearance sync, real all-windows/current-window chrome.tabs.query arguments plus rerenders, custom-image upload/delete invalidation in open settings and Meridian windows, and latest-wins theme/background async ordering.\n\nValidation:\n- Focused corrected-runtime tests: 4/4 pass\n- Same tests on pre-fix parent beb506b: 4/4 fail for the expected missing behaviors\n- Complete suite: 155/155 pass\n- Runtime JavaScript syntax checks: pass\n- Manifest parsing: pass\n- Packaged runtime parity: pass via the complete suite\n- git diff --check: pass",
       "attachment": "active/replace-source-pattern-settings-tests-with-behav-30d4/replace-source-pattern-settings-tests-with-behavio.md",
       "agent_run_id": "agent-replace-source-pattern-settings-tests-with-behav-30d4-4b27afa0b5a8"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:25.497Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "replace-source-pattern-settings-tests-with-behav-30d4",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

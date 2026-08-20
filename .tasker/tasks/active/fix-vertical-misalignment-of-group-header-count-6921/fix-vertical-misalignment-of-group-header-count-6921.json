@@ -2,14 +2,14 @@
   "id": "fix-vertical-misalignment-of-group-header-count-6921",
   "title": "Fix vertical misalignment of group header count badge (lane-tab-count)",
   "description": "In the sidebar group header row (chevron, colored dot, group name, tab-count badge — e.g. \"EMBERSTONE  10\"), the count number is visibly misaligned vs. the group title's baseline. See attached screenshot.\n\nRoot cause: components/WorkspaceLane.js renders the header as a `.lane-header` flex row (meridian.css line ~460) using `align-items: center`, which centers children by box height, not text baseline. `.lane-title` (13px, `padding: 2px 4px`) and `.lane-tab-count` (11px, no padding) end up with different box heights, so their glyphs land at different optical heights. There's already a hardcoded `transform: translateY(1px)` on `.lane-tab-count` (meridian.css ~line 702) — and a similar translateY hack on `.lane-collapse-btn` (~line 554) — attempting to compensate, but it's an imprecise nudge rather than a real fix, hence the visible offset.\n\nFix: replace the box-centering + magic-number-nudge approach with real baseline alignment — either:\n- switch `.lane-header` to `align-items: baseline` and remove the translateY hacks on `.lane-collapse-btn` and `.lane-tab-count`, or\n- give `.lane-tab-count` matching vertical padding to `.lane-title` so box heights match before centering, then drop/adjust the translateY nudges.\n\nVerify visually that chevron, dot, title, and count badge all sit on a consistent visual baseline after the fix. Apply to meridian.css (and mirror to meridian-extension/ if that CSS is duplicated there like the other recent background-panel changes).",
-  "status": "in_review",
+  "status": "done",
   "priority": "medium",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:36:10.613Z",
-  "updated_at": "2026-08-19T18:38:57.853Z",
+  "updated_at": "2026-08-20T16:25:17.887Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:36:10.613Z",
@@ -51,6 +51,18 @@
       "content": "Fixed the group-header count alignment in both shipped CSS copies.\n\n- Changed `.lane-header` from box centering to baseline alignment.\n- Removed the compensating `translateY(1px)` rules from `.lane-collapse-btn` and `.lane-tab-count`.\n- Mirrored the change in `meridian-extension/meridian.css`.\n\nVerification: rendered the real CSS in headless Chrome and visually confirmed the chevron, group dot, title, and count share the intended header alignment; `git diff --check` passes; both CSS copies remain byte-identical.",
       "attachment": "active/fix-vertical-misalignment-of-group-header-count-6921/fix-vertical-misalignment-of-group-header-count-ba.md",
       "agent_run_id": "agent-fix-vertical-misalignment-of-group-header-count-6921-8ec99a1e5649"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:17.887Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "fix-vertical-misalignment-of-group-header-count-6921",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

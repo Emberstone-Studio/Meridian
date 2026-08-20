@@ -2,14 +2,14 @@
   "id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
   "title": "Add \"show tabs from all windows / current window only\" setting under Tab Organization",
   "description": "Add a new toggle under the existing \"Tab Organization\" group in Settings → Tabs (components/SettingsPanel.js, mirrored in meridian-extension/components/SettingsPanel.js), letting the user choose whether the workspace grid shows tabs from all windows or just the current window.\n\nCurrent state (from investigation):\n- `tabsSection` (SettingsPanel.js:224) contains three groups: New Tab Behavior, **Tab Organization** (lines 400-429, currently just the \"Group unsorted tabs by domain\" checkbox, state var `groupByDomain`), and Thumbnails.\n- The main workspace grid is populated in `meridian.js` `render()` (~line 397-409) via `chrome.tabs.query({})` at line 409 — this queries ALL windows, no filter. This is the query that needs to become conditional on the new setting.\n- No existing per-window/all-windows concept exists in the settings schema today. For contrast, `components/sidebar.js:62` already scopes its own tab list to `{ currentWindow: true }`, so that's a precedent for the query shape to use.\n\nImplementation:\n1. Add a new checkbox/toggle to the \"Tab Organization\" group (pattern-match the existing \"Group unsorted tabs by domain\" toggle at SettingsPanel.js:400-429) — e.g. \"Show tabs from all windows\" (default: on/all windows, to preserve current behavior) or \"Show only current window's tabs\" — pick whichever phrasing matches the existing toggle style.\n2. Add a new state var + default (pattern-match `groupByDomain`, SettingsPanel.js:198), persist via `chrome.storage.sync.set(...)`, and add the key to the load list at SettingsPanel.js:1157-1166. Dispatch the existing `settings-changed` custom event pattern so it propagates like `groupByDomain` does.\n3. In `meridian.js` `render()` (~line 401-409), read the new setting from `chrome.storage.sync` (same place `groupByDomain` is already read at line 401) and pass `{ currentWindow: true }` vs `{}` to `chrome.tabs.query` accordingly.\n4. Check whether other `chrome.tabs.query({})` call sites that feed the same grid/search UX (e.g. `utils/browserSearch.js`, `utils/thumbnailCache.js`) should also respect this setting for consistency, or should intentionally stay all-windows (e.g. thumbnail caching) — use judgment, but at minimum the main grid query must respect it.\n5. Mirror all changes into `meridian-extension/` (components/SettingsPanel.js, meridian.js) per the project's existing source/extension parity pattern.\n6. Default to preserving current behavior (all windows) so this is additive, not a behavior change, unless product intent is otherwise — flag if unsure.\n\nNote: this touches SettingsPanel.js, which other background-panel tasks have recently modified — check current work-tree state / any in-progress tasks on that file before starting to avoid conflicts.",
-  "status": "in_review",
+  "status": "done",
   "priority": "medium",
   "label": "Feature",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:41:30.145Z",
-  "updated_at": "2026-08-19T18:49:02.333Z",
+  "updated_at": "2026-08-20T16:25:18.959Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:41:30.145Z",
@@ -51,6 +51,18 @@
       "content": "Implemented the new **Show tabs from all windows** setting under Tab Organization.\n\n- Defaults to enabled, preserving the existing all-window grid behavior.\n- Persists through `chrome.storage.sync` and dispatches `settings-changed` so the workspace rerenders immediately.\n- Uses `{ currentWindow: true }` for the main grid tab query when disabled.\n- Mirrored the SettingsPanel and Meridian changes into `meridian-extension/`.\n- Left browser-search indexing and thumbnail caching global because they are shared background data stores rather than visible-grid selectors.\n- Added `tests/tabWindowScope.test.mjs` regression coverage.\n\nValidation: `node --test tests/*.test.mjs` — 139 passed; packaged parity and `git diff --check` also passed.",
       "attachment": "active/add-show-tabs-from-all-windows-current-window-on-2ee6/add-show-tabs-from-all-windows-current-window-only.md",
       "agent_run_id": "agent-add-show-tabs-from-all-windows-current-window-on-2ee6-67abc14b4b4e"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:18.959Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "add-show-tabs-from-all-windows-current-window-on-2ee6",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

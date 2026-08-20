@@ -1,8 +1,11 @@
 import { createSearchBar } from "./components/SearchBar.js";
 import {
   createWorkspaceLane,
+  finishLaneDrag,
   finishTabDrag,
   isTabDragActive,
+  isWorkspaceDragActive,
+  setupLaneReordering,
 } from "./components/WorkspaceLane.js";
 import { search } from "./utils/browserSearch.js";
 import {
@@ -31,7 +34,9 @@ import {
   getWorkspaceData,
   createWorkspace,
   assignTab,
+  unassignTab,
 } from "./utils/workspaceManager.js";
+import { mutateStorageValue } from "./utils/storageMutationQueue.js";
 import {
   show as showContextMenu,
   isOpen as isContextMenuOpen,
@@ -342,6 +347,7 @@ function openSettingsFromSearch() {
 }
 
 async function openBookmark(url) {
+  searchBarApi?.clearSearch?.();
   await openUrlFromMeridian(url);
 }
 
@@ -352,19 +358,20 @@ function colorLabel(color) {
 let renderTimer = null;
 let renderRunning = false;
 let renderDeferredByDrag = false;
+let currentMeridianWindowId = null;
 
 function scheduleRender() {
   // Replacing the lane DOM during a native drag removes the source element,
   // which prevents `dragend` from firing and leaves Meridian stuck in its drag
   // state. Hold browser/storage-driven renders until the gesture is finished.
-  if (isTabDragActive()) {
+  if (isWorkspaceDragActive()) {
     renderDeferredByDrag = true;
     return;
   }
 
   clearTimeout(renderTimer);
   renderTimer = setTimeout(async () => {
-    if (isTabDragActive()) {
+    if (isWorkspaceDragActive()) {
       renderDeferredByDrag = true;
       return;
     }
@@ -395,6 +402,115 @@ function sortByTabOrder(tabs, order) {
   );
 }
 
+function sortLaneIds(laneIds, savedOrder) {
+  if (!savedOrder?.length) return laneIds;
+  const positions = new Map(savedOrder.map((id, index) => [id, index]));
+  return laneIds
+    .map((id, index) => ({ id, index }))
+    .sort(
+      (a, b) =>
+        (positions.get(a.id) ?? Infinity) -
+          (positions.get(b.id) ?? Infinity) ||
+        a.index - b.index,
+    )
+    .map(({ id }) => id);
+}
+
+function mergeLaneOrder(savedOrder, visibleOrder) {
+  const visible = new Set(visibleOrder);
+  let visibleIndex = 0;
+  const merged = (savedOrder ?? []).map((id) =>
+    visible.has(id) ? visibleOrder[visibleIndex++] : id,
+  );
+  while (visibleIndex < visibleOrder.length) {
+    merged.push(visibleOrder[visibleIndex++]);
+  }
+  return [...new Set(merged)];
+}
+
+function persistLaneOrder(visibleOrder) {
+  return mutateStorageValue("laneOrder", [], (savedOrder) =>
+    mergeLaneOrder(savedOrder, visibleOrder),
+  );
+}
+
+async function moveLaneToCurrentWindow(payload) {
+  if (!payload?.tabIds?.length || currentMeridianWindowId == null)
+    return payload?.laneId ?? null;
+
+  const movedTabIds = [];
+  for (const tabId of payload.tabIds) {
+    try {
+      const tab = await chrome.tabs.get(tabId);
+      if (tab.windowId !== currentMeridianWindowId) {
+        await chrome.tabs.move(tabId, {
+          windowId: currentMeridianWindowId,
+          index: -1,
+        });
+      }
+      movedTabIds.push(tabId);
+    } catch (error) {
+      console.warn("[Meridian] Could not move dragged group tab:", error);
+    }
+  }
+
+  if (!movedTabIds.length || !payload.chromeGroup || !hasNativeGroups)
+    return payload.laneId;
+
+  const tabs = await Promise.all(
+    movedTabIds.map((tabId) => chrome.tabs.get(tabId).catch(() => null)),
+  );
+  const existingGroupId = tabs[0]?.groupId;
+  if (
+    existingGroupId != null &&
+    existingGroupId !== -1 &&
+    tabs.every((tab) => tab?.groupId === existingGroupId)
+  ) {
+    return `cg_${existingGroupId}`;
+  }
+
+  const groups = await chrome.tabGroups.query({
+    windowId: currentMeridianWindowId,
+  });
+  const matchingGroup = groups.find(
+    (group) =>
+      (group.title ?? "").trim() ===
+        (payload.chromeGroup.title ?? "").trim() &&
+      group.color === payload.chromeGroup.color,
+  );
+  if (matchingGroup) {
+    await chrome.tabs.group({ tabIds: movedTabIds, groupId: matchingGroup.id });
+    return `cg_${matchingGroup.id}`;
+  }
+
+  const groupId = await chrome.tabs.group({ tabIds: movedTabIds });
+  await chrome.tabGroups.update(groupId, {
+    title: payload.chromeGroup.title ?? "",
+    color: payload.chromeGroup.color,
+  });
+  return `cg_${groupId}`;
+}
+
+async function handleLaneReorder(visibleOrder, externalPayload) {
+  await persistLaneOrder(visibleOrder);
+  if (!externalPayload) return;
+
+  const movedLaneId = await moveLaneToCurrentWindow(externalPayload);
+  if (!movedLaneId || movedLaneId === externalPayload.laneId) return;
+  await mutateStorageValue("laneOrder", [], (savedOrder) =>
+    savedOrder.map((id) => (id === externalPayload.laneId ? movedLaneId : id)),
+  );
+}
+
+function applyLaneOrder(container, savedOrder) {
+  const lanes = [
+    ...container.querySelectorAll(":scope > .workspace-lane"),
+  ];
+  const byId = new Map(lanes.map((lane) => [lane.dataset.workspaceId, lane]));
+  const orderedIds = sortLaneIds([...byId.keys()], savedOrder);
+  for (const id of orderedIds) container.appendChild(byId.get(id));
+}
+
 async function render() {
   const container = document.getElementById("workspace-container");
   container.innerHTML = "";
@@ -418,10 +534,12 @@ async function render() {
       getAllThumbnails(),
       chrome.tabs.getCurrent(),
       getWorkspaceData(),
-      chrome.storage.local.get(["collapsedLanes", "tabOrder"]),
+      chrome.storage.local.get(["collapsedLanes", "tabOrder", "laneOrder"]),
     ]);
   const collapsedLanes = localStore.collapsedLanes ?? {};
   const tabOrder = localStore.tabOrder ?? {};
+  const laneOrder = localStore.laneOrder ?? [];
+  currentMeridianWindowId = currentTab?.windowId ?? null;
 
   const meridianUrl = chrome.runtime.getURL("meridian.html");
   const visibleTabs = allTabs.filter(
@@ -472,12 +590,15 @@ async function render() {
         sorted,
         thumbnails,
         handleTabClosed,
-        { collapsed: collapsedLanes[workspace.id] ?? false },
+        {
+          destinationWindowId: currentMeridianWindowId,
+          collapsed: collapsedLanes[workspace.id] ?? false,
+        },
       );
       lane.addEventListener("workspace-reassigned", scheduleRender);
       container.appendChild(lane);
     }
-  } else if (trulyUnsorted.length > 0) {
+  } else {
     const workspace = { id: "unsorted", name: "Unsorted" };
     const sorted = sortByTabOrder(trulyUnsorted, tabOrder["unsorted"]);
     const lane = createWorkspaceLane(
@@ -485,8 +606,13 @@ async function render() {
       sorted,
       thumbnails,
       handleTabClosed,
-      { collapsed: collapsedLanes[workspace.id] ?? false },
+      {
+        destinationWindowId: currentMeridianWindowId,
+        collapsed: collapsedLanes[workspace.id] ?? false,
+      },
     );
+    if (trulyUnsorted.length === 0)
+      lane.classList.add("workspace-lane--empty-unsorted");
     lane.addEventListener("workspace-reassigned", scheduleRender);
     container.appendChild(lane);
   }
@@ -503,6 +629,7 @@ async function render() {
       handleTabClosed,
       {
         meridianWorkspace: ws,
+        destinationWindowId: currentMeridianWindowId,
         collapsed: collapsedLanes[ws.id] ?? false,
         autoRename,
       },
@@ -525,6 +652,7 @@ async function render() {
       handleTabClosed,
       {
         chromeGroup: group,
+        destinationWindowId: currentMeridianWindowId,
         collapsed: collapsedLanes[workspace.id] ?? false,
         autoRename,
       },
@@ -532,6 +660,8 @@ async function render() {
     lane.addEventListener("workspace-reassigned", scheduleRender);
     container.appendChild(lane);
   }
+
+  applyLaneOrder(container, laneOrder);
 }
 
 function clearBrowserSearch() {
@@ -590,6 +720,7 @@ function buildResultRow(item) {
     } else {
       openUrlFromMeridian(item.url);
     }
+    searchBarApi?.clearSearch?.();
   });
 
   row.addEventListener("keydown", (e) => {
@@ -930,30 +1061,101 @@ async function init() {
     scheduleRender();
   });
 
-  const dropZone = document.getElementById("new-group-drop-zone");
-  document.addEventListener("dragstart", () =>
-    dropZone.classList.remove("hidden"),
-  );
+  const newGroupDropZone = document.getElementById("new-group-drop-zone");
+  const ungroupDropZone = document.getElementById("ungroup-drop-zone");
+  const workspaceContainer = document.getElementById("workspace-container");
+  let externalTabDragTimer = null;
+  let ungroupRevealFrame = null;
+  const showTabDropZones = (temporary = false, deferUngroup = false) => {
+    document.body.classList.add("tab-drag-active");
+    newGroupDropZone.classList.remove("hidden");
+    cancelAnimationFrame(ungroupRevealFrame);
+    const visibleUnsorted = [
+      ...workspaceContainer.querySelectorAll('[data-workspace-id="unsorted"]'),
+    ].some((lane) => !lane.classList.contains("workspace-lane--empty-unsorted"));
+    if (visibleUnsorted) {
+      ungroupDropZone.classList.add("hidden");
+    } else if (deferUngroup) {
+      // Revealing an in-flow row inside dragstart moves the source before the
+      // browser has established its native drag. Wait one frame so the row can
+      // take its proper place above the stack without cancelling the gesture.
+      ungroupRevealFrame = requestAnimationFrame(() => {
+        ungroupRevealFrame = null;
+        ungroupDropZone.classList.remove("hidden");
+      });
+    } else {
+      ungroupDropZone.classList.remove("hidden");
+    }
+    clearTimeout(externalTabDragTimer);
+    if (temporary) {
+      externalTabDragTimer = setTimeout(hideTabDropZones, 750);
+    }
+  };
+  function hideTabDropZones() {
+    cancelAnimationFrame(ungroupRevealFrame);
+    ungroupRevealFrame = null;
+    clearTimeout(externalTabDragTimer);
+    externalTabDragTimer = null;
+    document.body.classList.remove("tab-drag-active");
+    for (const zone of [newGroupDropZone, ungroupDropZone]) {
+      zone.classList.add("hidden");
+      zone.classList.remove("drag-over");
+    }
+  }
+  setupLaneReordering(workspaceContainer, handleLaneReorder);
+  document.addEventListener("dragstart", () => {
+    if (isTabDragActive()) showTabDropZones(false, true);
+  });
+  document.addEventListener("dragover", (e) => {
+    if (
+      !isTabDragActive() &&
+      [...(e.dataTransfer?.types ?? [])].includes("text/plain")
+    ) {
+      showTabDropZones(true);
+    }
+  });
+  document.addEventListener("drop", hideTabDropZones);
   document.addEventListener("dragend", () => {
+    finishLaneDrag();
     finishTabDrag();
-    dropZone.classList.add("hidden");
-    dropZone.classList.remove("drag-over");
+    hideTabDropZones();
     flushDeferredDragRender();
   });
-  dropZone.addEventListener("dragover", (e) => {
+  for (const zone of [newGroupDropZone, ungroupDropZone]) {
+    zone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      zone.classList.add("drag-over");
+    });
+    zone.addEventListener("dragleave", (e) => {
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove("drag-over");
+    });
+  }
+  ungroupDropZone.addEventListener("drop", async (e) => {
     e.preventDefault();
-    dropZone.classList.add("drag-over");
-  });
-  dropZone.addEventListener("dragleave", (e) => {
-    if (!dropZone.contains(e.relatedTarget))
-      dropZone.classList.remove("drag-over");
-  });
-  dropZone.addEventListener("drop", async (e) => {
-    e.preventDefault();
-    dropZone.classList.remove("drag-over");
     const tabId = parseInt(e.dataTransfer.getData("text/plain"), 10);
     finishTabDrag();
-    dropZone.classList.add("hidden");
+    hideTabDropZones();
+    flushDeferredDragRender();
+    if (!tabId) return;
+    const tab = await chrome.tabs.get(tabId);
+    if (
+      currentMeridianWindowId != null &&
+      tab.windowId !== currentMeridianWindowId
+    ) {
+      await chrome.tabs.move(tabId, {
+        windowId: currentMeridianWindowId,
+        index: -1,
+      });
+    }
+    if (hasNativeGroups) await chrome.tabs.ungroup([tabId]).catch(() => {});
+    await unassignTab(tabId);
+    scheduleRender();
+  });
+  newGroupDropZone.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    const tabId = parseInt(e.dataTransfer.getData("text/plain"), 10);
+    finishTabDrag();
+    hideTabDropZones();
     flushDeferredDragRender();
     if (!tabId) return;
     const name = prompt("New group name:");
@@ -978,6 +1180,10 @@ async function init() {
   });
 
   chrome.tabs.onMoved.addListener(scheduleRender);
+  // Moving a tab between windows emits onDetached/onAttached, not onMoved.
+  // Listen to both sides so the source and destination workspaces rerender.
+  chrome.tabs.onDetached.addListener(scheduleRender);
+  chrome.tabs.onAttached.addListener(scheduleRender);
 
   if (hasNativeGroups) {
     chrome.tabGroups.onCreated.addListener(scheduleRender);
@@ -1029,7 +1235,8 @@ async function init() {
           k.startsWith("thumb_") ||
           k === "thumbnailCacheRevision" ||
           k === "workspaces" ||
-          k === "tabOrder",
+          k === "tabOrder" ||
+          k === "laneOrder",
       )
     ) {
       scheduleRender();

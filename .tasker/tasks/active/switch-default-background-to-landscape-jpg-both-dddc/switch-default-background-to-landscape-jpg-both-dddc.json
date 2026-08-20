@@ -1,0 +1,85 @@
+{
+  "id": "switch-default-background-to-landscape-jpg-both-dddc",
+  "title": "Switch default background to landscape.jpg (both themes) with brand accent #2ed8b0",
+  "description": "Replace the shipped default wallpaper. Currently light/dark modes each use a different topo image (img/topo-light.webp, img/topo-dark.webp) as --default-bg-image. Switch both themes to the single new img/landscape.jpg asset (already added at /home/russell/Documents/Meridian/img/landscape.jpg, mirroring the mountain/gradient-sky screenshot shared in chat 99df29a9), and keep the accent locked to brand #2ed8b0 in both themes (do not let the wallpaper solver derive/tint the accent from this image — same \"shipped wallpaper is brand-locked\" behavior documented in meridian.css around line 44-76).\n\nScope:\n1. meridian.css (root project) — update --default-bg-image in :root, the prefers-color-scheme: dark block, and html[data-theme=\"dark\"] block to all point at img/landscape.jpg instead of topo-light.webp / topo-dark.webp.\n2. meridian-extension/meridian.css — same change, mirrored.\n3. Copy img/landscape.jpg into meridian-extension/img/ (extension currently only has topo-light.webp/topo-dark.webp; needs the new asset alongside).\n4. Confirm the wallpaper solver (components/SettingsPanel.js / meridian-extension/components/SettingsPanel.js, applyDerivedAccent) still treats this as the \"shipped default\" case that does NOT tint --accent-hue/--accent-sat from the image — accent should stay hardcoded brand hue 166/69% (i.e. #2ed8b0-derived) in both light and dark, per the existing comment block in meridian.css. If the solver identifies \"shipped wallpaper\" by filename/URL rather than a flag, update that detection so it still matches the new landscape.jpg default (do not just skip solving entirely — the flag mechanism should be filename-agnostic if reasonably easy, else update the literal path check).\n5. Leave topo-light.webp/topo-dark.webp/topo.svg files in place (unused default, but may still be referenced elsewhere, e.g. as a selectable preset) — do not delete unless you confirm nothing else references them as an option.\n6. Sanity check the extension's manifest/web_accessible_resources (if any) lists img/*.jpg or a glob that already covers the new file; add landscape.jpg explicitly if the manifest enumerates files rather than globbing.\n\nContext: this default is primarily being tuned for the Chrome Web Store listing screenshot appeal — reference chat 99df29a9 for the visual discussion (light vs dark mode comparison, why dark mode/this background was chosen).",
+  "status": "done",
+  "priority": "medium",
+  "label": "Feature",
+  "agent_id": "coder",
+  "trashed": false,
+  "trashed_at": null,
+  "created_at": "2026-08-20T15:52:16.831Z",
+  "updated_at": "2026-08-20T16:25:26.081Z",
+  "activity": [
+    {
+      "timestamp": "2026-08-20T15:52:16.831Z",
+      "type": "created",
+      "content": "Task created"
+    },
+    {
+      "timestamp": "2026-08-20T15:52:16.831Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_create",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_create"
+    },
+    {
+      "timestamp": "2026-08-20T15:52:18.789Z",
+      "type": "moved",
+      "content": "In progress"
+    },
+    {
+      "timestamp": "2026-08-20T15:52:18.900Z",
+      "type": "actor",
+      "tool": "mcp__tasker__agent_dispatch",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__agent_dispatch"
+    },
+    {
+      "timestamp": "2026-08-20T15:54:47.144Z",
+      "type": "output",
+      "content": "Implemented the landscape wallpaper default in both runtime trees.\n\n- All light, system-dark, and explicit-dark `--default-bg-image` declarations now use `img/landscape.jpg`.\n- Added the byte-identical landscape asset to `meridian-extension/img/landscape.jpg`.\n- Confirmed the brand lock is filename-agnostic: the shipped default is recognized by its semantic theme token and clears derived accent overrides, preserving hue 166 / saturation 69% with theme-specific lightness. Added regression assertions for this behavior.\n- Kept all existing topo assets untouched.\n- Confirmed neither manifest enumerates `web_accessible_resources`, so no manifest change is required for this extension-owned CSS asset.\n- Validation: `node --test tests/*.test.mjs` passed all 156 tests; `git diff --check` and source/package parity checks passed.",
+      "attachment": "active/switch-default-background-to-landscape-jpg-both-dddc/switch-default-background-to-landscape-jpg-both-th.md",
+      "agent_run_id": "agent-switch-default-background-to-landscape-jpg-both-dddc-3a6b4ed55c7b"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:26.081Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "switch-default-background-to-landscape-jpg-both-dddc",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
+    }
+  ],
+  "routing": {
+    "chosen_model": "codex-gpt-5-6-sol",
+    "rationale": "Direct Run Now dispatch to assigned role",
+    "decided_by": "run-now",
+    "decided_at": "2026-08-20T15:52:18.553Z",
+    "auto_router_mode": null
+  },
+  "agent_attempt_id": "attempt-0d507e351888ba20a5ca",
+  "agent_startup_started_at": "2026-08-20T15:52:18.775Z",
+  "role_docs": [
+    {
+      "role_slug": "coder",
+      "doc_path": "roles/coder/memory/tasks/switch-default-background-to-landscape-jpg-both-dddc.md",
+      "direction": "self",
+      "at": "2026-08-20T15:54:47.144Z"
+    }
+  ]
+}

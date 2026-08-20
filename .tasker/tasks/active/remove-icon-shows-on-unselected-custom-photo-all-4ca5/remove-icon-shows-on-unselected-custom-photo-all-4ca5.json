@@ -2,14 +2,14 @@
   "id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
   "title": "Remove-icon (✕) shows on unselected custom photo, allowing accidental deletion instead of reselect",
   "description": "Bug in the Background settings panel hover-to-remove feature. See attached screenshots.\n\nRepro: select the custom/uploaded photo as the background, then switch to a different swatch (e.g. a color preset like \"Amber\"). Now hover over the custom photo tile again (it is no longer the active selection — the Amber swatch has the active border). The custom photo tile still shows the \"✕ Remove custom image\" hover affordance/tooltip, and clicking it deletes the custom image entirely.\n\nExpected UX: the ✕/remove affordance should only appear on whichever swatch is CURRENTLY selected/active. Hovering an unselected swatch (custom photo or any preset) should just offer to select it (normal click-to-select behavior, plain hover highlight) — not offer to remove/delete something that isn't even the active choice. The user should be able to click the custom photo tile again to switch back to it, and only see the ✕ remove option when the custom photo is already the active/selected background.\n\nThis is a real functional bug (risk of accidentally deleting the user's uploaded custom image while trying to reselect it), not just cosmetic — treat as high priority.\n\nRelevant file: components/SettingsPanel.js (Background settings — hover-remove overlay logic, likely a condition that shows the remove button based on tile type alone rather than whether the tile is the *currently selected* background), mirrored in meridian-extension/components/SettingsPanel.js. Also noticed in the screenshot: the custom photo tile's thumbnail preview appears to render as a broken image icon when it's not the active selection — check whether that's related (e.g. thumbnail data being cleared/invalidated when switching away) or a separate pre-existing issue, and fix or flag accordingly.\n\nNote: this touches the same file/area as other in-flight background-panel tasks (animation desync fix, tab-scope setting, search engine reorder) — check current work-tree state before starting to avoid conflicts, and this should take priority given it risks data loss.",
-  "status": "in_review",
+  "status": "done",
   "priority": "high",
   "label": "Bug",
   "agent_id": "coder",
   "trashed": false,
   "trashed_at": null,
   "created_at": "2026-08-19T18:50:24.646Z",
-  "updated_at": "2026-08-19T18:53:28.860Z",
+  "updated_at": "2026-08-20T16:25:20.612Z",
   "activity": [
     {
       "timestamp": "2026-08-19T18:50:24.646Z",
@@ -51,6 +51,18 @@
       "content": "Implemented the active-only custom-image removal behavior in both runtime copies of `SettingsPanel.js`. An inactive custom-photo tile now remains a normal selectable tile and does not render the remove button; the remove affordance is created only when the custom background is selected.\n\nAlso fixed the broken custom thumbnail shown in the attachments: `getCustomBackgroundUrl()` now shares one live blob URL among concurrent consumers instead of revoking an earlier caller’s URL. The URL is revoked when the image is replaced or cleared. Both source and packaged utility copies were updated.\n\nAdded regression coverage for selected-only removal and shared blob-URL lifecycle. Verification: `node --test tests/*.test.mjs` — 141 passed, 0 failed; syntax checks, packaged parity, and `git diff --check` also pass.",
       "attachment": "active/remove-icon-shows-on-unselected-custom-photo-all-4ca5/remove-icon-shows-on-unselected-custom-photo-allow.md",
       "agent_run_id": "agent-remove-icon-shows-on-unselected-custom-photo-all-4ca5-ed5130923f85"
+    },
+    {
+      "timestamp": "2026-08-20T16:25:20.612Z",
+      "type": "actor",
+      "tool": "mcp__tasker__task_move",
+      "actor": {
+        "kind": "controller",
+        "run_id": "chat-f9a8fa090c33096546fc15ec25410a76-1edc168b",
+        "task_id": null
+      },
+      "task_id": "remove-icon-shows-on-unselected-custom-photo-all-4ca5",
+      "content": "controller chat-f9a8fa090c33096546fc15ec25410a76-1edc168b called mcp__tasker__task_move"
     }
   ],
   "routing": {

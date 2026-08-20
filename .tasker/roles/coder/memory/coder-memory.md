@@ -286,3 +286,43 @@
 **Status:** in_review
 **Last updated:** 2026-08-19
 
+### switch-default-background-to-landscape-jpg-both-dddc
+**Title:** Switch default background to landscape.jpg (both themes) with brand accent #2ed8b0
+**Tags:** Feature
+**Summary:** Implemented the landscape wallpaper default in both runtime trees.
+**Key decisions:** 
+**Status:** in_review
+**Last updated:** 2026-08-20
+
+### group-lane-label-text-isn-t-legible-across-gradi-ddd0
+**Title:** Group/lane label text isn't legible across gradient backgrounds (single global luminance sample)
+**Tags:** Bug
+**Summary:** Implemented a local contrast surface for every lane header.
+**Key decisions:** 
+**Status:** in_review
+**Last updated:** 2026-08-20
+
+### revert-lane-header-scrim-bar-use-true-inverse-mi-faa7
+**Title:** Revert lane-header scrim bar; use true inverse (mix-blend-mode) text instead
+**Tags:** Bug
+**Summary:** Implemented the lane-header inverse-text treatment and removed the rejected scrim.
+**Key decisions:** 
+**Status:** in_review
+**Last updated:** 2026-08-20
+
+### drag-and-drop-to-reorder-groups-lanes-in-the-wor-3353
+**Title:** Drag-and-drop to reorder groups (lanes) in the workspace
+**Tags:** Feature
+**Summary:** Implemented lane-level reordering across the workspace.
+**Key decisions:** 
+**Status:** in_review
+**Last updated:** 2026-08-20
+
+### drag-and-drop-tabs-groups-across-browser-windows-c19e
+**Title:** Drag-and-drop tabs/groups across browser windows
+**Tags:** 
+**Summary:** _Not yet summarized._
+**Key decisions:** 
+**Status:** done
+**Last updated:** 2026-08-20
+
